@@ -1,0 +1,4 @@
+tableNo,NextDailogNo,Speaker,ko,en,jp
+int,int,string,string,string,string
+1001,1002,Char_NPC_Name,I heard of a strong fighter living in this town…If I can convince her to join my cause I might be able to prevent the calamity…,Text,Text
+1002,0,Char_NPC_Name,I heard of a strong fighter living in this town…If I can convince her to join my cause I might be able to prevent the calamity…2,Text2,Text2

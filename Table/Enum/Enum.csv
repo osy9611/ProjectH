@@ -1,0 +1,16 @@
+﻿,!Enum,InteractionType,,
+,!Enumerator,NONE,,
+,!Enumerator,Talk,,대화
+,!Enumerator,Shop,!End,상점
+,,,,
+,!Enum,CharType,,
+,!Enumerator,Character,,
+,!Enumerator,Monster,!End,대화
+,,,,
+,!Enum,SceneType,,
+,!Enumerator,Field,,
+,!Enumerator,Battle,!End,대화
+,,,,
+,!Enum,MonsterType,,
+,!Enumerator,Normal,,
+,!Enumerator,Boss,!End,대화

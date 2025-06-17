@@ -1,0 +1,4 @@
+tableNo,DataPath,SceneType,SceneValue
+int,string,SceneType,int
+1,/Game/System/Experience/Default/DA_GameSceneData.DA_GameSceneData,Field,0
+2,/BattleGame/Experiences/DA_BattleSceneData.DA_BattleSceneData,Battle,101

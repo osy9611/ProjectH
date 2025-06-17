@@ -1,0 +1,4 @@
+tableNo,HP,MP,ATK,DEF,Speed
+int,float,float,float,float,float
+101,320,54,200,120,100
+102,310,55,300,200,101

@@ -1,0 +1,4 @@
+tableNo,ATK,DEF,Speed
+int,float,float,float
+101,200,120,100
+102,300,200,101

@@ -1,0 +1,42 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "UObject/NoExportTypes.h"
+#include "BattleStateManager.generated.h"
+
+class UBattleState;
+
+UENUM()
+enum class EBattleState : uint8
+{
+	Ready,
+	Play,
+	Char_Turn,
+	Monster_Turn,
+	Win,
+	Lose,
+	End
+};
+
+UCLASS()
+class PROJECTH_API UBattleStateManager : public UObject
+{
+	GENERATED_BODY()
+public:
+	UBattleStateManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	void OnInit();
+	void OnStart();
+	void RegisterState();	
+
+	void UpdateState(float DeltaTime);
+	void ChageState(EBattleState NextState);
+
+private:
+	EBattleState CurrentState;
+	EBattleState PrevState;
+
+	UPROPERTY()
+	TMap<EBattleState, UBattleState*> States;
+};

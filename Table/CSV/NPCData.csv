@@ -1,0 +1,4 @@
+tableNo,InteractionRadius,InteractionType,InteractionValue
+int,float,InteractionType,int
+1001,30,Talk,1001
+1002,30,Talk,0
