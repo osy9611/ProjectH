@@ -1,0 +1,6 @@
+.uasset filter=lfs diff=lfs merge=lfs -text
+.umap filter=lfs diff=lfs merge=lfs -text
+.udk filter=lfs diff=lfs merge=lfs -text
+.wav filter=lfs diff=lfs merge=lfs -text
+Client/Content/StarterContent/HDRI/*.uasset filter=lfs diff=lfs merge=lfs -text
+Client/Content/Asian_Village/maps/Asian_Village_Demo_BuiltData.uasset filter=lfs diff=lfs merge=lfs -text
