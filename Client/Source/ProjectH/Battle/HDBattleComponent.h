@@ -31,9 +31,13 @@ public:
 	virtual void HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) final;
 	virtual void CheckDefaultInitialization() final;
 
+	void ProcessAbility(FGameplayTag Tag);
+
 	void RegisterBattleData(UHDAttributeSet* AttributeSet);
 
 	UHDAttributeSet* GetAttributeSet() const;
+
+	bool CheckDead();
 
 	FString TableID;
 

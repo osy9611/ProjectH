@@ -3,11 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "HDMessageExtensions.generated.h"
 
 USTRUCT(BlueprintType)
-struct FUpdateCharInfoWidget
+struct FBattleEventSelectActivate
 {
 	GENERATED_BODY()
 
+public:
+	FGameplayTag SelectTag;
 };

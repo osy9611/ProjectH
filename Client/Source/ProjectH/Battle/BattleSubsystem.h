@@ -48,6 +48,8 @@ public:
 	//StateManager
 	void InitState();
 	void ChangeState(EBattleState Type);
+	void HandleAttackExecute();
+	void CheckBattleState();
 
 	//TurnManager
 	void RegisterTurn();
@@ -57,7 +59,10 @@ public:
 	//BattleInput
 	void InitInput();
 
-	TArray<AActor*> GetBattleActors()
+	bool IsWin();
+	bool IsLose();
+
+	TArray<AActor*> GetCharacterActors()
 	{
 		TArray<AActor*> Result;
 		BattleCharDatas.GenerateValueArray(Result);

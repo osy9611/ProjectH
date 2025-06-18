@@ -30,6 +30,25 @@ void UBattleStateManager::OnStart()
 	States[CurrentState]->DoStart();
 }
 
+void UBattleStateManager::OnAttackExecute()
+{
+	if (CurrentState == EBattleState::Monster_Turn || CurrentState == EBattleState::Char_Turn)
+	{
+		States[CurrentState]->DoExecute();
+	}
+}
+
+void UBattleStateManager::CheckBattleState()
+{
+	if (CurrentState == EBattleState::Monster_Turn || CurrentState == EBattleState::Char_Turn)
+	{
+		States[CurrentState]->HandleEndSequence([this]()
+			{
+				ChangeState(EBattleState::Play);
+			});
+	}
+}
+
 void UBattleStateManager::RegisterState()
 {
 	States.Add(EBattleState::Ready, NewObject<UBattleState_Ready>(this));
@@ -49,7 +68,7 @@ void UBattleStateManager::UpdateState(float DeltaTime)
 	}
 }
 
-void UBattleStateManager::ChageState(EBattleState NextState)
+void UBattleStateManager::ChangeState(EBattleState NextState)
 {
 	if (CurrentState != NextState)
 	{

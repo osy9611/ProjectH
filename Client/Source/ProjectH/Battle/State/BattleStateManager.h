@@ -26,13 +26,14 @@ class PROJECTH_API UBattleStateManager : public UObject
 	GENERATED_BODY()
 public:
 	UBattleStateManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	void RegisterState();
 	void OnInit();
 	void OnStart();
-	void RegisterState();	
+	void OnAttackExecute();
+	void CheckBattleState();
 
 	void UpdateState(float DeltaTime);
-	void ChageState(EBattleState NextState);
-
+	void ChangeState(EBattleState NextState);
 private:
 	EBattleState CurrentState;
 	EBattleState PrevState;

@@ -9,6 +9,8 @@
 #include "ProjectH/Data/GenerateTableData.h"
 #include "ProjectH/Battle/BattleSubsystem.h"
 #include "ProjectH/UI/Battle/BattleCharActiveSelect.h"
+#include "ProjectH/Util/HDMessageExtensions.h"
+#include "ProjectH/Util/UtilFunc.h"
 
 UBattleCharActiveWidget::UBattleCharActiveWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -37,6 +39,14 @@ void UBattleCharActiveWidget::OnSelectionChanged(UObject* SelectedItem)
 {
 	Super::OnSelectionChanged(SelectedItem);
 
+	UBattleCharActiveSelect* SelectWidget = Cast<UBattleCharActiveSelect>(SelectedItem);
+	if (!SelectWidget)
+		return;
+
+	const FHDGameplayTags& GameplayTags = FHDGameplayTags::Get();
+	FBattleEventSelectActivate Message;
+	Message.SelectTag = SelectWidget->ActiveTag;
+	UtilFunc::RequestListener(GetWorld(), GameplayTags.Battle_SelectActive, Message);
 }
 
 void UBattleCharActiveWidget::GetToggles()

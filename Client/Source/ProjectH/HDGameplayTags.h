@@ -31,6 +31,9 @@ struct FHDGameplayTags
 	FGameplayTag InputTag_Interaction;
 	FGameplayTag InputTag_ClickTarget;
 
+	//Battle Event Tags
+	FGameplayTag Battle_SelectActive;
+
 	//SkillTags
 	FGameplayTag Battle_Skill1;
 	FGameplayTag Battle_Skill2;

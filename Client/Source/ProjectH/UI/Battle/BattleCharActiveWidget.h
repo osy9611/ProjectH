@@ -28,6 +28,8 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UVerticalBox> ToggleRoot;
 
+	FGameplayTag SelectedActiveTags;
+
 	UPROPERTY()
 	TArray<FGameplayTag> ActiveTags;
 };

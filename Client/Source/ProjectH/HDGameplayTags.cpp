@@ -30,6 +30,8 @@ void FHDGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(InputTag_Interaction, "InputTag.Interaction", "");
 	AddTag(InputTag_ClickTarget, "InputTag.ClickTarget", "");
 
+	//Battle Event Tags
+	AddTag(Battle_SelectActive, "Battle.SelectActive", "");
 	//Skill Tag
 	AddTag(Battle_Skill1, "Battle.Skill1", "");
 	AddTag(Battle_Skill2, "Battle.Skill2", "");

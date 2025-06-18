@@ -77,5 +77,6 @@ FVector UtilFunc_Sprite::GetSpriteSize(AActor* Actor)
 
 	FBoxSphereBounds RenderBounds = Sprite->GetRenderBounds();
 	FVector Extent = RenderBounds.BoxExtent;
+
 	return Extent;
 }

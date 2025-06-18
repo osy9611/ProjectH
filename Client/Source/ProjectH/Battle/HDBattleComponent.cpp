@@ -137,6 +137,22 @@ void UHDBattleComponent::CheckDefaultInitialization()
 	ContinueInitStateChain(StateChain);
 }
 
+void UHDBattleComponent::ProcessAbility(FGameplayTag Tag)
+{
+	APawn* Pawn = GetPawn<APawn>();
+
+	if (!ensure(Pawn))
+		return;
+
+	AHDPlayerState* HDPlayerState = Pawn->GetPlayerState<AHDPlayerState>();
+	if (!HDPlayerState)
+		return;
+
+	UHDAbilitySystemComponent* ASC = HDPlayerState->GetHDAbilitySystemComponent();
+	if (ASC)
+		ASC->ProcessAbility(Tag);
+}
+
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
 void UHDBattleComponent::RegisterBattleData(UHDAttributeSet* AttributeSet)
 {
@@ -167,5 +183,13 @@ UHDAttributeSet* UHDBattleComponent::GetAttributeSet() const
 	}
 
 	return nullptr;
+}
+bool UHDBattleComponent::CheckDead()
+{
+	UHDAttributeSet* AttributeSet = GetAttributeSet();
+	if (!AttributeSet)
+		return false;
+
+	return AttributeSet->GetHP() <= 0;
 }
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

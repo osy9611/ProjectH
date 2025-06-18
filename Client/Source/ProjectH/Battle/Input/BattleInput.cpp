@@ -39,11 +39,4 @@ void UBattleInput::OnInit()
 	InputConfig = Result;
 
 	const FHDGameplayTags& GameplayTags = FHDGameplayTags::Get();
-	InputManager->BindNativeAction(InputConfig, GameplayTags.InputTag_ClickTarget, ETriggerEvent::Started, this, &ThisClass::Input_ClickTarget, true);
 }
-
-void UBattleInput::Input_ClickTarget(const FInputActionValue& InputActionValue)
-{
-	UE_LOG(HDLog, Log, TEXT("[BattleInput] Input_ClickTarget"));
-}
-

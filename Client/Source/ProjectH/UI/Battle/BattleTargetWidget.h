@@ -7,7 +7,7 @@
 #include "BattleTargetWidget.generated.h"
 
 class UImage;
-
+class USizeBox;
 UCLASS()
 class PROJECTH_API UBattleTargetWidget : public UUserWidget
 {
@@ -15,8 +15,17 @@ class PROJECTH_API UBattleTargetWidget : public UUserWidget
 public:
 	UBattleTargetWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+	void SetSizeBox(const FVector& Size);
+
+	UFUNCTION(BlueprintCallable)
+	void OnClick();
+
 public:
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<USizeBox> TargetSizeBox;
+
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> TargetImg;
 
+	TFunction<void()> OnClickCallback;
 };

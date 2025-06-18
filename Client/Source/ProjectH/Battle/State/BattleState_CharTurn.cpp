@@ -3,15 +3,34 @@
 
 #include "BattleState_CharTurn.h"
 #include "Components/WidgetComponent.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
 #include "LevelSequence.h"
 #include "LevelSequencePlayer.h"
 #include "MovieSceneSequencePlaybackSettings.h"
 #include "ProjectH/LogChannels.h"
+#include "ProjectH/HDGameplayTags.h"
+#include "ProjectH/Util/HDMessageExtensions.h"
 #include "ProjectH/Util/UtilFunc.h"
+#include "ProjectH/Util/UtilFunc_UI.h"
 #include "ProjectH/Battle/Turn/TurnManager.h"
 #include "ProjectH/Battle/HDBattleComponent.h"
 #include "ProjectH/Battle/BattleSubsystem.h"
 #include "ProjectH/UI/Battle/BattleWidget.h"
+
+
+void UBattleState_CharTurn::RegisterListener()
+{
+	const FHDGameplayTags& GameplayTags = FHDGameplayTags::Get();
+
+	UtilFunc::RegisterListener(GetWorld(), GameplayTags.Battle_SelectActive, this, &ThisClass::Request_SelectActive);
+}
+
+void UBattleState_CharTurn::Request_SelectActive(FGameplayTag InChannel, const FBattleEventSelectActivate& InMessage)
+{
+	ActiveMonsterTargetWiget();
+	CurrentSelectActive = InMessage.SelectTag;
+}
+
 void UBattleState_CharTurn::Initailize()
 {
 	Super::Initailize();
@@ -34,6 +53,8 @@ void UBattleState_CharTurn::Initailize()
 		UWidgetComponent* MonsterWidgetComp = UtilFunc::GetActorComponent<UWidgetComponent>(Actor, "TargetWidget");
 		MonsterTargetWidgets.Add(MonsterWidgetComp);
 	}
+
+	RegisterListener();
 }
 
 void UBattleState_CharTurn::DoStart()
@@ -52,7 +73,21 @@ void UBattleState_CharTurn::DoStart()
 
 void UBattleState_CharTurn::DoEnd()
 {
+	SequenceEndCallback = nullptr;
 	Super::DoEnd();
+}
+
+void UBattleState_CharTurn::DoExecute()
+{
+	UHDBattleComponent* BattleComp = TurnManager->GetCurrentActor();
+	if (!BattleComp)
+		return;
+
+	if (BattleComp->CharType != ECharType::Character)
+		return;
+
+	BattleComp->ProcessAbility(CurrentSelectActive);
+	BattleWidget->DeActiveBattleCharActiveWidget();
 	DeActiveMonsterTargetWiget();
 }
 
@@ -60,6 +95,33 @@ void UBattleState_CharTurn::Update(float DeltaTime)
 {
 	Super::Update(DeltaTime);
 }
+
+void UBattleState_CharTurn::HandleEndSequence(TFunction<void()> Callback)
+{
+	UHDBattleComponent* BattleComp = TurnManager->GetCurrentActor();
+	if (!BattleComp)
+		return;
+	
+	int32 SlotNo = BattleComp->SlotNo;
+
+	FMovieSceneSequencePlaybackSettings PlaybackSettings;
+	PlaybackSettings.FinishCompletionStateOverride = EMovieSceneCompletionModeOverride::ForceKeepState;
+	ALevelSequenceActor* OutActor = nullptr;
+
+	ULevelSequencePlayer* SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(
+		GetWorld(), Select_Sequences[SlotNo], PlaybackSettings, OutActor);
+
+	if (!SequencePlayer || !OutActor)
+	{
+		return;
+	}
+
+	SequenceEndCallback = Callback;
+
+	SequencePlayer->OnFinished.AddDynamic(this, &ThisClass::FinishEndSelectSequence);
+	SequencePlayer->PlayReverse();
+}
+
 
 void UBattleState_CharTurn::StartSelectSequence(int32 SlotNo)
 {
@@ -75,14 +137,19 @@ void UBattleState_CharTurn::StartSelectSequence(int32 SlotNo)
 		return;
 	}
 
-	SequencePlayer->OnFinished.AddDynamic(this, &ThisClass::EndSelectSequence);
+	SequencePlayer->OnFinished.AddDynamic(this, &ThisClass::FinishStartSelectSequence);
 	SequencePlayer->Play();
 }
 
-void UBattleState_CharTurn::EndSelectSequence()
+void UBattleState_CharTurn::FinishStartSelectSequence()
 {
-	ActiveMonsterTargetWiget();
 	BattleWidget->ActiveBattleCharActiveWidget();
+}
+
+void UBattleState_CharTurn::FinishEndSelectSequence()
+{
+	if (SequenceEndCallback)
+		SequenceEndCallback();
 }
 
 void UBattleState_CharTurn::ActiveMonsterTargetWiget()

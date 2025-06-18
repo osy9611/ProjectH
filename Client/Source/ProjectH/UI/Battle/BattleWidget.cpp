@@ -60,7 +60,7 @@ void UBattleWidget::UpdateCharInfoWidget()
 		return;
 	}
 
-	TArray<AActor*> BattleActors = BattleSubsystem->GetBattleActors();
+	TArray<AActor*> BattleActors = BattleSubsystem->GetCharacterActors();
 	int32 Index = 0;
 	for (const AActor* Actor : BattleActors)
 	{
@@ -95,7 +95,6 @@ void UBattleWidget::UpdateBattleCharActiveWidget(const FCharacterData& Character
 {
 	BattleCharActive->UpdateToggles(CharacterData);
 }
-
 
 void UBattleWidget::ActiveBattleCharActiveWidget()
 {

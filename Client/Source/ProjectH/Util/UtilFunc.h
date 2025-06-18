@@ -3,7 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
 #include "ProjectH/LogChannels.h"
+#include "ProjectH/HDGameplayTags.h"
 #include "ProjectH/System/HDAssetManager.h"
 #include "ProjectH/Data/PlayerData/HDPlayerDataSubsystem.h"
 class UHDAssetManager;
@@ -19,6 +22,12 @@ public:
 
 	template<typename T = UActorComponent>
 	static T* GetActorComponent(AActor* TargetActor, const FName& ComponentName);
+
+	template<class UserClass, typename FuncType>
+	static void RegisterListener(UWorld* World,FGameplayTag Channel, UserClass* Object, FuncType Func);
+
+	template<typename StructType>
+	static void RequestListener(UWorld* World, FGameplayTag Channel, StructType Message);
 };
 
 template<typename T>
@@ -85,4 +94,26 @@ T* UtilFunc::GetActorComponent(AActor* TargetActor, const FName& ComponentName)
 	}
 
 	return nullptr;
+}
+
+template<class UserClass, typename FuncType>
+void UtilFunc::RegisterListener(UWorld* World,FGameplayTag Channel, UserClass* Object, FuncType Func)
+{
+	if (!World)
+		return;
+
+	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(World);
+	const FHDGameplayTags& GameplayTags = FHDGameplayTags::Get();
+
+	MessageSubsystem.RegisterListener(Channel, Object, Func);
+}
+
+template<typename StructType>
+void UtilFunc::RequestListener(UWorld* World, FGameplayTag Channel, StructType Message)
+{
+	if (!World)
+		return;
+
+	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(World);
+	MessageSubsystem.BroadcastMessage(Channel, Message);
 }

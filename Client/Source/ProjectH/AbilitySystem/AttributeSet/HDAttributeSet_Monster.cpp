@@ -22,6 +22,7 @@ void UHDAttributeSet_Monster::OnInit(FString InitTableID)
 	if (!StatusData)
 		return;
 
+	HP = StatusData->HP;
 	Speed = StatusData->Speed;
 }
 
@@ -36,5 +37,6 @@ void UHDAttributeSet_Monster::OnUpdateStatus()
 	if (!StatusData)
 		return;
 
+	HP = StatusData->HP;
 	Speed = StatusData->Speed;
 }

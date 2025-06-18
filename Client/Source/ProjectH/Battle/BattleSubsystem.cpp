@@ -20,6 +20,7 @@
 #include "ProjectH/Battle/Turn/TurnManager.h"
 #include "ProjectH/Battle/Input/BattleInput.h"
 #include "ProjectH/UI/Battle/BattleMonsterInfoWidget.h"
+#include "ProjectH/UI/Battle/BattleTargetWidget.h"
 #include "ProjectH/Character/HDPawnExtensionComponent.h"
 #include "ProjectH/Util/UtilFunc.h"
 #include "ProjectH/Util/UtilFunc_Data.h"
@@ -190,6 +191,15 @@ void UBattleSubsystem::SetBattleMonsters(int32 GroupID)
 			TargetWidgetComp->AddLocalOffset(FVector(0.0f,0.0f, NewLocation.Z));
 			TargetWidgetComp->SetVisibility(false);
 
+			if (UBattleTargetWidget* TargetWidget = Cast<UBattleTargetWidget>(TargetWidgetComp->GetWidget()))
+			{
+				TargetWidget->SetSizeBox(SpriteSize);
+				TargetWidget->OnClickCallback = [this]()
+					{
+						HandleAttackExecute();
+					};
+			}
+
 			//Set Info Widget
 			UWidgetComponent* InfoWidgetComp = UtilFunc::GetActorComponent<UWidgetComponent>(SpawnedPawn, "InfoWidget");
 			UUserWidget* InfoWidget = InfoWidgetComp->GetUserWidgetObject();
@@ -229,7 +239,35 @@ void UBattleSubsystem::ChangeState(EBattleState Type)
 	if (!StateManager)
 		return;
 
-	StateManager->ChageState(Type);
+	StateManager->ChangeState(Type);
+}
+
+void UBattleSubsystem::HandleAttackExecute()
+{
+	if (!StateManager)
+		return;
+
+	StateManager->OnAttackExecute();
+}
+
+void UBattleSubsystem::CheckBattleState()
+{
+	if (!StateManager)
+		return;
+
+	if (IsWin())
+	{
+		StateManager->ChangeState(EBattleState::Win);
+		return;
+	}
+	
+	if (IsLose())
+	{
+		StateManager->ChangeState(EBattleState::Lose);
+		return;
+	}
+
+	StateManager->CheckBattleState();
 }
 
 void UBattleSubsystem::InitState()
@@ -263,6 +301,46 @@ void UBattleSubsystem::InitInput()
 	UBattleInput* NewInput = NewObject<UBattleInput>(this);
 	Input = NewInput;
 	Input->OnInit();
+}
+
+bool UBattleSubsystem::IsWin()
+{
+	TArray<AActor*> MonsterActors = GetMonsterActors();
+
+	bool isWin = true;
+	for (AActor* Actor : MonsterActors)
+	{
+		UHDBattleComponent* BattleComp = UHDBattleComponent::FindBattleComponent(Actor);
+		if (!BattleComp)
+			continue;
+
+		if (!BattleComp->CheckDead())
+		{
+			isWin = false;
+		}
+	}
+
+	return isWin;
+}
+
+bool UBattleSubsystem::IsLose()
+{
+	TArray<AActor*> PlayerActors = GetCharacterActors();
+
+
+	bool isLose = true;
+	for (AActor* Actor : PlayerActors)
+	{
+		UHDBattleComponent* BattleComp = UHDBattleComponent::FindBattleComponent(Actor);
+		if (!BattleComp)
+			continue;
+
+		if (!BattleComp->CheckDead())
+		{
+			isLose = false;
+		}
+	}
+	return isLose;
 }
 
 UHDCharacterData* UBattleSubsystem::GetCharacterData()

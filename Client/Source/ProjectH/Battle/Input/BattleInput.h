@@ -17,7 +17,7 @@ public:
 	UBattleInput(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	void OnInit();
-	void Input_ClickTarget(const FInputActionValue& InputActionValue);
+	//void Input_ClickTarget(const FInputActionValue& InputActionValue);
 
 private:
 	UPROPERTY()
