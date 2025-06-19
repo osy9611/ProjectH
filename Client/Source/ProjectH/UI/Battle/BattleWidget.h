@@ -7,6 +7,7 @@
 #include "BattleWidget.generated.h"
 
 struct FCharacterData;
+struct FSkillData;
 class UVerticalBox;
 class UBattleCharInfoWidget;
 class UBattleTurnWidget;
@@ -31,7 +32,7 @@ public:
 	void UpdateBattleTurnWidget();
 
 	void InitActiveBattleCharActiveWidget();
-	void UpdateBattleCharActiveWidget(const FCharacterData& CharacterData);
+	void UpdateBattleCharActiveWidget(const TArray<FSkillData>& SkillDatas);
 	void ActiveBattleCharActiveWidget();
 	void DeActiveBattleCharActiveWidget();
 public:

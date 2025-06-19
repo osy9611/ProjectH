@@ -11,6 +11,11 @@ UHDAttributeSet_Player::UHDAttributeSet_Player(const FObjectInitializer& ObjectI
 void UHDAttributeSet_Player::OnInit(FString InitTableID)
 {
 	Super::OnInit(InitTableID);
+
+	FCharacterData* TableData = UtilFunc_Data::GetTableData<FCharacterData>(GetWorld(), TableID);
+	if (!TableData)
+		return;
+	SetSkillData(TableData->SkillIDs);
 }
 
 void UHDAttributeSet_Player::OnUpdateStatus()
@@ -24,10 +29,15 @@ void UHDAttributeSet_Player::OnUpdateStatus()
 		return;
 
 	OriginHP = StatusData->HP;
-	OriginMP = StatusData->MP;
+	OriginSP = StatusData->SP;
 
 	HP = StatusData->HP;
-	MP = StatusData->MP;
+	SP = StatusData->SP;
 
+	PATK = StatusData->PATK;
+	PDEF = StatusData->PDEF;
+	EATK = StatusData->EATK;
+	EDEF = StatusData->EDEF;
+	CRI = StatusData->CRI;
 	Speed = StatusData->Speed;
 }

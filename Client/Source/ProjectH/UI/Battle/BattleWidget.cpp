@@ -91,9 +91,9 @@ void UBattleWidget::InitActiveBattleCharActiveWidget()
 	BattleCharActive->SetVisibility(ESlateVisibility::Hidden);
 }
 
-void UBattleWidget::UpdateBattleCharActiveWidget(const FCharacterData& CharacterData)
+void UBattleWidget::UpdateBattleCharActiveWidget(const TArray<FSkillData>& SkillDatas)
 {
-	BattleCharActive->UpdateToggles(CharacterData);
+	BattleCharActive->UpdateToggles(SkillDatas);
 }
 
 void UBattleWidget::ActiveBattleCharActiveWidget()

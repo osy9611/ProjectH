@@ -25,11 +25,8 @@ void UBattleState_Play::DoStart()
 	if (!CurrentActor)
 		return;
 
-	FCharacterData* CharData =CurrentActor->GetAttributeSet()->GetTableData<FCharacterData>();
-
-	if (!CharData)
-		return;
-	BattleWidget->UpdateBattleCharActiveWidget(*CharData);
+	TArray<FSkillData> SkillDatas = CurrentActor->GetAttributeSet()->GetSkillDatas();
+	BattleWidget->UpdateBattleCharActiveWidget(SkillDatas);
 }
 
 void UBattleState_Play::DoEnd()

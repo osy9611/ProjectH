@@ -9,7 +9,7 @@
 #include "BattleCharActiveWidget.generated.h"
 
 class UVerticalBox;
-struct FCharacterData;
+struct FSkillData;
 
 UCLASS()
 class PROJECTH_API UBattleCharActiveWidget : public UToggleGroupDefaultWidget
@@ -23,7 +23,7 @@ public:
 	virtual void OnSelectionChanged(UObject* SelectedItem) override;
 
 	void GetToggles();
-	void UpdateToggles(const FCharacterData& CharacterData);
+	void UpdateToggles(const TArray<FSkillData>& SkillDatas);
 public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UVerticalBox> ToggleRoot;

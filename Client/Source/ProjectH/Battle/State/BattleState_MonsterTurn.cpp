@@ -11,6 +11,9 @@ void UBattleState_MonsterTurn::Initailize()
 void UBattleState_MonsterTurn::DoStart()
 {
 	Super::DoStart();
+
+	//우선 임시로 처리한다(AI가 구현이 아직 안되서)
+	ChangeState(EBattleState::Play);
 }
 
 void UBattleState_MonsterTurn::DoEnd()

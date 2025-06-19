@@ -48,19 +48,19 @@ void UTurnManager::ExecuteNextTurn()
 	CurrentTime = Entry.NextTime;
 	CurrentActor = Entry.BattleComp;
 
-	OnTurnStart.Broadcast(Entry.BattleComp);
-
 	float Speed = GetSpeed(Entry.BattleComp);
 	float BaseTime = Threshold / Speed;
 	Entry.NextTime = CurrentTime + BaseTime;
 
 	Timeline.Add(Entry);
 	OnUpdateTurn();
+
+	OnTurnStart.Broadcast(Entry.BattleComp);
 }
 
 void UTurnManager::OnUpdateTurn()
 {
-	Timeline.Sort([](const FTimelineEntry& A, const FTimelineEntry& B)
+		Timeline.Sort([](const FTimelineEntry& A, const FTimelineEntry& B)
 		{
 			if (A.NextTime < B.NextTime)
 				return true;

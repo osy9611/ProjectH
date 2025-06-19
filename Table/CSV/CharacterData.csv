@@ -1,4 +1,4 @@
-tableNo,CharName,StatusNo,SkillNames,BattleResource,ABP_Path,Filpbook_Path
-int,string,int,TArray<FString>,string,string,string
-10001,Char_Chung_Name,101,"Chung_Skill1,Chung_Skill2,Chung_Skill3,Chung_Skill4",/Game/Blueprints/Characters/Primrose/DA_BattleResource_Primrose.DA_BattleResource_Primrose,/Game/Blueprints/Characters/Primrose/ABP_Primrose_Battle.ABP_Primrose_Battle,/Game/PaperAssets/Characters/Primrose/Primrose_Battle_Idle.Primrose_Battle_Idle
-10002,Char_Ren_Name,102,"Ren_Skill1,Ren_Skill2,Ren_Skill3,Ren_Skill4",/Game/Blueprints/Characters/Sazantos/DA_BattleResource_Sazantos.DA_BattleResource_Sazantos,/Game/Blueprints/Characters/Ren/ABP_Ren.ABP_Ren,/Game/PaperAssets/Characters/Ren/Ren__Idle_D.Ren__Idle_D
+tableNo,CharName,StatusNo,SkillIDs,SkillNames,BattleResource,ABP_Path,Filpbook_Path
+int,string,int,TArray<int32>,TArray<FString>,string,string,string
+10001,Char_Chung_Name,101,"1001, 1002, 1003, 1004","Chung_Skill1,Chung_Skill2,Chung_Skill3,Chung_Skill4",/Game/Blueprints/Characters/Primrose/DA_BattleResource_Primrose.DA_BattleResource_Primrose,/Game/Blueprints/Characters/Primrose/ABP_Primrose_Battle.ABP_Primrose_Battle,/Game/PaperAssets/Characters/Primrose/Primrose_Battle_Idle.Primrose_Battle_Idle
+10002,Char_Ren_Name,102,"2001, 2002, 2003, 2004","Ren_Skill1,Ren_Skill2,Ren_Skill3,Ren_Skill4",/Game/Blueprints/Characters/Sazantos/DA_BattleResource_Sazantos.DA_BattleResource_Sazantos,/Game/Blueprints/Characters/Ren/ABP_Ren.ABP_Ren,/Game/PaperAssets/Characters/Ren/Ren__Idle_D.Ren__Idle_D

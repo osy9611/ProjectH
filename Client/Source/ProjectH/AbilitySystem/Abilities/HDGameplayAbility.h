@@ -28,6 +28,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void PlayFlipBookAnimation(FDynamicOnFlipbookComplete OnComplete);
 
+	UFUNCTION()
+	void OnAnimNotify(FName NotifyName);
+
 public:
 	/*UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "PaperFlipbook")
 	UPaperFlipbook* Flipbook;*/

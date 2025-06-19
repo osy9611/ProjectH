@@ -166,7 +166,7 @@ void UBattleSubsystem::SetBattleMonsters(int32 GroupID)
 	{
 		//Create Attribute 
 		UHDAttributeSet_Monster* AttributeSet = NewObject<UHDAttributeSet_Monster>(this);
-		AttributeSet->TableID = FString::FromInt(MonsterID);
+		AttributeSet->OnInit(FString::FromInt(MonsterID));
 
 		//Find Table Data
 		FMonsterData* MonsterData = AttributeSet->GetTableData<FMonsterData>();

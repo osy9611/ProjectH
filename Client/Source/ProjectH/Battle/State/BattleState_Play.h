@@ -15,5 +15,4 @@ public:
 	virtual void DoStart() override;
 	virtual void DoEnd() override;
 	virtual void Update(float DeltaTime) override;
-
 };

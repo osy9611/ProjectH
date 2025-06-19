@@ -13,17 +13,13 @@ void UHDAttributeSet_Monster::OnInit(FString InitTableID)
 {
 	Super::OnInit(InitTableID);
 
-	FMonsterData* MonsterData = UtilFunc_Data::GetTableData<FMonsterData>(GetWorld(), InitTableID);
+	OnUpdateStatus();
 
+	FMonsterData* MonsterData = UtilFunc_Data::GetTableData<FMonsterData>(GetWorld(), TableID);
 	if (!MonsterData)
 		return;
-
-	FMonsterStatusData* StatusData = UtilFunc_Data::GetTableData<FMonsterStatusData>(GetWorld(), FString::FromInt(MonsterData->StatusNo));
-	if (!StatusData)
-		return;
-
-	HP = StatusData->HP;
-	Speed = StatusData->Speed;
+	
+	SetSkillData(MonsterData->SkillNos);
 }
 
 void UHDAttributeSet_Monster::OnUpdateStatus()
@@ -37,6 +33,12 @@ void UHDAttributeSet_Monster::OnUpdateStatus()
 	if (!StatusData)
 		return;
 
-	HP = StatusData->HP;
+	HP = StatusData->HP; 
+	PATK = StatusData->PATK;
+	PDEF = StatusData->PDEF;
+	EATK = StatusData->EATK;
+	EDEF = StatusData->EDEF;
+	CRI = StatusData->CRI;
 	Speed = StatusData->Speed;
 }
+

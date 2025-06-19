@@ -72,10 +72,11 @@ void UBattleCharActiveWidget::GetToggles()
 	}
 }
 
-void UBattleCharActiveWidget::UpdateToggles(const FCharacterData& CharacterData)
+void UBattleCharActiveWidget::UpdateToggles(const TArray<FSkillData>& SkillDatas)
 {
 	int32 Index = 0;
-	for (const FString& SkillName : CharacterData.SkillNames)
+	
+	for (const FSkillData SkillData : SkillDatas)
 	{
 		UToggleWidget* ToggleWidget = Toggles[Index];
 		if (!ToggleWidget)
@@ -85,7 +86,7 @@ void UBattleCharActiveWidget::UpdateToggles(const FCharacterData& CharacterData)
 		if (!SelectWidget)
 			continue;
 
-		SelectWidget->OnInit(SkillName);
+		SelectWidget->OnInit(SkillData.Name);
 
 		Index++;
 	}

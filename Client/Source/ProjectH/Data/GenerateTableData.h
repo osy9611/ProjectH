@@ -14,6 +14,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 StatusNo;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<int32> SkillIDs;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FString> SkillNames;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString BattleResource;
@@ -30,11 +32,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float HP;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MP;
+	float SP;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float ATK;
+	float PATK;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float DEF;
+	float PDEF;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float EATK;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float EDEF;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CRI;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Speed;
 };
@@ -100,6 +108,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 StatusNo;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<int32> SkillNos;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString ResourcePath;
 };
 USTRUCT(BlueprintType)
@@ -118,9 +128,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float HP;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float ATK;
+	float PATK;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float DEF;
+	float PDEF;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float EATK;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float EDEF;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CRI;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Speed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -149,6 +165,26 @@ public:
 	ESceneType SceneType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 SceneValue;
+};
+USTRUCT(BlueprintType)
+struct FSkillData : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Name;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ESkillTargetType SkillTargetType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EDamageType DamageType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AddDamageRate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool UseCritical;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 HitCount;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CostSP;
 };
 USTRUCT(BlueprintType)
 struct FSkillString : public FTableRowBase

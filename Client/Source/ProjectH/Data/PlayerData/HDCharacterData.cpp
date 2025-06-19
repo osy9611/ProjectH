@@ -22,7 +22,7 @@ UHDAttributeSet_Player* UHDCharacterData::CreateCharacterData(int32 TableID)
 	}
 
 	UHDAttributeSet_Player* NewAttributeSet = NewObject<UHDAttributeSet_Player>(this);
-	NewAttributeSet->TableID = FString::FromInt(TableID);
+	NewAttributeSet->OnInit(FString::FromInt(TableID));
 	CharacterDatas.Add(FString::FromInt(TableID), NewAttributeSet);
 
 	return NewAttributeSet;

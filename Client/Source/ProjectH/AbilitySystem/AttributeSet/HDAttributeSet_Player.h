@@ -13,13 +13,15 @@ class PROJECTH_API UHDAttributeSet_Player : public UHDAttributeSet
 public:
 	UHDAttributeSet_Player(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	void OnInit(FString InitTableID) override;
-	void OnUpdateStatus() override;
+	virtual void OnInit(FString InitTableID) override;
+	virtual void OnUpdateStatus() override;
 
 	float GetOriginHP() { return OriginHP; }
-	float GetOriginMP() { return OriginMP; }
+	float GetOriginSP() { return OriginSP; }
+
+
 
 private:
 	float OriginHP;
-	float OriginMP;
+	float OriginSP;
 };

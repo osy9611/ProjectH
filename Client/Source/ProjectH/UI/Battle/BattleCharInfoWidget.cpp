@@ -57,8 +57,8 @@ void UBattleCharInfoWidget::UpdateMP()
 	if (!Attibute.IsValid())
 		return;
 
-	float OriginMP = Attibute.Get()->GetOriginMP();
-	float CurrentMP = Attibute.Get()->GetMP();
+	float OriginMP = Attibute.Get()->GetOriginSP();
+	float CurrentMP = Attibute.Get()->GetSP();
 
 	FString MPString = FString::Printf(TEXT("%.0f / %.0f"), CurrentMP, OriginMP);
 	MPText->SetText(FText::FromString(MPString));

@@ -1,4 +1,4 @@
-tableNo,HP,MP,ATK,DEF,Speed
-int,float,float,float,float,float
-101,320,54,200,120,100
-102,310,55,300,200,101
+tableNo,HP,SP,PATK,PDEF,EATK,EDEF,CRI,Speed
+int,float,float,float,float,float,float,float,float
+101,320,54,200,120,120,120,10,100
+102,310,55,300,200,200,200,20,101

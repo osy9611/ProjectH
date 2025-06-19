@@ -88,6 +88,8 @@ void UBattleState_CharTurn::DoExecute()
 
 	BattleComp->ProcessAbility(CurrentSelectActive);
 	BattleWidget->DeActiveBattleCharActiveWidget();
+
+
 	DeActiveMonsterTargetWiget();
 }
 
