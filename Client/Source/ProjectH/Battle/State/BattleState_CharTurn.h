@@ -24,10 +24,9 @@ public:
 	virtual void Initailize() override;
 	virtual void DoStart() override;
 	virtual void DoEnd() override;
-	virtual void DoExecute() override;
+	virtual void DoExecute(const FBattleStateParams& Params) override;
 	virtual void Update(float DeltaTime) override;
 	virtual void HandleEndSequence(TFunction<void()>Callback) override;
-
 
 	void StartSelectSequence(int32 SlotNo);
 	UFUNCTION()

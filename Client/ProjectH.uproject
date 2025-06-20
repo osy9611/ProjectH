@@ -19,7 +19,8 @@
 				"UMG",
 				"CommonUI",
 				"AIModule",
-				"CoreUObject"
+				"CoreUObject",
+				"PaperZD"
 			]
 		}
 	],

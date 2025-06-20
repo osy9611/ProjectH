@@ -54,6 +54,22 @@ void UModularAbilitySystemComponent::ProcessAbility(const FGameplayTag& Tag)
 	}
 }
 
+UGameplayAbility* UModularAbilitySystemComponent::GetAbility(const FGameplayTag& Tag)
+{
+	if (Tag.IsValid())
+	{
+		for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
+		{
+			if (AbilitySpec.Ability && !AbilitySpec.IsActive() && (AbilitySpec.DynamicAbilityTags.HasTagExact(Tag)))
+			{
+				return AbilitySpec.Ability;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 void UModularAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag)
 {
 	if (InputTag.IsValid())

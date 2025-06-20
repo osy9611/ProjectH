@@ -48,7 +48,7 @@ public:
 	//StateManager
 	void InitState();
 	void ChangeState(EBattleState Type);
-	void HandleAttackExecute();
+	void HandleAttackExecute(const FBattleStateParams& Target);
 	void CheckBattleState();
 
 	//TurnManager

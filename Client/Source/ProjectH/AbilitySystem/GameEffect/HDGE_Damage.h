@@ -5,11 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameplayEffect.h"
 #include "GameplayEffectExecutionCalculation.h"
+#include "ProjectH/Battle/State/BattleState.h"
 #include "HDGE_Damage.generated.h"
 
 struct FGameplayEffectCustomExecutionParameters;
 struct FGameplayEffectCustomExecutionOutput;
-
+struct FBattleStateParams;
 USTRUCT(BlueprintType)
 struct FDamageEffectContext : public FGameplayEffectContext
 {
@@ -17,6 +18,9 @@ struct FDamageEffectContext : public FGameplayEffectContext
 public:
 	UPROPERTY()
 	FGameplayTag SkillTag;
+
+	UPROPERTY()
+	FBattleStateParams BattleStateParams;
 };
 
 UCLASS()

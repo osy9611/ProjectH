@@ -13,6 +13,7 @@
 #include "ProjectH/Character/HDPawnExtensionComponent.h"
 #include "ProjectH/Data/PlayerData/HDCharacterData.h"
 #include "ProjectH/Data/PlayerData/HDPlayerDataSubsystem.h"
+#include "ProjectH/AbilitySystem/Abilities/HDGameplayAbility_ActiveSkill.h"
 
 const FName UHDBattleComponent::NAME_ActorFeatureName("Battle");
 
@@ -149,6 +150,32 @@ void UHDBattleComponent::ProcessAbility(FGameplayTag Tag)
 		return;
 
 	UHDAbilitySystemComponent* ASC = HDPlayerState->GetHDAbilitySystemComponent();
+	if (ASC)
+		ASC->ProcessAbility(Tag);
+}
+
+void UHDBattleComponent::ProcessAbility_Skill(FGameplayTag Tag, const FBattleStateParams& Params)
+{
+
+	APawn* Pawn = GetPawn<APawn>();
+
+	if (!ensure(Pawn))
+		return;
+
+	AHDPlayerState* HDPlayerState = Pawn->GetPlayerState<AHDPlayerState>();
+	if (!HDPlayerState)
+		return;
+
+	UHDAbilitySystemComponent* ASC = HDPlayerState->GetHDAbilitySystemComponent();
+
+	UGameplayAbility* GA = ASC->GetAbility(Tag);
+	if (!GA)
+		return;
+
+	UHDGameplayAbility_ActiveSkill* GA_ActiveSkill = Cast<UHDGameplayAbility_ActiveSkill>(GA);
+	if (GA_ActiveSkill)
+		GA_ActiveSkill->Params = Params;
+
 	if (ASC)
 		ASC->ProcessAbility(Tag);
 }

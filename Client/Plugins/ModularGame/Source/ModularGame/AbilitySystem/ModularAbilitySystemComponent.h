@@ -26,6 +26,8 @@ public:
 
 	virtual void ProcessAbility(const FGameplayTag& Tag);
 
+	virtual UGameplayAbility* GetAbility(const FGameplayTag& Tag);
+
 	virtual void AbilityInputTagPressed(const FGameplayTag& InputTag);
 	virtual void AbilityInputTagReleased(const FGameplayTag& InputTag);
 	virtual void ProcessAbilityInput(float DeltaTime, bool bGamePaused);

@@ -9,6 +9,7 @@
 #include "HDBattleComponent.generated.h"
 
 class UHDAttributeSet;
+struct FBattleStateParams;
 
 UCLASS(Blueprintable, Meta = (BlueprintSpawnableComponent))
 class PROJECTH_API UHDBattleComponent : public UPawnComponent, public IGameFrameworkInitStateInterface
@@ -32,6 +33,7 @@ public:
 	virtual void CheckDefaultInitialization() final;
 
 	void ProcessAbility(FGameplayTag Tag);
+	void ProcessAbility_Skill(FGameplayTag Tag,const FBattleStateParams& Params);
 
 	void RegisterBattleData(UHDAttributeSet* AttributeSet);
 

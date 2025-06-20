@@ -77,7 +77,7 @@ void UBattleState_CharTurn::DoEnd()
 	Super::DoEnd();
 }
 
-void UBattleState_CharTurn::DoExecute()
+void UBattleState_CharTurn::DoExecute(const FBattleStateParams& Params)
 {
 	UHDBattleComponent* BattleComp = TurnManager->GetCurrentActor();
 	if (!BattleComp)
@@ -86,9 +86,8 @@ void UBattleState_CharTurn::DoExecute()
 	if (BattleComp->CharType != ECharType::Character)
 		return;
 
-	BattleComp->ProcessAbility(CurrentSelectActive);
+	BattleComp->ProcessAbility_Skill(CurrentSelectActive, Params);
 	BattleWidget->DeActiveBattleCharActiveWidget();
-
 
 	DeActiveMonsterTargetWiget();
 }

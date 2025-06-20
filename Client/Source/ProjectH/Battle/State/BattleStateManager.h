@@ -7,6 +7,7 @@
 #include "BattleStateManager.generated.h"
 
 class UBattleState;
+struct FBattleStateParams;
 
 UENUM()
 enum class EBattleState : uint8
@@ -29,7 +30,7 @@ public:
 	void RegisterState();
 	void OnInit();
 	void OnStart();
-	void OnAttackExecute();
+	void OnAttackExecute(const FBattleStateParams& Params);
 	void CheckBattleState();
 
 	void UpdateState(float DeltaTime);

@@ -8,6 +8,17 @@
 
 class UBattleWidget;
 class UTurnManager;
+
+
+USTRUCT()
+struct FBattleStateParams
+{
+	GENERATED_BODY()
+public:
+	TArray<UObject*> Params;
+};
+
+
 UCLASS(Abstract)
 class PROJECTH_API UBattleState : public UObject
 {
@@ -18,7 +29,7 @@ public:
 	virtual void Initailize();
 	virtual void DoStart() {}
 	virtual void DoEnd() {}
-	virtual void DoExecute(){}	//즉시 State관련 실행을 하기 위해서 사용
+	virtual void DoExecute(const FBattleStateParams& Params){}	//즉시 State관련 실행을 하기 위해서 사용
 	virtual void Update(float DeltaTime) {}
 	virtual void ChangeState(EBattleState State);
 

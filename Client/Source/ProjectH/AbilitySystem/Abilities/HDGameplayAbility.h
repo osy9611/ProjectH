@@ -26,10 +26,7 @@ public:
 	virtual void ClearCameraMode(bool UseFovOffest = true) override;
 
 	UFUNCTION(BlueprintCallable)
-	void PlayFlipBookAnimation(FDynamicOnFlipbookComplete OnComplete);
-
-	UFUNCTION()
-	void OnAnimNotify(FName NotifyName);
+	virtual void PlayFlipBookAnimation(FDynamicOnFlipbookComplete OnComplete);
 
 public:
 	/*UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "PaperFlipbook")
@@ -37,4 +34,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AnimSequence")
 	UPaperZDAnimSequence* AnimSequence;
+
+
 };

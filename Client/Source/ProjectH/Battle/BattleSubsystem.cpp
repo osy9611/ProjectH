@@ -19,6 +19,7 @@
 #include "ProjectH/Battle/Data/BattleResourceData_AI.h"
 #include "ProjectH/Battle/Turn/TurnManager.h"
 #include "ProjectH/Battle/Input/BattleInput.h"
+#include "ProjectH/Battle/State/BattleState.h"
 #include "ProjectH/UI/Battle/BattleMonsterInfoWidget.h"
 #include "ProjectH/UI/Battle/BattleTargetWidget.h"
 #include "ProjectH/Character/HDPawnExtensionComponent.h"
@@ -194,9 +195,11 @@ void UBattleSubsystem::SetBattleMonsters(int32 GroupID)
 			if (UBattleTargetWidget* TargetWidget = Cast<UBattleTargetWidget>(TargetWidgetComp->GetWidget()))
 			{
 				TargetWidget->SetSizeBox(SpriteSize);
-				TargetWidget->OnClickCallback = [this]()
+				TargetWidget->OnClickCallback = [this, SpawnedPawn]()
 					{
-						HandleAttackExecute();
+						FBattleStateParams Params;
+						Params.Params = { SpawnedPawn };
+						HandleAttackExecute(Params);
 					};
 			}
 
@@ -242,12 +245,12 @@ void UBattleSubsystem::ChangeState(EBattleState Type)
 	StateManager->ChangeState(Type);
 }
 
-void UBattleSubsystem::HandleAttackExecute()
+void UBattleSubsystem::HandleAttackExecute(const FBattleStateParams& Target)
 {
 	if (!StateManager)
 		return;
 
-	StateManager->OnAttackExecute();
+	StateManager->OnAttackExecute(Target);
 }
 
 void UBattleSubsystem::CheckBattleState()

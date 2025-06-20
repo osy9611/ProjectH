@@ -18,5 +18,6 @@ void UBattleTargetWidget::OnClick()
 	if (!OnClickCallback)
 		return;
 
+
 	OnClickCallback();
 }
