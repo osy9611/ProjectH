@@ -4,6 +4,8 @@
 #include "HDGE_Damage.h"
 #include "AbilitySystemGlobals.h"
 #include "ProjectH/LogChannels.h"
+#include "ProjectH/Util/UtilFunc.h"
+#include "ProjectH/Player/HDPlayerState.h"
 #include "ProjectH/AbilitySystem//AttributeSet/HDAttributeSet.h"
 
 UHDGE_Damage::UHDGE_Damage()
@@ -17,7 +19,6 @@ UHDDamageExecutionCalculation::UHDDamageExecutionCalculation()
 }
 
 
-//Damage = ((ATK - DEF) × SkillMultiplier) × RandomVariance × CritBonus × WeaknessBonus
 //SkillMultiplier -> 스킬마다 고정된 데미지 배율 (예 : 1.2x, 2.0x 등)
 //RandomVariance -> 0.95 ~ 1.05 사이의 랜덤 값 (데미지 흔들림)
 //CritBonus -> 치명타 발생 시 ×1.25 ~ ×1.5 배 적용
@@ -34,7 +35,7 @@ void UHDDamageExecutionCalculation::Execute_Implementation(const FGameplayEffect
 
 	//공격자 
 	AActor* SourceActor = ContextHandle.GetOriginalInstigator();
-	UAbilitySystemComponent* SourceASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(SourceActor);
+	UAbilitySystemComponent* SourceASC = UtilFunc::GetASC(SourceActor);	
 	if (!SourceASC)
 		return;
 
@@ -59,15 +60,17 @@ void UHDDamageExecutionCalculation::Execute_Implementation(const FGameplayEffect
 	float ATK = (SourceSkillData->DamageType == EDamageType::Physical) ? SourceAttributeSet->GetPATK() : SourceAttributeSet->GetEATK();
 	float DEF = (SourceSkillData->DamageType == EDamageType::Physical) ? TargetAttr->GetPDEF() : TargetAttr->GetEDEF();
 
-	//(ATK - DEF) × SkillMultiplier
-	float RawDamage = FMath::Max(0.0f, (ATK - DEF)) * SourceSkillData->AddDamageRate;
+	float DefenseFactor = DEF / (DEF + 100.0f);
+	float MitigatedRate = 1.0f - DefenseFactor;
+
+	float BaseDamage = ATK * MitigatedRate * SourceSkillData->AddDamageRate;
 
 	//랜덤/크리티컬/약점 보정
 	float Rand = FMath::FRandRange(0.95f, 1.05f);
 	float CritBonus = SourceSkillData->UseCritical ? 1.5f : 1.0f;     // 예시: 치명타 적용 여부
 	float WeakBonus = 1.0f; // 약점 보정은 이후 적용할 수 있음 (추후 Weakness 시스템 연계)
 
-	float FinalDamage = RawDamage * Rand * CritBonus * WeakBonus;
+	float FinalDamage = BaseDamage * Rand * CritBonus * WeakBonus;
 
 	//데미지 적용(HP 감소)
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(

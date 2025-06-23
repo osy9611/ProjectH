@@ -85,6 +85,9 @@ private:
 	APawn* SpawnPawn(TSubclassOf<AActor> Actor, ECharType CharType,int32 SlotNo,FTransform SpawnPoint, FString PawnName, UHDAttributeSet* AttributeSet, TSubclassOf<UPaperZDAnimInstance> AnimInstance,
 		TObjectPtr<UPaperFlipbook> Flipbook, TArray<TObjectPtr<UHDAbilitySet>> AbilitySets);
 
+	APawn* SpawnPawn(TSubclassOf<AActor> Actor, ECharType CharType, int32 SlotNo, FTransform SpawnPoint, FString PawnName, TSubclassOf<UPaperZDAnimInstance> AnimInstance,
+		TObjectPtr<UPaperFlipbook> Flipbook, TArray<TObjectPtr<UHDAbilitySet>> AbilitySets);
+
 	template<typename T>
 	T* GetResourceData(FString Path);
 

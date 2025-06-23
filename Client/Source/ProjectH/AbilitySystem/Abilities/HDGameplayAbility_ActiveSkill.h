@@ -7,8 +7,6 @@
 #include "ProjectH/AbilitySystem/Abilities/HDGameplayAbility.h"
 #include "HDGameplayAbility_ActiveSkill.generated.h"
 
-struct FBattleStateParams;
-
 UCLASS()
 class PROJECTH_API UHDGameplayAbility_ActiveSkill : public UHDGameplayAbility
 {
@@ -19,7 +17,7 @@ public:
 
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 	virtual void PlayFlipBookAnimation(FDynamicOnFlipbookComplete OnComplete);
-	
-public:
-	FBattleStateParams Params;
+private:
+	void ApplyDamage();
+	void ExecuteGameEffect(UAbilitySystemComponent* OwnerASC,AActor* TargetActor);
 };

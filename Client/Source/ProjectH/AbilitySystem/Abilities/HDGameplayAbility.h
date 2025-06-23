@@ -10,6 +10,7 @@
 
 class UModularCameraMode;
 class UPaperFlipbook;
+struct FGameAbilityParam;
 
 DECLARE_DYNAMIC_DELEGATE(FDynamicOnFlipbookComplete);
 
@@ -19,7 +20,7 @@ class PROJECTH_API UHDGameplayAbility : public UModularGameplayAbility
 	GENERATED_BODY()
 
 public:
-
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
 	virtual void SetCameraMode(TSubclassOf<UModularCameraMode> CameraMode, bool UseFovOffset = true) override;
@@ -28,6 +29,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void PlayFlipBookAnimation(FDynamicOnFlipbookComplete OnComplete);
 
+protected:
+	virtual FGameplayTag GetGameplayTag();
 public:
 	/*UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "PaperFlipbook")
 	UPaperFlipbook* Flipbook;*/
@@ -35,5 +38,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AnimSequence")
 	UPaperZDAnimSequence* AnimSequence;
 
-
+protected:
+	FGameAbilityParam* Params;
 };

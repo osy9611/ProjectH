@@ -2,11 +2,37 @@
 
 
 #include "HDAttributeSet_Monster.h"
+#include "GameplayEffectExtension.h"
+#include "Components/WidgetComponent.h"
+#include "ProjectH/LogChannels.h"
 #include "ProjectH/Data/GenerateTableData.h"
+#include "ProjectH/Util/UtilFunc.h"
 #include "ProjectH/Util/UtilFunc_Data.h"
+#include <ProjectH/UI/Battle/BattleMonsterInfoWidget.h>
 
 UHDAttributeSet_Monster::UHDAttributeSet_Monster(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+}
+
+void UHDAttributeSet_Monster::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+	AActor* Actor = GetOwningActor();
+	if (Data.EvaluatedData.Attribute == GetHPAttribute())
+	{
+		float NowHP = GetHP();
+		UE_LOG(HDLog, Log, TEXT("[HDAttributeSet_Monster] Now HP %.2f"), NowHP);
+
+		UWidgetComponent* InfoWidgetComp = UtilFunc::GetActorComponent<UWidgetComponent>(Actor, "InfoWidget");
+		UUserWidget* InfoWidget = InfoWidgetComp->GetUserWidgetObject();
+		if (InfoWidgetComp)
+		{
+			if (UBattleMonsterInfoWidget* MonsterInfoWidget = Cast<UBattleMonsterInfoWidget>(InfoWidget))
+			{
+				MonsterInfoWidget->UpdateHP(Actor);
+			}
+		}
+	}
 }
 
 void UHDAttributeSet_Monster::OnInit(FString InitTableID)
@@ -33,6 +59,7 @@ void UHDAttributeSet_Monster::OnUpdateStatus()
 	if (!StatusData)
 		return;
 
+	OriginHP = StatusData->HP;
 	HP = StatusData->HP; 
 	PATK = StatusData->PATK;
 	PDEF = StatusData->PDEF;

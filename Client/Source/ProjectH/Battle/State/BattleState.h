@@ -4,18 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "ProjectH/Battle/State/BattleStateManager.h"
+#include "ProjectH/AbilitySystem/HDAbilitySystemComponent.h"
 #include "BattleState.generated.h"
 
 class UBattleWidget;
 class UTurnManager;
 
+struct FGameAbilityParam;
 
 USTRUCT()
-struct FBattleStateParams
+struct FBattleStateParams : public FGameAbilityParam
 {
 	GENERATED_BODY()
 public:
-	TArray<UObject*> Params;
+	TArray<AActor*> Objects;
+
+	virtual FGameAbilityParam* Clone() const override
+	{
+		return new FBattleStateParams(*this);
+	}
 };
 
 

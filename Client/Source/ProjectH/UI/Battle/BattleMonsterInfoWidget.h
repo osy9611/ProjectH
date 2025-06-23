@@ -19,7 +19,7 @@ public:
 	UBattleMonsterInfoWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	void OnInit(const FMonsterData MonsterData);
-	void UpdateHP();
+	void UpdateHP(AActor* Actor);
 public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> NameText;

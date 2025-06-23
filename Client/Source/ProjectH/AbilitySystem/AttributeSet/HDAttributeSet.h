@@ -40,9 +40,18 @@ public:
 	virtual FSkillData* GetSkillData(FGameplayTag SkillTag);
 
 public:
+
+	ATTRIBUTE_ACCESSORS(UHDAttributeSet, OriginHP);
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes")
+	FGameplayAttributeData OriginHP;
+
 	ATTRIBUTE_ACCESSORS(UHDAttributeSet, HP);
 	UPROPERTY(BlueprintReadOnly, Category = "Attributes")
 	FGameplayAttributeData HP;
+
+	ATTRIBUTE_ACCESSORS(UHDAttributeSet, OriginSP);
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes")
+	FGameplayAttributeData OriginSP;
 
 	ATTRIBUTE_ACCESSORS(UHDAttributeSet, SP);
 	UPROPERTY(BlueprintReadOnly, Category = "Attributes")

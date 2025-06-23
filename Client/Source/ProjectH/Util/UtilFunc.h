@@ -11,6 +11,8 @@
 #include "ProjectH/Data/PlayerData/HDPlayerDataSubsystem.h"
 class UHDAssetManager;
 class UModularUserData;
+class UHDAbilitySystemComponent;
+
 class PROJECTH_API UtilFunc
 {
 public:
@@ -28,6 +30,8 @@ public:
 
 	template<typename StructType>
 	static void RequestListener(UWorld* World, FGameplayTag Channel, StructType Message);
+
+	static UHDAbilitySystemComponent* GetASC(AActor* Actor);
 };
 
 template<typename T>

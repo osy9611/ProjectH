@@ -16,12 +16,4 @@ public:
 	virtual void OnInit(FString InitTableID) override;
 	virtual void OnUpdateStatus() override;
 
-	float GetOriginHP() { return OriginHP; }
-	float GetOriginSP() { return OriginSP; }
-
-
-
-private:
-	float OriginHP;
-	float OriginSP;
 };

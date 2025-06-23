@@ -14,6 +14,7 @@
 #include "ProjectH/Data/PlayerData/HDCharacterData.h"
 #include "ProjectH/Data/PlayerData/HDPlayerDataSubsystem.h"
 #include "ProjectH/AbilitySystem/Abilities/HDGameplayAbility_ActiveSkill.h"
+#include "BattleSubsystem.h"
 
 const FName UHDBattleComponent::NAME_ActorFeatureName("Battle");
 
@@ -156,7 +157,6 @@ void UHDBattleComponent::ProcessAbility(FGameplayTag Tag)
 
 void UHDBattleComponent::ProcessAbility_Skill(FGameplayTag Tag, const FBattleStateParams& Params)
 {
-
 	APawn* Pawn = GetPawn<APawn>();
 
 	if (!ensure(Pawn))
@@ -168,16 +168,35 @@ void UHDBattleComponent::ProcessAbility_Skill(FGameplayTag Tag, const FBattleSta
 
 	UHDAbilitySystemComponent* ASC = HDPlayerState->GetHDAbilitySystemComponent();
 
+	const UHDAttributeSet* AttributeSet = ASC->GetSet<UHDAttributeSet>();
+	if (!AttributeSet)
+		return;
+
+	//Set Target Params
+	FSkillData* SkillData = const_cast<UHDAttributeSet*>(AttributeSet)->GetSkillData(Tag);
+	if (!SkillData)
+		return;
+
+	if (SkillData->SkillTargetType == ESkillTargetType::Enemy_All)
+	{
+		UBattleSubsystem* BattleSubsystem = GetWorld()->GetSubsystem<UBattleSubsystem>();
+		if (!BattleSubsystem)
+		{
+			UE_LOG(HDLog, Error, TEXT("[HDBattleComponent] BattleSubsystem is nullptr"));
+			return;
+		}
+		if (CharType == ECharType::Monster)
+			const_cast<FBattleStateParams&>(Params).Objects = BattleSubsystem->GetMonsterActors();
+		else
+			const_cast<FBattleStateParams&>(Params).Objects = BattleSubsystem->GetCharacterActors();
+	}
+
 	UGameplayAbility* GA = ASC->GetAbility(Tag);
 	if (!GA)
 		return;
 
-	UHDGameplayAbility_ActiveSkill* GA_ActiveSkill = Cast<UHDGameplayAbility_ActiveSkill>(GA);
-	if (GA_ActiveSkill)
-		GA_ActiveSkill->Params = Params;
-
 	if (ASC)
-		ASC->ProcessAbility(Tag);
+		ASC->ProcessAbilityAndParam(Tag, Params);
 }
 
 PRAGMA_DISABLE_DEPRECATION_WARNINGS

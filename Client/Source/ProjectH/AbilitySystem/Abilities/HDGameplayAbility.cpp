@@ -8,7 +8,19 @@
 #include "ProjectH/Character/HDPawnExtensionComponent.h"
 #include "ProjectH/Util/UtilFunc_Sprite.h"
 #include "ProjectH/Battle/BattleSubsystem.h"
+#include "ProjectH/AbilitySystem/HDAbilitySystemComponent.h"
 #include "ProjectH/AbilitySystem/AbilityTask/AbilityTask_PlayFlipbookAndWait.h"
+
+void UHDGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	UHDAbilitySystemComponent* ASC = Cast<UHDAbilitySystemComponent>(ActorInfo->AbilitySystemComponent);
+	if (ASC)
+	{
+		Params = ASC->ConsumeParams(Handle);
+	}
+}
 
 void UHDGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
@@ -19,7 +31,7 @@ void UHDGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, con
 	{
 		BattleSubsystem->CheckBattleState();
 	}
-
+	Params = nullptr;
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -39,4 +51,17 @@ void UHDGameplayAbility::PlayFlipBookAnimation(FDynamicOnFlipbookComplete OnComp
 	UAbilityTask_PlayFlipbookAndWait* Task = UAbilityTask_PlayFlipbookAndWait::PlayFlipbookAndWaitForEnd(this, AnimSequence);
 	Task->OnCompleted.Add(OnComplete);
 	Task->ReadyForActivation();
+}
+
+FGameplayTag UHDGameplayAbility::GetGameplayTag()
+{
+	FGameplayAbilitySpec* Spec = GetCurrentAbilitySpec();
+
+	if (Spec)
+	{
+		const FGameplayTagContainer& Tags = Spec->DynamicAbilityTags;
+		return Tags.GetByIndex(0);
+	}
+
+	return FGameplayTag();
 }
