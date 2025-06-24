@@ -14,6 +14,7 @@
 #include "ProjectH/Data/PlayerData/HDCharacterData.h"
 #include "ProjectH/Data/PlayerData/HDPlayerDataSubsystem.h"
 #include "ProjectH/AbilitySystem/Abilities/HDGameplayAbility_ActiveSkill.h"
+#include "ProjectH/Util/UtilFunc.h"
 #include "BattleSubsystem.h"
 
 const FName UHDBattleComponent::NAME_ActorFeatureName("Battle");
@@ -238,4 +239,33 @@ bool UHDBattleComponent::CheckDead()
 
 	return AttributeSet->GetHP() <= 0;
 }
+
+void UHDBattleComponent::ChachedWidgets(FString WidgetName, TFunction<void(UWidgetComponent*)> Result)
+{
+	APawn* Pawn = GetPawn<APawn>();
+	if (!ensure(Pawn))
+		return;
+
+	UWidgetComponent* WidgetComp = UtilFunc::GetActorComponent<UWidgetComponent>(Pawn, FName(*WidgetName));
+	if (!WidgetComp)
+	{
+		UE_LOG(HDLog, Warning, TEXT("[HDBattleComponent] Cached Widget Fail WidgetComponent is nullptr"));
+		return;
+	}
+
+	if (Result)
+		Result(WidgetComp);
+
+	ChachedWidgetComps.Add(WidgetName, WidgetComp);
+}
+
+UWidgetComponent* UHDBattleComponent::GetWidgetComponent(FString WidgetName)
+{
+	UWidgetComponent** WidgetComp = ChachedWidgetComps.Find(WidgetName);
+	if (WidgetComp)
+		return *WidgetComp;
+
+	return nullptr;
+}
+
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

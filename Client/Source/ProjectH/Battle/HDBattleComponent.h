@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/PawnComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Components/GameFrameworkInitStateInterface.h"
 #include "ProjectH/Data/EnumGenerateData.h"
 #include "HDBattleComponent.generated.h"
@@ -33,16 +34,40 @@ public:
 	virtual void CheckDefaultInitialization() final;
 
 	void ProcessAbility(FGameplayTag Tag);
-	void ProcessAbility_Skill(FGameplayTag Tag,const FBattleStateParams& Params);
-
+	void ProcessAbility_Skill(FGameplayTag Tag, const FBattleStateParams& Params);
 	void RegisterBattleData(UHDAttributeSet* AttributeSet);
 
 	UHDAttributeSet* GetAttributeSet() const;
-
 	bool CheckDead();
 
-	FString TableID;
+	void ChachedWidgets(FString WidgetName, TFunction<void(UWidgetComponent*)> Result);
 
+	UWidgetComponent* GetWidgetComponent(FString WidgetName);
+
+	template<typename T = UUserWidget>
+	T* GetWidgetObject(FString WidgetName, bool VisibleComp);
+
+
+public:
+	FString TableID;
 	int32 SlotNo;
 	ECharType CharType;
+
+private:
+	TMap<FString, UWidgetComponent*> ChachedWidgetComps;
 };
+
+template<typename T>
+T* UHDBattleComponent::GetWidgetObject(FString WidgetName, bool VisibleComp)
+{
+	UWidgetComponent* WidgetComp = GetWidgetComponent(WidgetName);
+	if (!WidgetComp)
+		return nullptr;
+
+	UUserWidget* UserWidget = WidgetComp->GetUserWidgetObject();
+	if (!UserWidget)
+		return nullptr;
+
+	WidgetComp->SetVisibility(VisibleComp);
+	return Cast<T>(UserWidget);
+}

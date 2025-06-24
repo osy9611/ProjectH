@@ -46,8 +46,7 @@ void UGameFeatureAction_BattleSetting::SetBattle(UWorld* World)
 	}
 	UHDExperienceManagerComponent* ExperienceManagerComponent = GameState->FindComponentByClass<UHDExperienceManagerComponent>();
 
-	BattleSubsystem->RegisterBPActor(BattleChar, BattleAI);
-	BattleSubsystem->OnBattleInit(ExperienceManagerComponent->CurrentSceneTableNo);
+	BattleSubsystem->OnBattleInit(ExperienceManagerComponent->CurrentSceneTableNo, BattleChar, BattleAI);
 	BattleSubsystem->OnStartBattle();
 }
 

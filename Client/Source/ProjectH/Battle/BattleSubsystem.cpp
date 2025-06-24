@@ -4,28 +4,10 @@
 #include "BattleSubsystem.h"
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "ProjectH/Player/HDPlayerState.h"
-#include "ProjectH/AbilitySystem/HDAbilitySet.h"
-#include "ProjectH/Data/GenerateTableData.h"
-#include "ProjectH/Data/DataManagerSubsystem.h"
-#include "ProjectH/Data/PlayerData/HDCharacterData.h"
-#include "ProjectH/Data/PlayerData/HDPlayerDataSubsystem.h"
-#include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet.h"
-#include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet_Player.h"
-#include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet_Monster.h"
-#include "ProjectH/Battle/HDBattleComponent.h"
-#include "ProjectH/Battle/Spawn/HDBattleSpawnPoint.h"
-#include "ProjectH/Battle/Data/BattleResourceData_Player.h"
-#include "ProjectH/Battle/Data/BattleResourceData_AI.h"
+#include "ProjectH/Util/UtilFunc_Data.h"
 #include "ProjectH/Battle/Turn/TurnManager.h"
 #include "ProjectH/Battle/Input/BattleInput.h"
-#include "ProjectH/Battle/State/BattleState.h"
-#include "ProjectH/UI/Battle/BattleMonsterInfoWidget.h"
-#include "ProjectH/UI/Battle/BattleTargetWidget.h"
-#include "ProjectH/Character/HDPawnExtensionComponent.h"
-#include "ProjectH/Util/UtilFunc.h"
-#include "ProjectH/Util/UtilFunc_Data.h"
-#include "ProjectH/Util/UtilFunc_Sprite.h"
+
 void UBattleSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
@@ -45,18 +27,12 @@ void UBattleSubsystem::OnEndBattle()
 {
 }
 
-void UBattleSubsystem::RegisterBPActor(TSubclassOf<AActor> BPActor, TSubclassOf<AActor> BPAIController)
+void UBattleSubsystem::OnBattleInit(FString BattleSceneTableNo, TSubclassOf<AActor> BPActor, TSubclassOf<AActor> BPAIActor)
 {
-	BattleActor = BPActor;
-	BattleAIActor = BPAIController;
-}
-
-void UBattleSubsystem::OnBattleInit(FString BattleSceneData)
-{
-	FSceneData* SceneData = GetSceneData(BattleSceneData);
+	FSceneData* SceneData = UtilFunc_Data::GetTableData<FSceneData>(GetWorld(), BattleSceneTableNo);
 	if (!SceneData)
 	{
-		UE_LOG(HDLog, Log, TEXT("[BattleSubsystem] Scene Data Not Found Table No : %s"), *BattleSceneData);
+		UE_LOG(HDLog, Log, TEXT("[BattleSubsystem] Scene Data Not Found Table No : %s"), *BattleSceneTableNo);
 		return;
 	}
 
@@ -72,158 +48,23 @@ void UBattleSubsystem::OnBattleInit(FString BattleSceneData)
 	PlayerController->SetInputMode(InputMode);
 
 
-	GetBattlePoints();
-	SetBattleCharacters();
-	SetBattleMonsters(SceneData->SceneValue);
+	InitSpawner(SceneData, BPActor, BPAIActor);
 	RegisterTurn();
 	InitState();
 	IsBattle = true;
 }
 
-void UBattleSubsystem::GetBattlePoints()
+void UBattleSubsystem::InitSpawner(FSceneData* SceneData, TSubclassOf<AActor> BPActor, TSubclassOf<AActor> BPAIController)
 {
-	TArray<AActor*> SpawnPoints;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHDBattleSpawnPoint::StaticClass(), SpawnPoints);
+	UBattleSpawner* NewBattleSpawner = NewObject<UBattleSpawner>(this);
+	BattleSpawner = NewBattleSpawner;
 
+	BattleSpawner->RegisterBPActor(BPActor, BPAIController);
 
-	for (AActor* SpawnPoint : SpawnPoints)
-	{
-		if (AHDBattleSpawnPoint* BattleSpawnPoint = Cast<AHDBattleSpawnPoint>(SpawnPoint))
+	BattleSpawner->OnInit(SceneData, [this](const FBattleStateParams& Params)
 		{
-			if (BattleSpawnPoint->Side == ECharType::Character)
-			{
-				PlayerSpawnPoints.Add(BattleSpawnPoint);
-			}
-
-			if (BattleSpawnPoint->Side == ECharType::Monster)
-			{
-				MonsterSpawnPoints.Add(BattleSpawnPoint);
-			}
-		}
-	}
-
-	PlayerSpawnPoints.Sort([](const AHDBattleSpawnPoint& A, const AHDBattleSpawnPoint& B)
-		{
-			return A.SlotIndex < B.SlotIndex;
+			HandleAttackExecute(Params);
 		});
-
-	MonsterSpawnPoints.Sort([](const AHDBattleSpawnPoint& A, const AHDBattleSpawnPoint& B)
-		{
-			return A.SlotIndex < B.SlotIndex;
-		});
-}
-
-void UBattleSubsystem::SetBattleCharacters()
-{
-	UHDCharacterData* CharacterData = GetCharacterData();
-	if (!CharacterData)
-		return;
-
-	TArray<const UHDAttributeSet_Player*> AttributeSets = CharacterData->GetPartySelectCharacters();
-	AttributeSets.Add(CharacterData->CreateCharacterData(10001));
-	AttributeSets.Add(CharacterData->CreateCharacterData(10002));
-
-	int SlotIndex = 0;
-	for (const UHDAttributeSet_Player* AttributeSet : AttributeSets)
-	{
-		//Find Table Data
-		FCharacterData* CharData = AttributeSet->GetTableData<FCharacterData>();
-		if (!CharData)
-		{
-			UE_LOG(HDLog, Log, TEXT("[BattleSubsystem] Character Table Data Not Found %s"), *AttributeSet->TableID);
-			continue;
-		}
-
-		//Create Actor
-		if (UBattleResourceData_Player* ResourceData = GetResourceData<UBattleResourceData_Player>(CharData->BattleResource))
-		{
-			APawn* SpawnedPawn = SpawnPawn(BattleActor, ECharType::Character, SlotIndex, PlayerSpawnPoints[SlotIndex]->GetTransform(), FString::FromInt(SlotIndex),
-				const_cast<UHDAttributeSet_Player*>(AttributeSet), ResourceData->AnimInstance, ResourceData->PaperFilpbook, ResourceData->AbilitySets);
-
-			SpawnedPawn->AttachToActor(PlayerSpawnPoints[SlotIndex], FAttachmentTransformRules::KeepWorldTransform);
-
-			//왼쪽을 바라보도록 수정해야함
-			FRotator NewRotation = FRotator(0.f, 180.f, 0.f);
-			SpawnedPawn->SetActorRotation(NewRotation);
-
-			BattleCharDatas.Add(SlotIndex, SpawnedPawn);
-
-			SlotIndex++;
-		}
-	}
-}
-
-void UBattleSubsystem::SetBattleMonsters(int32 GroupID)
-{
-	FMonsterGroupData* MonsterGroupData = UtilFunc_Data::GetTableData<FMonsterGroupData>(GetWorld(), FString::FromInt(GroupID));
-	if (!MonsterGroupData)
-	{
-		UE_LOG(HDLog, Log, TEXT("[BattleSubsystem] MonsterGroup Not Found TableNo : %d"), GroupID);
-		return;
-	}
-
-	int SlotIndex = 0;
-	for (int32 MonsterID : MonsterGroupData->MonsterIDs)
-	{
-		//Find Table Data
-		FMonsterData* MonsterData = UtilFunc_Data::GetTableData<FMonsterData>(GetWorld(), FString::FromInt(MonsterID));
-
-		if (!MonsterData)
-		{
-			UE_LOG(HDLog, Log, TEXT("[BattleSubsystem] Monster Table Data Not Found %s"), *FString::FromInt(MonsterID));
-			continue;
-		}
-
-		//Create Actor
-		if (UBattleResourceData_AI* ResourceData = GetResourceData<UBattleResourceData_AI>(MonsterData->ResourcePath))
-		{
-			APawn* SpawnedPawn = SpawnPawn(BattleAIActor, ECharType::Monster, SlotIndex, MonsterSpawnPoints[SlotIndex]->GetTransform(), FString::FromInt(SlotIndex),
-				ResourceData->AnimInstance, ResourceData->PaperFilpbook, ResourceData->AbilitySets);
-
-
-			//Create Attribute 
-			UHDAttributeSet_Monster* AttributeSet = NewObject<UHDAttributeSet_Monster>(SpawnedPawn);
-			AttributeSet->OnInit(FString::FromInt(MonsterID));
-
-			if (UHDBattleComponent* BattleComp = UHDBattleComponent::FindBattleComponent(SpawnedPawn))
-			{
-				BattleComp->RegisterBattleData(AttributeSet);
-			}
-
-			//Set Target Widget
-			FVector SpriteSize  = UtilFunc_Sprite::GetSpriteSize(SpawnedPawn);
-			FVector CurrentLocation = SpawnedPawn->GetActorLocation();
-			FVector NewLocation = CurrentLocation + SpriteSize;
-			UWidgetComponent* TargetWidgetComp = UtilFunc::GetActorComponent<UWidgetComponent>(SpawnedPawn,"TargetWidget");
-			TargetWidgetComp->AddLocalOffset(FVector(0.0f,0.0f, NewLocation.Z));
-			TargetWidgetComp->SetVisibility(false);
-
-			if (UBattleTargetWidget* TargetWidget = Cast<UBattleTargetWidget>(TargetWidgetComp->GetWidget()))
-			{
-				TargetWidget->SetSizeBox(SpriteSize);
-				TargetWidget->OnClickCallback = [this, SpawnedPawn]()
-					{
-						FBattleStateParams Params;
-						Params.Objects = { SpawnedPawn };
-						HandleAttackExecute(Params);
-					};
-			}
-
-			//Set Info Widget
-			UWidgetComponent* InfoWidgetComp = UtilFunc::GetActorComponent<UWidgetComponent>(SpawnedPawn, "InfoWidget");
-			UUserWidget* InfoWidget = InfoWidgetComp->GetUserWidgetObject();
-			if (InfoWidget)
-			{
-				if (UBattleMonsterInfoWidget* MonsterInfoWidget = Cast<UBattleMonsterInfoWidget>(InfoWidget))
-				{
-					MonsterInfoWidget->OnInit(*MonsterData);
-				}				
-			}
-
-			BattleMonsterDatas.Add(SlotIndex, SpawnedPawn);
-			SlotIndex++;
-		}
-	}
 }
 
 void UBattleSubsystem::RegisterTurn()
@@ -234,10 +75,8 @@ void UBattleSubsystem::RegisterTurn()
 	TArray<AActor*> RegisterActors;
 	TArray<AActor*> Temp;
 
-	BattleCharDatas.GenerateValueArray(Temp);
-	RegisterActors.Append(Temp);
-	BattleMonsterDatas.GenerateValueArray(Temp);
-	RegisterActors.Append(Temp);
+	RegisterActors.Append(BattleSpawner->GetCharacterActors());
+	RegisterActors.Append(BattleSpawner->GetMonsterActors());
 
 	TurnManager->OnInitTurn(RegisterActors);
 	TurnManager->OnTurnStart.AddUObject(this, &ThisClass::HandleTurnStart);
@@ -351,104 +190,3 @@ bool UBattleSubsystem::IsLose()
 	}
 	return isLose;
 }
-
-UHDCharacterData* UBattleSubsystem::GetCharacterData()
-{
-	UHDPlayerDataSubsystem* PlayerData = GetWorld()->GetGameInstance()->GetSubsystem<UHDPlayerDataSubsystem>();
-
-	if (!PlayerData)
-	{
-		UE_LOG(HDLog, Error, TEXT("[BattleSubsystem] HDPlayerDataSubsystem is nullptr"));
-		return nullptr;
-	}
-
-	UHDCharacterData* CharacterData = PlayerData->GetData<UHDCharacterData>("CharacterData");
-	if (!CharacterData)
-	{
-		UE_LOG(HDLog, Log, TEXT("[BattleSubsystem] CharacterData is nullptr"));
-	}
-
-	return CharacterData;
-}
-
-APawn* UBattleSubsystem::SpawnPawn(TSubclassOf<AActor> Actor, ECharType CharType, int32 SlotNo, FTransform SpawnPoint, FString PawnName, UHDAttributeSet* AttributeSet,
-	TSubclassOf<UPaperZDAnimInstance> AnimInstance, TObjectPtr<UPaperFlipbook> Flipbook, TArray<TObjectPtr<UHDAbilitySet>> AbilitySets)
-{
-	FActorSpawnParameters SpawnInfo;
-	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnInfo.Instigator = nullptr;
-	SpawnInfo.ObjectFlags |= RF_Transient;
-	SpawnInfo.bDeferConstruction = true;
-
-	if (APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(Actor, SpawnPoint, SpawnInfo))
-	{
-		SpawnedPawn->FinishSpawning(SpawnPoint);
-
-		UHDPawnExtensionComponent* PawnExtComp = UHDPawnExtensionComponent::FindPawnExtensionComponent(SpawnedPawn);
-
-		if (UHDBattleComponent* BattleComp = UHDBattleComponent::FindBattleComponent(SpawnedPawn))
-		{
-			BattleComp->RegisterBattleData(AttributeSet);
-			BattleComp->SlotNo = SlotNo;
-			BattleComp->CharType = CharType;
-		}
-
-		PawnExtComp->SetAnimationInstance(AnimInstance);
-		PawnExtComp->SetFlipbook(Flipbook);
-
-
-		AHDPlayerState* HDPS = SpawnedPawn->GetPlayerState<AHDPlayerState>();
-		if (HDPS)
-		{
-			HDPS->RegisterAbilitySet(AbilitySets);
-		}
-
-		return SpawnedPawn;
-	}
-	return nullptr;
-}
-
-APawn* UBattleSubsystem::SpawnPawn(TSubclassOf<AActor> Actor, ECharType CharType, int32 SlotNo, FTransform SpawnPoint, FString PawnName, TSubclassOf<UPaperZDAnimInstance> AnimInstance, TObjectPtr<UPaperFlipbook> Flipbook, TArray<TObjectPtr<UHDAbilitySet>> AbilitySets)
-{
-	FActorSpawnParameters SpawnInfo;
-	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnInfo.Instigator = nullptr;
-	SpawnInfo.ObjectFlags |= RF_Transient;
-	SpawnInfo.bDeferConstruction = true;
-
-	if (APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(Actor, SpawnPoint, SpawnInfo))
-	{
-		SpawnedPawn->FinishSpawning(SpawnPoint);
-
-		UHDPawnExtensionComponent* PawnExtComp = UHDPawnExtensionComponent::FindPawnExtensionComponent(SpawnedPawn);
-
-		if (UHDBattleComponent* BattleComp = UHDBattleComponent::FindBattleComponent(SpawnedPawn))
-		{
-			BattleComp->SlotNo = SlotNo;
-			BattleComp->CharType = CharType;
-		}
-
-		PawnExtComp->SetAnimationInstance(AnimInstance);
-		PawnExtComp->SetFlipbook(Flipbook);
-
-
-		AHDPlayerState* HDPS = SpawnedPawn->GetPlayerState<AHDPlayerState>();
-		if (HDPS)
-		{
-			HDPS->RegisterAbilitySet(AbilitySets);
-		}
-
-		return SpawnedPawn;
-	}
-	return nullptr;
-}
-
-FSceneData* UBattleSubsystem::GetSceneData(FString SceneID)
-{
-	FSceneData* SceneData = UtilFunc_Data::GetTableData<FSceneData>(GetWorld(), SceneID);
-	if (SceneData)
-		return SceneData;
-
-	return nullptr;
-}
-

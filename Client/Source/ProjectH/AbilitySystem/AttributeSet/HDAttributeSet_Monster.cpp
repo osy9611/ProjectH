@@ -8,7 +8,9 @@
 #include "ProjectH/Data/GenerateTableData.h"
 #include "ProjectH/Util/UtilFunc.h"
 #include "ProjectH/Util/UtilFunc_Data.h"
-#include <ProjectH/UI/Battle/BattleMonsterInfoWidget.h>
+#include "ProjectH/Battle/HDBattleComponent.h"
+#include "ProjectH/UI/Battle/BattleMonsterInfoWidget.h"
+#include "ProjectH/UI/Damage/HDDamageWidget.h"
 
 UHDAttributeSet_Monster::UHDAttributeSet_Monster(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -32,6 +34,20 @@ void UHDAttributeSet_Monster::PostGameplayEffectExecute(const FGameplayEffectMod
 				MonsterInfoWidget->UpdateHP(Actor);
 			}
 		}
+
+		UHDBattleComponent* BattleComp = UHDBattleComponent::FindBattleComponent(Actor);
+		if (!BattleComp)
+			return;
+
+		UBattleMonsterInfoWidget* MonsterInfoWidget = BattleComp->GetWidgetObject<UBattleMonsterInfoWidget>("InfoWidget", true);
+		if (MonsterInfoWidget)
+			MonsterInfoWidget->UpdateHP(Actor);
+
+		UHDDamageWidget* DamageWidget = BattleComp->GetWidgetObject<UHDDamageWidget>("DamageWidget", true);
+		if (DamageWidget)
+		{
+			DamageWidget->StartDamageWidget(Data.EvaluatedData.Magnitude);
+		}
 	}
 }
 
@@ -44,7 +60,7 @@ void UHDAttributeSet_Monster::OnInit(FString InitTableID)
 	FMonsterData* MonsterData = UtilFunc_Data::GetTableData<FMonsterData>(GetWorld(), TableID);
 	if (!MonsterData)
 		return;
-	
+
 	SetSkillData(MonsterData->SkillNos);
 }
 
@@ -60,7 +76,7 @@ void UHDAttributeSet_Monster::OnUpdateStatus()
 		return;
 
 	OriginHP = StatusData->HP;
-	HP = StatusData->HP; 
+	HP = StatusData->HP;
 	PATK = StatusData->PATK;
 	PDEF = StatusData->PDEF;
 	EATK = StatusData->EATK;
