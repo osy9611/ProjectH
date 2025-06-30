@@ -2,6 +2,7 @@
 
 #include "UtilFunc.h"
 #include "ProjectH/Player/HDPlayerState.h"
+#include "ProjectH/Object/HDObjectPoolSubsystem.h"
 
 UHDAbilitySystemComponent* UtilFunc::GetASC(AActor* Actor)
 {
@@ -13,4 +14,19 @@ UHDAbilitySystemComponent* UtilFunc::GetASC(AActor* Actor)
 	}
 
 	return ASC;
+}
+
+UNiagaraComponent* UtilFunc::GetNiagaraSystem(UWorld* World, UNiagaraSystem* NiagaraSystem, AActor* OwnerActor, bool IsActive)
+{
+	if (!World)
+		return nullptr;
+
+	UHDObjectPoolSubsystem* PoolSubsystem = World->GetSubsystem<UHDObjectPoolSubsystem>();
+	if (!PoolSubsystem)
+	{
+		UE_LOG(HDLog, Log, TEXT("[UtilFunc] HDObjectPoolSubsystem is nullptr"));
+		return nullptr;
+	}
+
+	return nullptr;
 }

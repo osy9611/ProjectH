@@ -46,7 +46,8 @@ void UHDAttributeSet_Monster::PostGameplayEffectExecute(const FGameplayEffectMod
 		UHDDamageWidget* DamageWidget = BattleComp->GetWidgetObject<UHDDamageWidget>("DamageWidget", true);
 		if (DamageWidget)
 		{
-			DamageWidget->StartDamageWidget(Data.EvaluatedData.Magnitude);
+			float DamageAmount = FMath::Abs(Data.EvaluatedData.Magnitude);
+			DamageWidget->StartDamageWidget(DamageAmount);
 		}
 	}
 }
@@ -84,4 +85,3 @@ void UHDAttributeSet_Monster::OnUpdateStatus()
 	CRI = StatusData->CRI;
 	Speed = StatusData->Speed;
 }
-

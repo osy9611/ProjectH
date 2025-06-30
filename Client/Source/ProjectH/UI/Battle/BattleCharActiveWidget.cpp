@@ -46,7 +46,7 @@ void UBattleCharActiveWidget::OnSelectionChanged(UObject* SelectedItem)
 	const FHDGameplayTags& GameplayTags = FHDGameplayTags::Get();
 	FBattleEventSelectActivate Message;
 	Message.SelectTag = SelectWidget->ActiveTag;
-	UtilFunc::RequestListener(GetWorld(), GameplayTags.Battle_SelectActive, Message);
+	UtilFunc::RequestNotifyListener(GetWorld(), GameplayTags.Battle_SelectActive, Message);
 }
 
 void UBattleCharActiveWidget::GetToggles()

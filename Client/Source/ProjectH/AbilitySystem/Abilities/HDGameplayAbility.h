@@ -10,6 +10,8 @@
 
 class UModularCameraMode;
 class UPaperFlipbook;
+class UNiagaraSystem;
+class UNiagaraComponent;
 struct FGameAbilityParam;
 
 DECLARE_DYNAMIC_DELEGATE(FDynamicOnFlipbookComplete);
@@ -29,6 +31,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void PlayFlipBookAnimation(FDynamicOnFlipbookComplete OnComplete);
 
+	UFUNCTION(BlueprintCallable)
+	void SetNiagaraSystem(UNiagaraSystem* InNiagaraSystem) { NiagaraSystem = InNiagaraSystem; }
+
+	UFUNCTION(BlueprintCallable)
+	virtual UNiagaraComponent* GetNiagaraComponent();
+
 protected:
 	virtual FGameplayTag GetGameplayTag();
 public:
@@ -39,5 +47,6 @@ public:
 	UPaperZDAnimSequence* AnimSequence;
 
 protected:
+	TObjectPtr<UNiagaraSystem> NiagaraSystem;
 	FGameAbilityParam* Params;
 };

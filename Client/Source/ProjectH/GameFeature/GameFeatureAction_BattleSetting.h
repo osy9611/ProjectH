@@ -14,6 +14,7 @@ public:
 	virtual void OnGameFeatureDeactivating(FGameFeatureDeactivatingContext& Context) override;
 	virtual void AddToWorld(const FWorldContext& WorldContext, const FGameFeatureStateChangeContext& ChangeContext) override;
 
+	void SetPool(UWorld* World);
 	void SetBattle(UWorld* World);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BattleChar")

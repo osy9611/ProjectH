@@ -7,6 +7,7 @@
 #include "ProjectH/Character/HDCharacter.h"
 #include "ProjectH/Character/HDPawnExtensionComponent.h"
 #include "ProjectH/Util/UtilFunc_Sprite.h"
+#include "ProjectH/Util/UtilFunc.h"
 #include "ProjectH/Battle/BattleSubsystem.h"
 #include "ProjectH/AbilitySystem/HDAbilitySystemComponent.h"
 #include "ProjectH/AbilitySystem/AbilityTask/AbilityTask_PlayFlipbookAndWait.h"
@@ -51,6 +52,15 @@ void UHDGameplayAbility::PlayFlipBookAnimation(FDynamicOnFlipbookComplete OnComp
 	UAbilityTask_PlayFlipbookAndWait* Task = UAbilityTask_PlayFlipbookAndWait::PlayFlipbookAndWaitForEnd(this, AnimSequence);
 	Task->OnCompleted.Add(OnComplete);
 	Task->ReadyForActivation();
+}
+
+UNiagaraComponent* UHDGameplayAbility::GetNiagaraComponent()
+{
+	if (!NiagaraSystem)
+		return nullptr;
+	
+	AActor* Actor = GetAvatarActorFromActorInfo();
+	return UtilFunc::GetNiagaraSystem(GetWorld(), NiagaraSystem, Actor, false);
 }
 
 FGameplayTag UHDGameplayAbility::GetGameplayTag()

@@ -22,7 +22,7 @@ void UBattleState_CharTurn::RegisterListener()
 {
 	const FHDGameplayTags& GameplayTags = FHDGameplayTags::Get();
 
-	UtilFunc::RegisterListener(GetWorld(), GameplayTags.Battle_SelectActive, this, &ThisClass::Request_SelectActive);
+	UtilFunc::RegisterNotifyListener(GetWorld(), GameplayTags.Battle_SelectActive, this, &ThisClass::Request_SelectActive);
 }
 
 void UBattleState_CharTurn::Request_SelectActive(FGameplayTag InChannel, const FBattleEventSelectActivate& InMessage)

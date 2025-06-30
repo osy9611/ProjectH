@@ -16,6 +16,12 @@ class PROJECTH_API UHDDamageWidget : public UUserWidget
 public:
 	UHDDamageWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	void StartDamageWidget(float DamageAmount);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayDamageWidget();
+
+	UFUNCTION(BlueprintCallable)
+	void EndDamageWidget();
 public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> DamageText;

@@ -3,6 +3,7 @@
 
 #include "HDGameplayAbility_ActiveSkill.h"
 #include "AbilitySystemGlobals.h"
+#include "NiagaraComponent.h"
 #include "AnimSequences/PaperZDAnimSequence.h"
 #include "ProjectH/LogChannels.h"
 #include "ProjectH/Battle/HDBattleComponent.h"
@@ -77,7 +78,15 @@ void UHDGameplayAbility_ActiveSkill::ApplyDamage()
 		if (!BattleComp->CheckDead())
 			ExecuteGameEffect(ASC, TargetActor);
 	}
+}
 
+void UHDGameplayAbility_ActiveSkill::PlayEffect()
+{
+	if (NiagaraSystem.IsNull())
+		return;
+
+	UNiagaraComponent* NiagaraComp = GetNiagaraComponent();
+	
 }
 
 void UHDGameplayAbility_ActiveSkill::ExecuteGameEffect(UAbilitySystemComponent* OwnerASC,AActor* TargetActor)

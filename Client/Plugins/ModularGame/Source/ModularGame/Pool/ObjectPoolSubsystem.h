@@ -4,12 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
+#include "ModularGame/Pool/GenericObjectPool.h"
 #include "ObjectPoolSubsystem.generated.h"
 
 class UPoolable_Actor;
 class UPoolable_NiagaraSystem;
 class UNiagaraSystem;
 class UNiagaraComponent;
+class UGenericObjectPool;
 
 UCLASS()
 class MODULARGAME_API UObjectPoolSubsystem : public UWorldSubsystem
@@ -21,19 +23,32 @@ public:
 	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
 
 	UFUNCTION(BlueprintCallable)
-	AActor* GetActor(TSubclassOf<AActor> ClassType);
-	UFUNCTION(BlueprintCallable)
-	void ReturnActor(AActor* Actor);
+	virtual void CreatePool(const FName& PoolName, TSubclassOf<AActor> Actor, int32 Count);
+
+	virtual void CreatePool(const FName& PoolName, TFunction<UObject* (UWorld*)>Generator, int32 Count, TFunction<void(UObject*, bool)>InInitializer = nullptr,
+					TFunction<void(UObject*)>InDeInitializer = nullptr);
 
 	UFUNCTION(BlueprintCallable)
-	UNiagaraComponent* GetNiagaraSystem(UNiagaraSystem* NiagaraSystem, AActor* OwnerActor, bool IsActive);
-	UFUNCTION(BlueprintCallable)
-	void ReturnNiagaraSystem(UNiagaraComponent* NiagaraComp);
+	UObject* Get(FName PoolName,bool IsActive);
 
-private:
+	template<typename T = UObject>
+	T* Get(FName PoolName, bool IsActive);
+
+	UFUNCTION(BlueprintCallable)
+	void Return(FName PoolName, UObject* Obj);
+
+protected:
 	UPROPERTY()
-	TMap<UClass*, UPoolable_Actor*> ObjectPools;
-
-	UPROPERTY()
-	TObjectPtr<UPoolable_NiagaraSystem> NiagaraPools;
+	TMap<FName, UGenericObjectPool*> Pools;
 };
+
+template<typename T>
+T* UObjectPoolSubsystem::Get(FName PoolName, bool IsActive)
+{
+	if (UGenericObjectPool** Pool = Pools.Find(PoolName))
+	{
+		UObject* Result = (*Pool)->Get(IsActive);
+		return Cast<T>(Result);
+	}
+	return nullptr;
+}

@@ -19,5 +19,6 @@ public:
 	virtual void PlayFlipBookAnimation(FDynamicOnFlipbookComplete OnComplete);
 private:
 	void ApplyDamage();
+	void PlayEffect();
 	void ExecuteGameEffect(UAbilitySystemComponent* OwnerASC,AActor* TargetActor);
 };

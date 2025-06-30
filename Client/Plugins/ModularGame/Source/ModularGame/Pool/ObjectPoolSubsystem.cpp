@@ -15,81 +15,64 @@ UObjectPoolSubsystem::UObjectPoolSubsystem()
 
 void UObjectPoolSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 {
-	NiagaraPools = NewObject<UPoolable_NiagaraSystem>(this);
-	NiagaraPools->SpawnRootActor(InWorld);
 }
 
-AActor* UObjectPoolSubsystem::GetActor(TSubclassOf<AActor> ClassType)
+void UObjectPoolSubsystem::CreatePool(const FName& PoolName, TSubclassOf<AActor> Actor, int32 Count)
 {
-	UWorld* World = GetWorld();
-	if (!World)
-	{
-		UE_LOG(Modular, Log, TEXT("[ObjectPoolSubsystem] World Is Null"));
-		return nullptr;
-	}
-	UPoolable_Actor** PoolableActor = ObjectPools.Find(ClassType.Get());
-	if (!PoolableActor)
-	{
-		UPoolable_Actor* NewPool = NewObject<UPoolable_Actor>(this);
-		NewPool->Init(World, ClassType);
-		ObjectPools.Add(ClassType, NewPool);
-		PoolableActor = ObjectPools.Find(ClassType.Get());
-	}
-
-	AActor* Result = (*PoolableActor)->Get(World, true);
-
-	return Result;
-}
-
-void UObjectPoolSubsystem::ReturnActor(AActor* Actor)
-{
-	check(Actor);
-
-	UClass* ClassType = Actor->GetClass();
-	if (ClassType)
-	{
-		if (UPoolable_Actor** PoolableActor = ObjectPools.Find(ClassType))
+	CreatePool(PoolName, [Actor](UWorld* World)
 		{
-			(*PoolableActor)->Return(Actor);
-		}
-		else
+			return World->SpawnActor<AActor>(Actor);
+		},
+		Count,
+		[](UObject* Obj, bool IsActive)
 		{
-			UE_LOG(Modular, Log, TEXT("[ObjectPoolSubsystem] This Class Is Not ObjectPool %s"), *ClassType->GetName());
-		}
-	}
+			if (!Obj)
+				return;
+
+			if (!IsActive)
+				return;
+
+			AActor* Actor = Cast<AActor>(Obj);
+			Actor->SetActorHiddenInGame(false);
+			Actor->SetActorEnableCollision(true);
+			Actor->SetActorTickEnabled(true);
+		},
+		[](UObject* Obj)
+		{
+			AActor* Actor = Cast<AActor>(Obj);
+			Actor->SetActorHiddenInGame(true);
+			Actor->SetActorEnableCollision(false);
+			Actor->SetActorTickEnabled(false);
+		});
 }
 
-UNiagaraComponent* UObjectPoolSubsystem::GetNiagaraSystem(UNiagaraSystem* NiagaraSystem, AActor* OwnerActor, bool IsActive)
+void UObjectPoolSubsystem::CreatePool(const FName& PoolName, TFunction<UObject* (UWorld*)> Generator, int32 Count, TFunction<void(UObject*, bool)>InInitializer, TFunction<void(UObject*)>InDeInitializer)
 {
-	if (!NiagaraPools)
+	if (Pools.Contains(PoolName))
 	{
-		UE_LOG(Modular, Error, TEXT("[ObjectPoolSubsystem] Niagara Pool System Is nullptr"));
-		return nullptr;
-	}
-
-	if (NiagaraPools->IsEmpty())
-	{
-		NiagaraPools->Init();
-	}
-
-	UNiagaraComponent* NiagaraComp = NiagaraPools->Get(NiagaraSystem, OwnerActor, IsActive);
-
-	return NiagaraComp;
-}
-
-void UObjectPoolSubsystem::ReturnNiagaraSystem(UNiagaraComponent* NiagaraComp)
-{
-	if (!NiagaraComp)
-	{
-		UE_LOG(Modular, Error, TEXT("[ObjectPoolSubsystem] Object Return Fail NiagaraComp Is nullptr"));
+		UE_LOG(Modular, Warning, TEXT("[ObjectPoolSubsystem] Pool already exists: %s"), *PoolName.ToString());
 		return;
 	}
 
-	if (!NiagaraPools)
+	UGenericObjectPool* NewPool = NewObject<UGenericObjectPool>(this);
+	NewPool->Init(Generator, Count, InInitializer, InDeInitializer);
+	Pools.Add(PoolName, NewPool);
+}
+
+UObject* UObjectPoolSubsystem::Get(FName PoolName, bool IsActive)
+{
+	if (UGenericObjectPool** Pool = Pools.Find(PoolName))
 	{
-		UE_LOG(Modular, Error, TEXT("[ObjectPoolSubsystem] Niagara Pool System Is nullptr"));
-		return;
+		return (*Pool)->Get(IsActive);
 	}
 
-	NiagaraPools->Return(NiagaraComp);
+	return nullptr;
+}
+
+void UObjectPoolSubsystem::Return(FName PoolName, UObject* Obj)
+{
+	if (UGenericObjectPool** Pool = Pools.Find(PoolName))
+	{
+		(*Pool)->Return(Obj);
+	}
 }

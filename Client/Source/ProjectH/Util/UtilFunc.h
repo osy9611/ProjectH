@@ -11,6 +11,8 @@
 #include "ProjectH/Data/PlayerData/HDPlayerDataSubsystem.h"
 class UHDAssetManager;
 class UModularUserData;
+class UNiagaraSystem;
+class UNiagaraComponent;
 class UHDAbilitySystemComponent;
 
 class PROJECTH_API UtilFunc
@@ -26,12 +28,14 @@ public:
 	static T* GetActorComponent(AActor* TargetActor, const FName& ComponentName);
 
 	template<class UserClass, typename FuncType>
-	static void RegisterListener(UWorld* World,FGameplayTag Channel, UserClass* Object, FuncType Func);
+	static void RegisterNotifyListener(UWorld* World,FGameplayTag Channel, UserClass* Object, FuncType Func);
 
 	template<typename StructType>
-	static void RequestListener(UWorld* World, FGameplayTag Channel, StructType Message);
+	static void RequestNotifyListener(UWorld* World, FGameplayTag Channel, StructType Message);
 
 	static UHDAbilitySystemComponent* GetASC(AActor* Actor);
+	
+	static UNiagaraComponent* GetNiagaraSystem(UWorld* World,UNiagaraSystem* NiagaraSystem,AActor* OwnerActor, bool IsActive);
 };
 
 template<typename T>
@@ -101,7 +105,7 @@ T* UtilFunc::GetActorComponent(AActor* TargetActor, const FName& ComponentName)
 }
 
 template<class UserClass, typename FuncType>
-void UtilFunc::RegisterListener(UWorld* World,FGameplayTag Channel, UserClass* Object, FuncType Func)
+void UtilFunc::RegisterNotifyListener(UWorld* World,FGameplayTag Channel, UserClass* Object, FuncType Func)
 {
 	if (!World)
 		return;
@@ -113,7 +117,7 @@ void UtilFunc::RegisterListener(UWorld* World,FGameplayTag Channel, UserClass* O
 }
 
 template<typename StructType>
-void UtilFunc::RequestListener(UWorld* World, FGameplayTag Channel, StructType Message)
+void UtilFunc::RequestNotifyListener(UWorld* World, FGameplayTag Channel, StructType Message)
 {
 	if (!World)
 		return;

@@ -8,6 +8,7 @@
 #include "ProjectH/Data/GenerateTableData.h"
 #include "ProjectH/Data/EnumGenerateData.h"
 #include "ProjectH/Data/DataManagerSubsystem.h"
+#include "ProjectH/Object/HDObjectPoolSubsystem.h"
 void UGameFeatureAction_BattleSetting::OnGameFeatureDeactivating(FGameFeatureDeactivatingContext& Context)
 {
 	Super::OnGameFeatureDeactivating(Context);
@@ -23,7 +24,23 @@ void UGameFeatureAction_BattleSetting::AddToWorld(const FWorldContext& WorldCont
 		return;
 	}
 
+	SetPool(World);
 	SetBattle(World);
+}
+
+void UGameFeatureAction_BattleSetting::SetPool(UWorld* World)
+{
+	if (!World)
+		return;
+
+	UHDObjectPoolSubsystem* PoolSubsystem = World->GetSubsystem<UHDObjectPoolSubsystem>();
+	if (!PoolSubsystem)
+	{
+		UE_LOG(HDLog, Error, TEXT("[GameFeatureAction_BattleSetting] PoolSubsystem Is nullptr"));
+		return;
+	}
+
+	PoolSubsystem->CreateParticle();
 }
 
 void UGameFeatureAction_BattleSetting::SetBattle(UWorld* World)
