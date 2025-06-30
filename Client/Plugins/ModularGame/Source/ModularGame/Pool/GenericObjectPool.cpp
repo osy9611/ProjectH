@@ -47,7 +47,7 @@ UObject* UGenericObjectPool::Get(bool IsActive)
 		NewObject = ObjectGenrator(GetWorld());
 	}
 
-	if (!Initializer)
+	if (Initializer)
 		Initializer(NewObject, IsActive);
 
 	if (IPoolable* Poolable = Cast<IPoolable>(NewObject))
@@ -67,7 +67,7 @@ void UGenericObjectPool::Return(UObject* ReturnObject)
 
 	ActiveObjects.Remove(ReturnObject);
 
-	if (!DeInitializer)
+	if (DeInitializer)
 		DeInitializer(ReturnObject);
 
 	if (IPoolable* Poolable = Cast<IPoolable>(ReturnObject))

@@ -20,5 +20,9 @@ public:
 private:
 	void ApplyDamage();
 	void PlayEffect();
+
+	void PlayNiagara();
+	void PlayParticle();
+
 	void ExecuteGameEffect(UAbilitySystemComponent* OwnerASC,AActor* TargetActor);
 };

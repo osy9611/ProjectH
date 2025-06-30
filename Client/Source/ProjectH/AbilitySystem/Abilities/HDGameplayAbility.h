@@ -12,6 +12,8 @@ class UModularCameraMode;
 class UPaperFlipbook;
 class UNiagaraSystem;
 class UNiagaraComponent;
+class UParticleSystemComponent;
+class UParticleSystem;
 struct FGameAbilityParam;
 
 DECLARE_DYNAMIC_DELEGATE(FDynamicOnFlipbookComplete);
@@ -35,6 +37,9 @@ public:
 	void SetNiagaraSystem(UNiagaraSystem* InNiagaraSystem) { NiagaraSystem = InNiagaraSystem; }
 
 	UFUNCTION(BlueprintCallable)
+	void SetParticleSystem(UParticleSystem* InParticleSystem) { ParticleSystem = InParticleSystem; }
+
+	UFUNCTION(BlueprintCallable)
 	virtual UNiagaraComponent* GetNiagaraComponent();
 
 protected:
@@ -48,5 +53,6 @@ public:
 
 protected:
 	TObjectPtr<UNiagaraSystem> NiagaraSystem;
+	TObjectPtr<UParticleSystem> ParticleSystem;
 	FGameAbilityParam* Params;
 };

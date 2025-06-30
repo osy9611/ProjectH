@@ -7,13 +7,13 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Particles/ParticleSystem.h"
 #include "ModularGame/Pool/Poolable_NiagaraSystem.h"
-
+PRAGMA_DISABLE_DEPRECATION_WARNINGS
 void UHDObjectPoolSubsystem::CreateParticle()
 {
 	CreatePool("Particle",
 		[this](UWorld* World)
 		{
-			return NewObject<UParticleSystemComponent>(this);
+			return NewObject<UParticleSystemComponent>(SpawnOwnerActor);
 		},
 		5,
 		[this](UObject* Obj, bool IsActive)
@@ -27,9 +27,12 @@ void UHDObjectPoolSubsystem::CreateParticle()
 
 			ParticleComp->OnSystemFinished.AddDynamic(this, &UHDObjectPoolSubsystem::ReturnParticle);
 
-			ParticleComp->SetVisibility(IsActive);
+
 			ParticleComp->RegisterComponent();
-			ParticleComp->Activate(IsActive);
+			ParticleComp->bAutoActivate = false;
+			ParticleComp->ActivateSystem(IsActive);
+			ParticleComp->SetVisibility(IsActive);
+
 		},
 		[](UObject* Obj)
 		{
@@ -55,3 +58,4 @@ void UHDObjectPoolSubsystem::ReturnParticle(UParticleSystemComponent* Particle)
 
 	Return("Particle", Particle);
 }
+PRAGMA_ENABLE_DEPRECATION_WARNINGS

@@ -54,6 +54,9 @@ void UObjectPoolSubsystem::CreatePool(const FName& PoolName, TFunction<UObject* 
 		return;
 	}
 
+	if (!SpawnOwnerActor)
+		CreatePoolRoot();
+
 	UGenericObjectPool* NewPool = NewObject<UGenericObjectPool>(this);
 	NewPool->Init(Generator, Count, InInitializer, InDeInitializer);
 	Pools.Add(PoolName, NewPool);
@@ -75,4 +78,13 @@ void UObjectPoolSubsystem::Return(FName PoolName, UObject* Obj)
 	{
 		(*Pool)->Return(Obj);
 	}
+}
+
+void UObjectPoolSubsystem::CreatePoolRoot()
+{
+	FVector SpawnLocation = FVector(0.0f, 0.0f, 0.0f);
+	FRotator SpawnRotation = FRotator(0.0f, 0.0f, 0.0f);
+
+	SpawnOwnerActor = GetWorld()->SpawnActor<AActor>(AActor::StaticClass(), SpawnLocation, SpawnRotation);
+	SpawnOwnerActor->SetActorLabel(TEXT("PoolingRoot"));
 }

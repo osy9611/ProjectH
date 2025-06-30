@@ -4,6 +4,8 @@
 #include "HDGameplayAbility_ActiveSkill.h"
 #include "AbilitySystemGlobals.h"
 #include "NiagaraComponent.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "AnimSequences/PaperZDAnimSequence.h"
 #include "ProjectH/LogChannels.h"
 #include "ProjectH/Battle/HDBattleComponent.h"
@@ -13,6 +15,7 @@
 #include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet.h"
 #include "ProjectH/AbilitySystem/GameEffect/HDGE_Damage.h"
 #include "ProjectH/Util/UtilFunc.h"
+#include "ProjectH/Util/UtilFunc_Pooling.h"
 
 UHDGameplayAbility_ActiveSkill::UHDGameplayAbility_ActiveSkill(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -39,6 +42,7 @@ void UHDGameplayAbility_ActiveSkill::PlayFlipBookAnimation(FDynamicOnFlipbookCom
 		DamageNotify->OnCallback = [this]()
 			{
 				UE_LOG(HDLog, Log, TEXT("[HDGameplayAbility_ActiveSkill] Notify Call"));
+				PlayEffect();
 				ApplyDamage();
 			};
 	}
@@ -82,11 +86,40 @@ void UHDGameplayAbility_ActiveSkill::ApplyDamage()
 
 void UHDGameplayAbility_ActiveSkill::PlayEffect()
 {
-	if (NiagaraSystem.IsNull())
-		return;
+	if (!NiagaraSystem.IsNull())
+	{
+		PlayNiagara();
+	}
 
-	UNiagaraComponent* NiagaraComp = GetNiagaraComponent();
+	if (ParticleSystem)
+	{
+		PlayParticle();
+	}
+}
+
+void UHDGameplayAbility_ActiveSkill::PlayNiagara()
+{
+}
+
+void UHDGameplayAbility_ActiveSkill::PlayParticle()
+{
+	FBattleStateParams* BattleStateParam = static_cast<FBattleStateParams*>(Params);
+	if (!BattleStateParam)
+		return;
 	
+	for (AActor* TargetActor : BattleStateParam->Objects)
+	{
+		UParticleSystemComponent* ParticleComp = UtilFunc_Pooling::Get<UParticleSystemComponent>(GetWorld(), "Particle", false);
+		if (!ParticleComp)
+			return;
+		
+		ParticleComp->SetTemplate(ParticleSystem);
+		ParticleComp->AttachToComponent(TargetActor->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		ParticleComp->SetRelativeLocation(FVector::ZeroVector);
+
+		ParticleComp->ActivateSystem(true);
+		ParticleComp->SetVisibility(true);
+	}
 }
 
 void UHDGameplayAbility_ActiveSkill::ExecuteGameEffect(UAbilitySystemComponent* OwnerASC,AActor* TargetActor)

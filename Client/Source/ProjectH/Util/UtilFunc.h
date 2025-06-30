@@ -36,6 +36,7 @@ public:
 	static UHDAbilitySystemComponent* GetASC(AActor* Actor);
 	
 	static UNiagaraComponent* GetNiagaraSystem(UWorld* World,UNiagaraSystem* NiagaraSystem,AActor* OwnerActor, bool IsActive);
+
 };
 
 template<typename T>

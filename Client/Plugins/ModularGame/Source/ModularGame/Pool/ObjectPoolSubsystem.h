@@ -38,6 +38,12 @@ public:
 	void Return(FName PoolName, UObject* Obj);
 
 protected:
+	void CreatePoolRoot();
+
+protected:
+	UPROPERTY()
+	TObjectPtr<AActor>SpawnOwnerActor;
+
 	UPROPERTY()
 	TMap<FName, UGenericObjectPool*> Pools;
 };

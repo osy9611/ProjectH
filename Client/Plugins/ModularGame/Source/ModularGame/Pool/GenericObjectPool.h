@@ -15,11 +15,10 @@ class MODULARGAME_API UGenericObjectPool : public UObject
 	GENERATED_BODY()
 public:
 	void Init(TFunction<UObject* (UWorld*)> InGenrator, int32 Count = 5, TFunction<void(UObject*,bool)>InInitializer = nullptr, TFunction<void(UObject*)>InDeInitializer = nullptr);
-	void Destroy();
+
 	UObject* Get(bool IsActive);
 	void Return(UObject* ReturnObject);
-
-
+	
 private:
 	TFunction<UObject* (UWorld*)> ObjectGenrator;
 	TFunction<void(UObject*,bool)>Initializer;
