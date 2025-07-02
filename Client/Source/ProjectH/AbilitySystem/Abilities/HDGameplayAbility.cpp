@@ -26,7 +26,7 @@ void UHDGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 void UHDGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	AActor* Actor = GetAvatarActorFromActorInfo();
-	
+
 	UBattleSubsystem* BattleSubsystem = GetWorld()->GetSubsystem<UBattleSubsystem>();
 	if (BattleSubsystem)
 	{
@@ -54,11 +54,22 @@ void UHDGameplayAbility::PlayFlipBookAnimation(FDynamicOnFlipbookComplete OnComp
 	Task->ReadyForActivation();
 }
 
+void UHDGameplayAbility::SetTargetOffSet(USceneComponent* SceneComp, AActor* Target)
+{
+	if (!SceneComp || !Target)
+		return;
+
+	FVector SpriteSize = UtilFunc_Sprite::GetSpriteSize(Target);
+	FVector CurrentLocation = Target->GetActorLocation();
+	FVector NewLocation = CurrentLocation + SpriteSize;
+	SceneComp->AddLocalOffset(FVector(0.0f, 0.0f, NewLocation.Z));
+}
+
 UNiagaraComponent* UHDGameplayAbility::GetNiagaraComponent()
 {
 	if (!NiagaraSystem)
 		return nullptr;
-	
+
 	AActor* Actor = GetAvatarActorFromActorInfo();
 	return UtilFunc::GetNiagaraSystem(GetWorld(), NiagaraSystem, Actor, false);
 }

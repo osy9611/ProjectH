@@ -61,20 +61,6 @@ FVector UtilFunc_Sprite::GetSpriteSize(AActor* Actor)
 		return FVector();
 	}
 
-	/*UPaperFlipbookComponent* FlipbookComp = GetFlipbookComponent(Actor);
-	if (!FlipbookComp)
-	{
-		UE_LOG(HDLog, Log, TEXT("[UtilFunc_Sprite] GetSpriteSize Fail FlipbookComp is nullptr"));
-		return nullptr;
-	}
-
-	FBoxSphereBounds RenderBounds = Sprite->GetRenderBounds();
-	FVector Extent = RenderBounds.BoxExtent;
-	FVector FullSize = Extent * 2.0f;
-
-	FVector ComponentScale = FlipbookComp->GetComponentScale();
-	FVector ScaledRenderSize = FullSize * ComponentScale;*/
-
 	FBoxSphereBounds RenderBounds = Sprite->GetRenderBounds();
 	FVector Extent = RenderBounds.BoxExtent;
 

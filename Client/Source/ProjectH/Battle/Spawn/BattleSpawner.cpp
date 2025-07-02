@@ -24,6 +24,7 @@
 #include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet_Monster.h"
 #include "ProjectH/UI/Battle/BattleTargetWidget.h"
 #include "ProjectH/UI/Battle/BattleMonsterInfoWidget.h"
+#include "ProjectH/Battle/AI/BattleAIController.h"
 
 
 void UBattleSpawner::RegisterBPActor(TSubclassOf<AActor> BPActor, TSubclassOf<AActor> BPAIController)
@@ -166,6 +167,17 @@ void UBattleSpawner::SetBattleMonsters(int32 GroupID)
 
 			if (UHDBattleComponent* BattleComp = UHDBattleComponent::FindBattleComponent(SpawnedPawn))
 			{
+
+				AController* Controller = SpawnedPawn->GetController();
+				if (Controller)
+				{
+					ABattleAIController* AIController = Cast<ABattleAIController>(Controller);
+					if (AIController)
+					{
+						AIController->OnInit(ResourceData);
+					}
+				}
+
 				BattleComp->RegisterBattleData(AttributeSet);
 
 				FVector SpriteSize = UtilFunc_Sprite::GetSpriteSize(SpawnedPawn);
@@ -245,9 +257,10 @@ APawn* UBattleSpawner::SpawnPawn(TSubclassOf<AActor> Actor, ECharType CharType, 
 	SpawnInfo.bDeferConstruction = true;
 
 
-	if (APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(Actor, SpawnPoint, SpawnInfo))
+	if (APawn* SpawnedPawn = GetWorld()->SpawnActorDeferred<APawn>(Actor, SpawnPoint))
 	{
-		SpawnedPawn->FinishSpawning(SpawnPoint);
+		UGameplayStatics::FinishSpawningActor(SpawnedPawn, SpawnPoint);
+		//SpawnedPawn->FinishSpawning(SpawnPoint);
 
 		UHDPawnExtensionComponent* PawnExtComp = UHDPawnExtensionComponent::FindPawnExtensionComponent(SpawnedPawn);
 

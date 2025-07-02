@@ -28,6 +28,18 @@ void ABattleAIController::OnInit(UBattleResourceData_AI* ResourceData)
 	if (BlackboardAsset)
 	{
 		UseBlackboard(BlackboardAsset, BlackboardComp);
-		RunBehaviorTree(BehaviorTree);
+		//RunBehaviorTree(BehaviorTree);
 	}
+}
+
+void ABattleAIController::OnStartBehavior()
+{
+	Blackboard->SetValueAsBool("IsOwnTurn", true);
+	BehaviorTreeComp->StartTree(*BehaviorTree);
+}
+
+void ABattleAIController::OnEndBehavior()
+{
+	Blackboard->SetValueAsBool("IsOwnTurn", false);
+	BehaviorTreeComp->StopTree();
 }

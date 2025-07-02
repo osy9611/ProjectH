@@ -2,6 +2,8 @@
 
 
 #include "BattleState_MonsterTurn.h"
+#include "ProjectH/Battle/AI/BattleAIController.h"
+#include "ProjectH/Battle/Turn/TurnManager.h"
 
 void UBattleState_MonsterTurn::Initailize()
 {
@@ -12,13 +14,29 @@ void UBattleState_MonsterTurn::DoStart()
 {
 	Super::DoStart();
 
-	//우선 임시로 처리한다(AI가 구현이 아직 안되서)
-	ChangeState(EBattleState::Play);
+	if (!TurnManager.IsValid())
+		return;
+
+	UHDBattleComponent* BattleComp = TurnManager->GetCurrentActor();
+	if (!BattleComp)
+		return;
+
+	ABattleAIController* Controller = BattleComp->GetController<ABattleAIController>();
+	if (!Controller)
+		return;
+
+	CurrentAIController = Controller;
+	CurrentAIController->OnStartBehavior();
 }
 
 void UBattleState_MonsterTurn::DoEnd()
 {
 	Super::DoEnd();
+	if (!CurrentAIController.IsValid())
+		return;
+
+	CurrentAIController->OnEndBehavior();
+	CurrentAIController = nullptr;
 }
 
 void UBattleState_MonsterTurn::Update(float DeltaTime)

@@ -39,6 +39,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetParticleSystem(UParticleSystem* InParticleSystem) { ParticleSystem = InParticleSystem; }
 
+	void SetTargetOffSet(USceneComponent* SceneComp, AActor* Target);
+	
 	UFUNCTION(BlueprintCallable)
 	virtual UNiagaraComponent* GetNiagaraComponent();
 

@@ -15,6 +15,7 @@
 #include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet.h"
 #include "ProjectH/AbilitySystem/GameEffect/HDGE_Damage.h"
 #include "ProjectH/Util/UtilFunc.h"
+#include "ProjectH/Util/UtilFunc_Sprite.h"
 #include "ProjectH/Util/UtilFunc_Pooling.h"
 
 UHDGameplayAbility_ActiveSkill::UHDGameplayAbility_ActiveSkill(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -35,7 +36,7 @@ void UHDGameplayAbility_ActiveSkill::PlayFlipBookAnimation(FDynamicOnFlipbookCom
 
 	for (UPaperZDAnimNotify_Base* Notify : Notifies)
 	{
-		UPaperZDAnimNotify_Damage* DamageNotify = Cast<UPaperZDAnimNotify_Damage>(Notify);
+	 	UPaperZDAnimNotify_Damage * DamageNotify = Cast<UPaperZDAnimNotify_Damage>(Notify);
 		if (!DamageNotify)
 			continue;
 
@@ -119,6 +120,8 @@ void UHDGameplayAbility_ActiveSkill::PlayParticle()
 
 		ParticleComp->ActivateSystem(true);
 		ParticleComp->SetVisibility(true);
+
+		SetTargetOffSet(ParticleComp, TargetActor);
 	}
 }
 

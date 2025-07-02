@@ -19,6 +19,9 @@ public:
 	ABattleAIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	void OnInit(UBattleResourceData_AI* ResourceData);
+
+	void OnStartBehavior();
+	void OnEndBehavior();
 public:
 	UPROPERTY()
 	TObjectPtr<UBehaviorTree> BehaviorTree;
