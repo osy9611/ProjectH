@@ -22,7 +22,7 @@ class PROJECTH_API UBattleSpawner : public UObject
 	GENERATED_BODY()
 public:
 	void RegisterBPActor(TSubclassOf<AActor> BPActor, TSubclassOf<AActor> BPAIController);
-	void OnInit(FSceneData* SceneDatas, TFunction<void(const FBattleStateParams)> AttackExecute);
+	void OnInit(FSceneData* SceneDatas, TFunction<void(FBattleStateParams&)> AttackExecute);
 	void GetBattlePoints();
 	void SetBattleCharacters();
 	void SetBattleMonsters(int32 GroupID);
@@ -61,6 +61,6 @@ private:
 	TMap<int32, AActor*> BattleMonsterDatas;
 
 
-	TFunction<void(const FBattleStateParams)> HandleAttackExecute;
+	TFunction<void(FBattleStateParams&)> HandleAttackExecute;
 
 };

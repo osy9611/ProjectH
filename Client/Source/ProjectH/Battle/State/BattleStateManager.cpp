@@ -30,7 +30,7 @@ void UBattleStateManager::OnStart()
 	States[CurrentState]->DoStart();
 }
 
-void UBattleStateManager::OnAttackExecute(const FBattleStateParams& Params)
+void UBattleStateManager::OnAttackExecute(FBattleStateParams& Params)
 {
 	if (CurrentState == EBattleState::Monster_Turn || CurrentState == EBattleState::Char_Turn)
 	{

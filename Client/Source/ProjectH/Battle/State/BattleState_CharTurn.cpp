@@ -47,7 +47,7 @@ void UBattleState_CharTurn::Initailize()
 		return;
 	}
 
-	TArray<AActor*> MonsterActors= BattleSubsystem->GetMonsterActors();
+	TArray<AActor*> MonsterActors = BattleSubsystem->GetMonsterActors();
 	for (AActor* Actor : MonsterActors)
 	{
 		UWidgetComponent* MonsterWidgetComp = UtilFunc::GetActorComponent<UWidgetComponent>(Actor, "TargetWidget");
@@ -77,7 +77,7 @@ void UBattleState_CharTurn::DoEnd()
 	Super::DoEnd();
 }
 
-void UBattleState_CharTurn::DoExecute(const FBattleStateParams& Params)
+void UBattleState_CharTurn::DoExecute(FBattleStateParams& Params)
 {
 	UHDBattleComponent* BattleComp = TurnManager->GetCurrentActor();
 	if (!BattleComp)
@@ -85,8 +85,8 @@ void UBattleState_CharTurn::DoExecute(const FBattleStateParams& Params)
 
 	if (BattleComp->CharType != ECharType::Character)
 		return;
-
-	BattleComp->ProcessAbility_Skill(CurrentSelectActive, Params);
+	Params.SkillTag = MoveTemp(CurrentSelectActive);
+	BattleComp->ProcessAbility_Skill(Params);
 	BattleWidget->DeActiveBattleCharActiveWidget();
 
 	DeActiveMonsterTargetWiget();
@@ -102,7 +102,7 @@ void UBattleState_CharTurn::HandleEndSequence(TFunction<void()> Callback)
 	UHDBattleComponent* BattleComp = TurnManager->GetCurrentActor();
 	if (!BattleComp)
 		return;
-	
+
 	int32 SlotNo = BattleComp->SlotNo;
 
 	FMovieSceneSequencePlaybackSettings PlaybackSettings;

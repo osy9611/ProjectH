@@ -20,6 +20,7 @@ void UBattleSubsystem::Deinitialize()
 
 void UBattleSubsystem::OnStartBattle()
 {
+	BattleRandomSkillSelect.Initialize(FDateTime::Now().GetTicks() % INT32_MAX);
 	StateManager->OnStart();
 }
 
@@ -61,7 +62,7 @@ void UBattleSubsystem::InitSpawner(FSceneData* SceneData, TSubclassOf<AActor> BP
 
 	BattleSpawner->RegisterBPActor(BPActor, BPAIController);
 
-	BattleSpawner->OnInit(SceneData, [this](const FBattleStateParams& Params)
+	BattleSpawner->OnInit(SceneData, [this](FBattleStateParams& Params)
 		{
 			HandleAttackExecute(Params);
 		});
@@ -90,7 +91,7 @@ void UBattleSubsystem::ChangeState(EBattleState Type)
 	StateManager->ChangeState(Type);
 }
 
-void UBattleSubsystem::HandleAttackExecute(const FBattleStateParams& Target)
+void UBattleSubsystem::HandleAttackExecute(FBattleStateParams& Target)
 {
 	if (!StateManager)
 		return;
@@ -149,6 +150,12 @@ void UBattleSubsystem::InitInput()
 	UBattleInput* NewInput = NewObject<UBattleInput>(this);
 	Input = NewInput;
 	Input->OnInit();
+}
+
+int32 UBattleSubsystem::RandomSkillSelect(int32 Min, int32 Max)
+{
+	int32 Result = BattleRandomSkillSelect.RandRange(Min, Max);
+	return Result;
 }
 
 bool UBattleSubsystem::IsWin()

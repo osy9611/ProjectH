@@ -18,6 +18,8 @@ struct FBattleStateParams : public FGameAbilityParam
 	GENERATED_BODY()
 public:
 	TArray<AActor*> Objects;
+	FGameplayTag SkillTag;
+	TFunction<void()> OnEndAbilityCallBack;
 
 	virtual FGameAbilityParam* Clone() const override
 	{
@@ -36,7 +38,7 @@ public:
 	virtual void Initailize();
 	virtual void DoStart() {}
 	virtual void DoEnd() {}
-	virtual void DoExecute(const FBattleStateParams& Params){}	//즉시 State관련 실행을 하기 위해서 사용
+	virtual void DoExecute(FBattleStateParams& Params) {}	//즉시 State관련 실행을 하기 위해서 사용
 	virtual void Update(float DeltaTime) {}
 	virtual void ChangeState(EBattleState State);
 

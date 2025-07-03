@@ -33,7 +33,7 @@ void UBattleSpawner::RegisterBPActor(TSubclassOf<AActor> BPActor, TSubclassOf<AA
 	BattleAIActor = BPAIController;
 }
 
-void UBattleSpawner::OnInit(FSceneData* SceneData, TFunction<void(const FBattleStateParams)> AttackExecute)
+void UBattleSpawner::OnInit(FSceneData* SceneData, TFunction<void(FBattleStateParams&)> AttackExecute)
 {
 	if (!SceneData)
 	{

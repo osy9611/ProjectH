@@ -34,7 +34,7 @@ public:
 	virtual void CheckDefaultInitialization() final;
 
 	void ProcessAbility(FGameplayTag Tag);
-	void ProcessAbility_Skill(FGameplayTag Tag, const FBattleStateParams& Params);
+	void ProcessAbility_Skill(const FBattleStateParams& Params);
 	void RegisterBattleData(UHDAttributeSet* AttributeSet);
 
 	UHDAttributeSet* GetAttributeSet() const;

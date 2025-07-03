@@ -9,16 +9,23 @@
 class AAIController;
 class UBehaviorTreeComponent;
 class UHDBattleComponent;
+struct FBattleStateParams;
 
-class PROJECTH_API UtlFunc_AI
+class PROJECTH_API UtilFunc_AI
 {
 public:
 	template<typename T = AAIController>
-	T* GetAIController(UBehaviorTreeComponent& OwnerComp);
+	static T* GetAIController(UBehaviorTreeComponent& OwnerComp);
+
+	static UHDBattleComponent* GetBattleComponent(UBehaviorTreeComponent& Comp);
+
+	static int32 RandomSkillSelect(UWorld* World,int32 Min, int32 Max);
+
+	static void ExecuteSkill(UWorld* World, FBattleStateParams& Params);
 };
 
 template<typename T>
-T* UtlFunc_AI::GetAIController(UBehaviorTreeComponent& OwnerComp)
+T* UtilFunc_AI::GetAIController(UBehaviorTreeComponent& OwnerComp)
 {
 	AAIController* Controller = OwnerComp.GetAIOwner();
 	if (!Controller)

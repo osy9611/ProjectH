@@ -4,6 +4,7 @@
 #include "BTTaskNode_CheckDeath.h"
 #include "AIController.h"
 #include "ProjectH/LogChannels.h"
+#include "ProjectH/Util/UtilFunc_AI.h"
 #include "ProjectH/Battle/HDBattleComponent.h"
 
 UBTTaskNode_CheckDeath::UBTTaskNode_CheckDeath()
@@ -12,16 +13,7 @@ UBTTaskNode_CheckDeath::UBTTaskNode_CheckDeath()
 
 EBTNodeResult::Type UBTTaskNode_CheckDeath::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	AAIController* Controller = OwnerComp.GetAIOwner();
-	if (!Controller)
-		return EBTNodeResult::Failed;
-
-	APawn* Pawn = Controller->GetPawn();
-
-	if (!Pawn)
-		return EBTNodeResult::Failed;
-
-	UHDBattleComponent* BattleComp = UHDBattleComponent::FindBattleComponent(Pawn);
+	UHDBattleComponent* BattleComp = UtilFunc_AI::GetBattleComponent(OwnerComp);
 	if (!BattleComp)
 		return EBTNodeResult::Failed;
 

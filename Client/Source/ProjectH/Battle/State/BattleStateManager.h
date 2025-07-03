@@ -30,7 +30,7 @@ public:
 	void RegisterState();
 	void OnInit();
 	void OnStart();
-	void OnAttackExecute(const FBattleStateParams& Params);
+	void OnAttackExecute(FBattleStateParams& Params);
 	void CheckBattleState();
 
 	void UpdateState(float DeltaTime);

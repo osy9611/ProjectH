@@ -41,7 +41,7 @@ public:
 	//StateManager
 	void InitState();
 	void ChangeState(EBattleState Type);
-	void HandleAttackExecute(const FBattleStateParams& Target);
+	void HandleAttackExecute(FBattleStateParams& Target);
 	void CheckBattleState();
 
 	//TurnManager
@@ -51,6 +51,8 @@ public:
 
 	//BattleInput
 	void InitInput();
+
+	int32 RandomSkillSelect(int32 Min, int32 Max);
 
 	bool IsWin();
 	bool IsLose();
@@ -81,4 +83,7 @@ private:
 	TObjectPtr<UBattleInput> Input;
 
 	bool IsBattle = false;
+
+	UPROPERTY()
+	FRandomStream BattleRandomSkillSelect;
 };

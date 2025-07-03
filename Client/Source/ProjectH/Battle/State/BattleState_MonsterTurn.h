@@ -15,6 +15,7 @@ public:
 	virtual void Initailize() override;
 	virtual void DoStart() override;
 	virtual void DoEnd() override;
+	virtual void DoExecute(FBattleStateParams& Params) override;
 	virtual void Update(float DeltaTime) override;
 
 private:

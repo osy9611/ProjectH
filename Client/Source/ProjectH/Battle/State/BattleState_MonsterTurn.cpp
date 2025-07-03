@@ -39,6 +39,18 @@ void UBattleState_MonsterTurn::DoEnd()
 	CurrentAIController = nullptr;
 }
 
+void UBattleState_MonsterTurn::DoExecute(FBattleStateParams& Params)
+{
+	UHDBattleComponent* BattleComp = TurnManager->GetCurrentActor();
+	if (!BattleComp)
+		return;
+
+	if (BattleComp->CharType != ECharType::Monster)
+		return;
+
+	BattleComp->ProcessAbility_Skill(Params);
+}
+
 void UBattleState_MonsterTurn::Update(float DeltaTime)
 {
 	Super::Update(DeltaTime);

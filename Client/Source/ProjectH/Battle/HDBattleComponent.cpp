@@ -156,7 +156,7 @@ void UHDBattleComponent::ProcessAbility(FGameplayTag Tag)
 		ASC->ProcessAbility(Tag);
 }
 
-void UHDBattleComponent::ProcessAbility_Skill(FGameplayTag Tag, const FBattleStateParams& Params)
+void UHDBattleComponent::ProcessAbility_Skill(const FBattleStateParams& Params)
 {
 	APawn* Pawn = GetPawn<APawn>();
 
@@ -174,7 +174,7 @@ void UHDBattleComponent::ProcessAbility_Skill(FGameplayTag Tag, const FBattleSta
 		return;
 
 	//Set Target Params
-	FSkillData* SkillData = const_cast<UHDAttributeSet*>(AttributeSet)->GetSkillData(Tag);
+	FSkillData* SkillData = const_cast<UHDAttributeSet*>(AttributeSet)->GetSkillData(Params.SkillTag);
 	if (!SkillData)
 		return;
 
@@ -192,12 +192,20 @@ void UHDBattleComponent::ProcessAbility_Skill(FGameplayTag Tag, const FBattleSta
 			const_cast<FBattleStateParams&>(Params).Objects = BattleSubsystem->GetCharacterActors();
 	}
 
-	UGameplayAbility* GA = ASC->GetAbility(Tag);
+	UGameplayAbility* GA = ASC->GetAbility(Params.SkillTag);
 	if (!GA)
 		return;
 
+	GA->OnGameplayAbilityEnded.AddWeakLambda(this,[Params](UGameplayAbility* GameAbility)
+		{
+			if (!GameAbility)
+				return;
+			if (Params.OnEndAbilityCallBack)
+				Params.OnEndAbilityCallBack();
+		});
+
 	if (ASC)
-		ASC->ProcessAbilityAndParam(Tag, Params);
+		ASC->ProcessAbilityAndParam(Params.SkillTag, Params);
 }
 
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
