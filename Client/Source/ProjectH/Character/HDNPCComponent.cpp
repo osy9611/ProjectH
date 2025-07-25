@@ -153,7 +153,6 @@ void UHDNPCComponent::RegisterInteractionHandler()
 				return;
 			}
 
-
 			if (OnDialog.IsBound())
 			{
 				APawn* Pawn = GetPawn<APawn>();

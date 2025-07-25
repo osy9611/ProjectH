@@ -174,7 +174,7 @@ bool UHDPawnExtensionComponent::CanChangeInitState(UGameFrameworkComponentManage
 	//DataAvailable -> DataInitialized
 	if (CurrentState == InitTags.InitState_DataAvailable && DesiredState == InitTags.InitState_DataInitialized)
 	{
-		//Actor에 바인드된 모든 Feature들이 DataAvailable 상태일 때, DataInitialized로 넘어감:
+		//Actor에 붙어 있는 모든 InitState 참여 컴포넌트 들이 전부 InitState_DataAvailabled인지 체크:
 		// - HaveAllFeaturesReachedInitState 확인
 		return Manager->HaveAllFeaturesReachedInitState(Pawn, InitTags.InitState_DataAvailable);
 	}

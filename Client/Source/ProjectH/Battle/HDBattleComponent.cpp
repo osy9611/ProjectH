@@ -122,6 +122,9 @@ void UHDBattleComponent::HandleChangeInitState(UGameFrameworkComponentManager* M
 
 		if (UHDPawnExtensionComponent* PawnExtComp = UHDPawnExtensionComponent::FindPawnExtensionComponent(Pawn))
 		{
+			if (Pawn->GetPlayerState())
+				return;  
+
 			AHDPlayerState* HDPlayerState = GetWorld()->SpawnActor<AHDPlayerState>(AHDPlayerState::StaticClass());
 			if (HDPlayerState)
 			{

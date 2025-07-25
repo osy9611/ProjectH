@@ -31,6 +31,9 @@ public:
 	virtual void OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult) override;
 	void ActivateSkillAction(UHDBattleComponent* BattleComp);
 	FGameplayTag SelectAction();
+
+	TArray<AActor*> GetTarget(FGameplayTag SkillTag);
+
 	int32 SumValue();
 	void OnCompleteSkillAction();
 

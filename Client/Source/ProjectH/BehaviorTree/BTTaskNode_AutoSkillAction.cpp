@@ -100,6 +100,14 @@ FGameplayTag UBTTaskNode_AutoSkillAction::SelectAction()
 	return FGameplayTag();
 }
 
+TArray<AActor*> UBTTaskNode_AutoSkillAction::GetTarget(FGameplayTag SkillTag)
+{
+	TArray<AActor*> Result;
+
+
+	return Result;
+}
+
 int32 UBTTaskNode_AutoSkillAction::SumValue()
 {
 	int32 Result = 0;

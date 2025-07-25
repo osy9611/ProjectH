@@ -171,8 +171,6 @@ void AHDGameModeBase::OnExperienceLoaded(const UHDExperienceDefinition* CurrentE
 			NPCComp->CheckDefaultInitialization(); // or 별도 Init 함수를 만들어 호출
 		}
 	}
-
-
 }
 
 const UHDPawnData* AHDGameModeBase::GetPawnDataForController(const AController* InController) const
