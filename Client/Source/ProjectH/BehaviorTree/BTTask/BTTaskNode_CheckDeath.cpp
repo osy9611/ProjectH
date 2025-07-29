@@ -13,8 +13,9 @@ UBTTaskNode_CheckDeath::UBTTaskNode_CheckDeath()
 
 EBTNodeResult::Type UBTTaskNode_CheckDeath::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	UHDBattleComponent* BattleComp = UtilFunc_AI::GetBattleComponent(OwnerComp);
-	if (!BattleComp)
+	Super::ExecuteTask(OwnerComp, NodeMemory);
+
+	if (!BattleComp.IsValid())
 		return EBTNodeResult::Failed;
 
 	if (BattleComp->CheckDead())

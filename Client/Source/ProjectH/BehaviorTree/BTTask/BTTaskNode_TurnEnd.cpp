@@ -19,5 +19,5 @@ EBTNodeResult::Type UBTTaskNode_TurnEnd::ExecuteTask(UBehaviorTreeComponent& Own
 
 	BattleSubsystem->CheckBattleState();
 
-	return EBTNodeResult::Succeeded;
+	return Super::ExecuteTask(OwnerComp,NodeMemory);
 }

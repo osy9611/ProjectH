@@ -176,6 +176,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ESkillTargetType SkillTargetType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TargetCount;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDamageType DamageType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AddDamageRate;

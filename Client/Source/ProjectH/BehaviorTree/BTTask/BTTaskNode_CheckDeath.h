@@ -4,17 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "BTTaskNode_TurnEnd.generated.h"
+#include "ProjectH/BehaviorTree/BTTask/BTTaskNode_Base.h"
+#include "BTTaskNode_CheckDeath.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTH_API UBTTaskNode_TurnEnd : public UBTTaskNode
+class PROJECTH_API UBTTaskNode_CheckDeath : public UBTTaskNode_Base
 {
 	GENERATED_BODY()
 public:
-	UBTTaskNode_TurnEnd();
+	UBTTaskNode_CheckDeath();
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 };

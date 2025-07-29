@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ProjectH/LogChannels.h"
+#include "ProjectH/Data/EnumGenerateData.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 
 class AAIController;
@@ -22,6 +23,8 @@ public:
 	static int32 RandomSkillSelect(UWorld* World,int32 Min, int32 Max);
 
 	static void ExecuteSkill(UWorld* World, FBattleStateParams& Params);
+
+	static TArray<AActor*> GetTarget(UWorld* World,ECharType CharType);
 };
 
 template<typename T>
