@@ -19,7 +19,7 @@ UHDBattleComponent* UtilFunc_AI::GetBattleComponent(UBehaviorTreeComponent& Comp
 	return BattleComp;
 }
 
-int32 UtilFunc_AI::RandomSkillSelect(UWorld* World, int32 Min, int32 Max)
+int32 UtilFunc_AI::RandomBattleSelect(UWorld* World, int32 Min, int32 Max)
 {
 	UBattleSubsystem* BattleSubsystem = World->GetSubsystem<UBattleSubsystem>();
 	if (!BattleSubsystem)
@@ -28,7 +28,7 @@ int32 UtilFunc_AI::RandomSkillSelect(UWorld* World, int32 Min, int32 Max)
 		return int32();
 	}
 
-	return BattleSubsystem->RandomSkillSelect(Min, Max);
+	return BattleSubsystem->RandomBattleSelect(Min, Max);
 }
 
 void UtilFunc_AI::ExecuteSkill(UWorld* World, FBattleStateParams& Params)
@@ -52,7 +52,7 @@ TArray<AActor*> UtilFunc_AI::GetTarget(UWorld* World, ECharType CharType)
 		return Result;
 	}
 
-	if (CharType == ECharType::Monster)
+	if (CharType == ECharType::Character)
 	{
 		Result = BattleSubsystem->GetCharacterActors();
 	}

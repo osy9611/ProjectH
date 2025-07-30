@@ -20,7 +20,7 @@ void UBattleSubsystem::Deinitialize()
 
 void UBattleSubsystem::OnStartBattle()
 {
-	BattleRandomSkillSelect.Initialize(FDateTime::Now().GetTicks() % INT32_MAX);
+	BattleRandomSelect.Initialize(FDateTime::Now().GetTicks() % INT32_MAX);
 	StateManager->OnStart();
 }
 
@@ -152,9 +152,9 @@ void UBattleSubsystem::InitInput()
 	Input->OnInit();
 }
 
-int32 UBattleSubsystem::RandomSkillSelect(int32 Min, int32 Max)
+int32 UBattleSubsystem::RandomBattleSelect(int32 Min, int32 Max)
 {
-	int32 Result = BattleRandomSkillSelect.RandRange(Min, Max);
+	int32 Result = BattleRandomSelect.RandRange(Min, Max);
 	return Result;
 }
 

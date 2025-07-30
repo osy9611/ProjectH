@@ -8,6 +8,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "AnimSequences/PaperZDAnimSequence.h"
 #include "ProjectH/LogChannels.h"
+#include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet.h"
 #include "ProjectH/Battle/HDBattleComponent.h"
 #include "ProjectH/Battle/BattleSubsystem.h"
 #include "ProjectH/Battle/State/BattleState.h"

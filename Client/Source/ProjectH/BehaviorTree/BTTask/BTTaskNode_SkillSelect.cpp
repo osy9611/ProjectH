@@ -64,7 +64,7 @@ FGameplayTag UBTTaskNode_SkillSelect::SelectAction()
 		}
 	}
 
-	int32 RandomValue = UtilFunc_AI::RandomSkillSelect(GetWorld(), 0, 1000);
+	int32 RandomValue = UtilFunc_AI::RandomBattleSelect(GetWorld(), 0, 1000);
 
 	int32 CurValue = 0;
 	for (FBTSkillInfo& SkillInfo : SkillInfos)

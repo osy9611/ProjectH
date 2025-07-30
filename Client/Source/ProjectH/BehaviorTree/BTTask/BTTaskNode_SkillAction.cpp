@@ -2,12 +2,14 @@
 
 
 #include "BTTaskNode_SkillAction.h"
+#include "Algo/Accumulate.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "ProjectH/LogChannels.h"
 #include "ProjectH/Data/GenerateTableData.h"
 #include "ProjectH/Battle/HDBattleComponent.h"
 #include "ProjectH/Battle/BattleSubsystem.h"
 #include "ProjectH/Util/UtilFunc_AI.h"
+#include "ProjectH/Util/UtilFunc_Data.h"
 #include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet.h"
 #include "ProjectH/Battle/State/BattleState.h"
 
@@ -16,8 +18,10 @@ EBTNodeResult::Type UBTTaskNode_SkillAction::ExecuteTask(UBehaviorTreeComponent&
 	if (IsCompleted)
 		return EBTNodeResult::Succeeded;
 
+	Super::ExecuteTask(OwnerComp, NodeMemory);
+	ActiveSkillAction();
 
-	return Super::ExecuteTask(OwnerComp, NodeMemory);
+	return EBTNodeResult::InProgress;
 }
 
 void UBTTaskNode_SkillAction::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult)
@@ -33,6 +37,7 @@ void UBTTaskNode_SkillAction::ActiveSkillAction()
 
 	FBattleStateParams Params;
 	Params.SkillTag = ActionTag;
+	Params.Objects = OnSelectTarget(ActionTag);
 	Params.OnEndAbilityCallBack = [this]()
 		{
 			CompleteActiveSkill();
@@ -75,17 +80,17 @@ TArray<AActor*> UBTTaskNode_SkillAction::OnSelectTarget(FGameplayTag GameplayTag
 
 	//SelectTarget
 	ECharType TargetType = BattleComp->CharType == ECharType::Character ? ECharType::Monster : ECharType::Character;
-	
+
 	switch (SkillData->SkillTargetType)
 	{
 	case ESkillTargetType::Mine:
 		Result = { BattleComp->GetOwner() };
 		break;
 	case ESkillTargetType::TeamAll:
-		Result = UtilFunc_AI::GetTarget(GetWorld(), TargetType);
+		Result = UtilFunc_AI::GetTarget(GetWorld(), BattleComp->CharType);
 		break;
 	case ESkillTargetType::Enemy_One:
-		
+		Result = SelectTarget(UtilFunc_AI::GetTarget(GetWorld(), TargetType), 1);
 		break;
 	case ESkillTargetType::Enemy_All:
 		Result = UtilFunc_AI::GetTarget(GetWorld(), TargetType);
@@ -126,7 +131,85 @@ TArray<AActor*> UBTTaskNode_SkillAction::SelectTargetRandom(TArray<AActor*> Targ
 	return Result;
 }
 
+//일반 타겟 설정법
+//1.어그로
+//2.HP 보너스
+//3.기타 (추후 따로 구현)
 TArray<AActor*> UBTTaskNode_SkillAction::SelectTarget(TArray<AActor*> TargetActor, int32 Count)
 {
-	return TArray<AActor*>();
+	TArray<float> TargetPers;
+	for (AActor* Actor : TargetActor)
+	{
+		UHDBattleComponent* TargetBattleComp = UHDBattleComponent::FindBattleComponent(Actor);
+		if (!TargetBattleComp)
+			continue;
+
+		UHDAttributeSet* AttributeSet = TargetBattleComp->GetAttributeSet();
+
+		if (!AttributeSet)
+			continue;
+
+		AttributeSet->OnUpdateStatus();
+
+		//1. Threat 추가
+		float TargetPer = AttributeSet->GetThreat();
+
+		//2. HP 보너스 추가
+		float HPPer = AttributeSet->GetHP() / AttributeSet->GetOriginHP();
+		if (HPPer < MiddleHPBonus)
+			TargetPer += UtilFunc_Data::GetBattleConstValue(GetWorld(), EBattleConstType::HPMidBonus);
+		else if (HPPer < MaxHPBonus)
+			TargetPer += UtilFunc_Data::GetBattleConstValue(GetWorld(), EBattleConstType::HPMaxBonus);
+
+
+		TargetPers.Add(TargetPer);
+	}
+
+	//1. 모든 확률의 합을 구하고
+	int32 SumRate = Algo::Accumulate(TargetPers, 0.0f);
+
+	//2. 총합이 1000을 못넘기면
+	if (SumRate < 1000)
+	{
+		//3. 남은 확률을 구해서 각 확률에 분배해서 넣어준다.
+		int32 RemainRate = 1000 - SumRate;
+		int32 Value = RemainRate / TargetPers.Num();
+
+		for (float& TargetPer : TargetPers)
+		{
+			TargetPer += Value;
+		}
+	}
+
+	//4. 그래도 1000이 안되면
+	SumRate = Algo::Accumulate(TargetPers, 0.0f);
+	if (SumRate < 1000)
+	{
+		//5. 0번 인덱스에 남은 값을 몰아준다
+		int32 RemainRate = 1000 - SumRate;
+		if (TargetPers.Num() > 0)
+		{
+			TargetPers[0] += RemainRate;
+		}
+	}
+
+	int32 RandomValue = UtilFunc_AI::RandomBattleSelect(GetWorld(), 0, 1000);
+
+	int32 CurValue = 0;
+
+	TArray<AActor*> Result;
+	for (int32 i = 0; i < TargetPers.Num(); ++i)
+	{
+		CurValue += TargetPers[i];
+
+		if (CurValue < RandomValue)
+			continue;
+
+		if (Result.Num() < Count)
+		{
+			Result.Add(TargetActor[i]);
+		}
+	}
+
+	return Result;
 }

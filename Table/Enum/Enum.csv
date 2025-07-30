@@ -21,8 +21,12 @@
 ,!Enumerator,Magical,!End,마법 데미지
 ,,,,
 ,!Enum,SkillTargetType,,
-,!Enumerator,Mine,,물리 데미지
-,!Enumerator,TeamAll,,마법 데미지
-,!Enumerator,Enemy_One,,물리 데미지
-,!Enumerator,Enemy_All,,마법 데미지
-,!Enumerator,Random,!End,물리 데미지
+,!Enumerator,Mine,,자신
+,!Enumerator,TeamAll,,팀 전체
+,!Enumerator,Enemy_One,,적 단일
+,!Enumerator,Enemy_All,,적 전체
+,!Enumerator,Random,!End,렌덤
+,,,,
+,!Enum,BattleConstType,,
+,!Enumerator,HPMidBonus,,HP 보너스 중간 
+,!Enumerator,HPMaxBonus,!End,HP 보너스 최대

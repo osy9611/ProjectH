@@ -6,9 +6,6 @@
 #include "ProjectH/BehaviorTree/BTTask/BTTaskNode_Base.h"
 #include "BTTaskNode_SkillAction.generated.h"
 
-/**
- *
- */
 UCLASS()
 class PROJECTH_API UBTTaskNode_SkillAction : public UBTTaskNode_Base
 {
@@ -26,6 +23,11 @@ public:
 	TArray<AActor*> SelectTargetRandom(TArray<AActor*> TargetActor,int32 Count);
 	TArray<AActor*> SelectTarget(TArray<AActor*> TargetActor,int32 Count);
 
+public:
+	UPROPERTY(EditAnywhere, Category = "HPBonus")
+	float MiddleHPBonus = 0.3f;
+	UPROPERTY(EditAnywhere, Category = "HPBonus")
+	float MaxHPBonus = 0.6f;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "SkillAction")

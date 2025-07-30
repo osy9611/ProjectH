@@ -52,7 +52,7 @@ public:
 	//BattleInput
 	void InitInput();
 
-	int32 RandomSkillSelect(int32 Min, int32 Max);
+	int32 RandomBattleSelect(int32 Min, int32 Max);
 
 	bool IsWin();
 	bool IsLose();
@@ -85,5 +85,5 @@ private:
 	bool IsBattle = false;
 
 	UPROPERTY()
-	FRandomStream BattleRandomSkillSelect;
+	FRandomStream BattleRandomSelect;
 };

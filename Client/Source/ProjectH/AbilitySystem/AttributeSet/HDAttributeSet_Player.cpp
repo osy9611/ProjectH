@@ -40,4 +40,5 @@ void UHDAttributeSet_Player::OnUpdateStatus()
 	EDEF = StatusData->EDEF;
 	CRI = StatusData->CRI;
 	Speed = StatusData->Speed;
+	Threat = StatusData->Threat;
 }

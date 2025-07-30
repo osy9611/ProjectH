@@ -81,6 +81,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Attributes")
 	FGameplayAttributeData Speed;
 
+	ATTRIBUTE_ACCESSORS(UHDAttributeSet, Threat);
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes")
+	FGameplayAttributeData Threat;
+
 	//Table ID
 	FString TableID;
 protected:

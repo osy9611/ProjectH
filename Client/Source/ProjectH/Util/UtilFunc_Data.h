@@ -15,6 +15,7 @@ public:
 
 	static FString GetCommonString(UWorld* World, FString TableID);
 	static FString GetSkillString(UWorld* World, FString TableID);
+	static float GetBattleConstValue(UWorld* World,EBattleConstType BattleConstType);
 };
 
 template<typename T>

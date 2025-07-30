@@ -5,6 +5,14 @@
 #include "GenerateTableData.generated.h"
 
 USTRUCT(BlueprintType)
+struct FBattleConst : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float value;
+};
+USTRUCT(BlueprintType)
 struct FCharacterData : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
@@ -45,6 +53,8 @@ public:
 	float CRI;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Speed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Threat;
 };
 USTRUCT(BlueprintType)
 struct FCommonString : public FTableRowBase
