@@ -11,7 +11,6 @@
 #include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet.h"
 #include "ProjectH/Battle/HDBattleComponent.h"
 #include "ProjectH/Battle/BattleSubsystem.h"
-#include "ProjectH/Battle/State/BattleState.h"
 #include "ProjectH/Animation/PaperZDAnimNotify_Damage.h"
 #include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet.h"
 #include "ProjectH/AbilitySystem/GameEffect/HDGE_Damage.h"
@@ -43,8 +42,7 @@ void UHDGameplayAbility_ActiveSkill::PlayFlipBookAnimation(FDynamicOnFlipbookCom
 
 		DamageNotify->OnCallback = [this]()
 			{
-				UE_LOG(HDLog, Log, TEXT("[HDGameplayAbility_ActiveSkill] Notify Call"));
-				PlayEffect();
+				OnPlayEffect();
 				ApplyDamage();
 			};
 	}
@@ -86,45 +84,6 @@ void UHDGameplayAbility_ActiveSkill::ApplyDamage()
 	}
 }
 
-void UHDGameplayAbility_ActiveSkill::PlayEffect()
-{
-	if (!NiagaraSystem.IsNull())
-	{
-		PlayNiagara();
-	}
-
-	if (ParticleSystem)
-	{
-		PlayParticle();
-	}
-}
-
-void UHDGameplayAbility_ActiveSkill::PlayNiagara()
-{
-}
-
-void UHDGameplayAbility_ActiveSkill::PlayParticle()
-{
-	FBattleStateParams* BattleStateParam = static_cast<FBattleStateParams*>(Params);
-	if (!BattleStateParam)
-		return;
-	
-	for (AActor* TargetActor : BattleStateParam->Objects)
-	{
-		UParticleSystemComponent* ParticleComp = UtilFunc_Pooling::Get<UParticleSystemComponent>(GetWorld(), "Particle", false);
-		if (!ParticleComp)
-			return;
-		
-		ParticleComp->SetTemplate(ParticleSystem);
-		ParticleComp->AttachToComponent(TargetActor->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-		ParticleComp->SetRelativeLocation(FVector::ZeroVector);
-
-		ParticleComp->ActivateSystem(true);
-		ParticleComp->SetVisibility(true);
-
-		SetTargetOffSet(ParticleComp, TargetActor);
-	}
-}
 
 void UHDGameplayAbility_ActiveSkill::ExecuteGameEffect(UAbilitySystemComponent* OwnerASC,AActor* TargetActor)
 {

@@ -9,6 +9,7 @@
 #include "ProjectH/Util/UtilFunc_Sprite.h"
 #include "ProjectH/Util/UtilFunc.h"
 #include "ProjectH/Battle/BattleSubsystem.h"
+#include "ProjectH/Battle/State/BattleState.h"
 #include "ProjectH/AbilitySystem/HDAbilitySystemComponent.h"
 #include "ProjectH/AbilitySystem/AbilityTask/AbilityTask_PlayFlipbookAndWait.h"
 
@@ -72,6 +73,18 @@ UNiagaraComponent* UHDGameplayAbility::GetNiagaraComponent()
 
 	AActor* Actor = GetAvatarActorFromActorInfo();
 	return UtilFunc::GetNiagaraSystem(GetWorld(), NiagaraSystem, Actor, false);
+}
+
+void UHDGameplayAbility::OnPlayEffect()
+{
+	FBattleStateParams* BattleStateParam = static_cast<FBattleStateParams*>(Params);
+	if (!BattleStateParam)
+		return;
+
+	for (AActor* TargetActor : BattleStateParam->Objects)
+	{
+		PlayEffect(TargetActor);
+	}
 }
 
 FGameplayTag UHDGameplayAbility::GetGameplayTag()

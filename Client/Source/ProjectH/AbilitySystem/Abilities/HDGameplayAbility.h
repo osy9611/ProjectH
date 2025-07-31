@@ -40,9 +40,13 @@ public:
 	void SetParticleSystem(UParticleSystem* InParticleSystem) { ParticleSystem = InParticleSystem; }
 
 	void SetTargetOffSet(USceneComponent* SceneComp, AActor* Target);
-	
+
 	UFUNCTION(BlueprintCallable)
 	virtual UNiagaraComponent* GetNiagaraComponent();
+
+	void OnPlayEffect();
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayEffect(AActor* Target);
 
 protected:
 	virtual FGameplayTag GetGameplayTag();
