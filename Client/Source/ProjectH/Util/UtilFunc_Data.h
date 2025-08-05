@@ -7,6 +7,9 @@
 #include "ProjectH/Data/DataManagerSubsystem.h"
 #include "ProjectH/Data/EnumGenerateData.h"
 #include "ProjectH/Data/GenerateTableData.h"
+
+struct FGameplayAttribute;
+
 class PROJECTH_API UtilFunc_Data
 {
 public:
@@ -16,6 +19,9 @@ public:
 	static FString GetCommonString(UWorld* World, FString TableID);
 	static FString GetSkillString(UWorld* World, FString TableID);
 	static float GetBattleConstValue(UWorld* World,EBattleConstType BattleConstType);
+
+
+	static FGameplayAttribute GetBuffAttribute(EBuffType Type);
 };
 
 template<typename T>

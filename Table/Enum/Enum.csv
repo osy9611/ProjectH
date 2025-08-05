@@ -32,10 +32,14 @@
 ,!Enumerator,HPMaxBonus,!End,HP 보너스 최대
 ,,,,
 ,!Enum,BuffType,,
-,!Enumerator,AddATK,,공격력 증가
-,!Enumerator,AddDEF,,방어력 증가
-,!Enumerator,LowATK,,공격력 감소
-,!Enumerator,LowDEF,,방어력 감소
+,!Enumerator,AddPATK,,물리 공격력 증가
+,!Enumerator,AddPDEF,,물리 방어력 증가
+,!Enumerator,LowPATK,,물리 공격력 감소
+,!Enumerator,LowPDEF,,물리 방어력 감소
+,!Enumerator,AddEATK,,마법 공격력 증가
+,!Enumerator,AddEDEF,,마법 방어력 증가
+,!Enumerator,LowEATK,,마법 공격력 감소
+,!Enumerator,LowEDEF,,마법 방어력 감소
 ,!Enumerator,Stun,,스턴
 ,!Enumerator,Dot,!End,도트 데미지
 ,,,,

@@ -12,8 +12,8 @@
 UHDGE_Buff::UHDGE_Buff()
 {
 	DurationPolicy = EGameplayEffectDurationType::Infinite;
+	//InheritableOwnedTagsContainer.AddTag(FGameplayTag::RequestGameplayTag("Buff"));
 	Executions.Add(FGameplayEffectExecutionDefinition(UHDBuffExecutionCalculation::StaticClass()));
-	InheritableOwnedTagsContainer
 }
 
 UHDBuffExecutionCalculation::UHDBuffExecutionCalculation()
@@ -42,5 +42,22 @@ void UHDBuffExecutionCalculation::Execute_Implementation(const FGameplayEffectCu
 	if (!TargetAttr)
 		return;
 
-	//RemainTurn = BuffData->TurnCount;
+	if (BuffContext->RemainTurn == 0)
+	{
+		const_cast<FBuffEffectContext*>(BuffContext)->RemainTurn = BuffData->TurnCount;
+		const_cast<FBuffEffectContext*>(BuffContext)->IsStackable = BuffData->Stackable;
+	}
+
+	//버프 적용
+	if (BuffData->ExectueType == EBuffExecuteType::Instant)
+	{
+		if (BuffData->BuffType == EBuffType::Dot)
+		{
+			//TODO :  어떻게 처리 해야할까 고민을 좀 해야할듯
+		}
+		else
+		{
+
+		}
+	}
 }

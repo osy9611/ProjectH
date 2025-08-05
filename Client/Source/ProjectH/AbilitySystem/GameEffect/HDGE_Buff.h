@@ -17,10 +17,18 @@ struct FBuffEffectContext : public FGameplayEffectContext
 {
 	GENERATED_BODY()
 public:
+	bool IsRemainTurn()
+	{
+		return RemainTurn <= 0;
+	}
+public:
 	int32 BuffID;
 
 	UPROPERTY()
 	FBattleStateParams BattleStateParams;
+
+	int32 RemainTurn;
+	bool IsStackable;
 };
 
 UCLASS()
@@ -39,11 +47,4 @@ class PROJECTH_API UHDGE_Buff : public  UGameplayEffect
 	GENERATED_BODY()
 public:
 	UHDGE_Buff();
-
-	void AddBuff();
-	void RemoveBuff();
-
-private:
-	int32 RemainTurn;
-	int32 StackCount;
 };

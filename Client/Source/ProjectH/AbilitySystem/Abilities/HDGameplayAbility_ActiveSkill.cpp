@@ -96,8 +96,6 @@ void UHDGameplayAbility_ActiveSkill::ExecuteGameEffect(UAbilitySystemComponent* 
 	AActor* SourceActor = GetAvatarActorFromActorInfo();
 	UHDAbilitySystemComponent* TargetASC = UtilFunc::GetASC(TargetActor);
 
-	FGameplayEffectContextHandle EffectContext = OwnerASC->MakeEffectContext();
-
 	FDamageEffectContext* DamageContext = new FDamageEffectContext();
 	DamageContext->AddInstigator(SourceActor, SourceActor);
 	DamageContext->SkillTag = GetGameplayTag();
@@ -107,7 +105,7 @@ void UHDGameplayAbility_ActiveSkill::ExecuteGameEffect(UAbilitySystemComponent* 
 	//Create GE Spec
 	TSubclassOf<UGameplayEffect> GEClass = UHDGE_Damage::StaticClass();
 	FGameplayEffectSpecHandle SpecHandle = OwnerASC->MakeOutgoingSpec(GEClass, 1.0f, ContextHandle);
-
+	
 	if (SpecHandle.IsValid())
 	{
 		OwnerASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);

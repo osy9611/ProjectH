@@ -24,7 +24,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool Stackable;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString TurnCount;
+	int32 TurnCount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Value;
 };

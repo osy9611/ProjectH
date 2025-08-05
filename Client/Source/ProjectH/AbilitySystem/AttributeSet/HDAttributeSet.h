@@ -39,7 +39,6 @@ public:
 
 	virtual TArray<FSkillData> GetSkillDatas();
 	virtual FSkillData* GetSkillData(FGameplayTag SkillTag);
-
 public:
 
 	ATTRIBUTE_ACCESSORS(UHDAttributeSet, OriginHP);
