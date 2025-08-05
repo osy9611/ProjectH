@@ -30,3 +30,16 @@
 ,!Enum,BattleConstType,,
 ,!Enumerator,HPMidBonus,,HP 보너스 중간 
 ,!Enumerator,HPMaxBonus,!End,HP 보너스 최대
+,,,,
+,!Enum,BuffType,,
+,!Enumerator,AddATK,,공격력 증가
+,!Enumerator,AddDEF,,방어력 증가
+,!Enumerator,LowATK,,공격력 감소
+,!Enumerator,LowDEF,,방어력 감소
+,!Enumerator,Stun,,스턴
+,!Enumerator,Dot,!End,도트 데미지
+,,,,
+,!Enum,BuffExecuteType,,
+,!Enumerator,Instant,,즉시
+,!Enumerator,TurnStart,,턴 시작
+,!Enumerator,TurnEnd,!End,턴 종료

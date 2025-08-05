@@ -7,6 +7,7 @@
 #include "AbilitySystemComponent.h"
 #include "ProjectH/LogChannels.h"
 #include "ProjectH/Data/GenerateTableData.h"
+#include "ProjectH/Data/EnumGenerateData.h"
 #include "ProjectH/Data/DataManagerSubsystem.h"
 #include "ProjectH/Util/UtilFunc_Data.h"
 #include "HDAttributeSet.generated.h"
@@ -88,7 +89,10 @@ public:
 	//Table ID
 	FString TableID;
 protected:
+	UPROPERTY()
+	TMap<EBuffType, float> BuffDatas;
 
+	UPROPERTY()
 	TMap<FGameplayTag, FSkillData> SkillDatas;
 };
 

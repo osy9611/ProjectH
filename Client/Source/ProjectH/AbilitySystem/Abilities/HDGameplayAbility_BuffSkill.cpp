@@ -41,4 +41,5 @@ void UHDGameplayAbility_BuffSkill::ApplyBuff()
 
 void UHDGameplayAbility_BuffSkill::ExecuteGameEffect(UAbilitySystemComponent* OwnerASC, AActor* TargetActor)
 {
+
 }

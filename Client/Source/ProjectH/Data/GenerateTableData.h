@@ -13,6 +13,22 @@ public:
 	float value;
 };
 USTRUCT(BlueprintType)
+struct FBuffData : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EBuffType BuffType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EBuffExecuteType ExectueType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool Stackable;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString TurnCount;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Value;
+};
+USTRUCT(BlueprintType)
 struct FCharacterData : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
@@ -197,6 +213,8 @@ public:
 	int32 HitCount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 CostSP;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 BuffTableNo;
 };
 USTRUCT(BlueprintType)
 struct FSkillString : public FTableRowBase
