@@ -84,7 +84,6 @@ void UHDGameplayAbility_ActiveSkill::ApplyDamage()
 	}
 }
 
-
 void UHDGameplayAbility_ActiveSkill::ExecuteGameEffect(UAbilitySystemComponent* OwnerASC,AActor* TargetActor)
 {
 	if (!OwnerASC || !TargetActor)

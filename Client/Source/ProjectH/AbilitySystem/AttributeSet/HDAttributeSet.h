@@ -85,6 +85,24 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Attributes")
 	FGameplayAttributeData Threat;
 
+	//BuffData
+	ATTRIBUTE_ACCESSORS(UHDAttributeSet, G1_PATK);
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes")
+	FGameplayAttributeData G1_PATK;
+
+	ATTRIBUTE_ACCESSORS(UHDAttributeSet, G1_PDEF);
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes")
+	FGameplayAttributeData G1_PDEF;
+
+	ATTRIBUTE_ACCESSORS(UHDAttributeSet, G1_EATK);
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes")
+	FGameplayAttributeData G1_EATK;
+
+	ATTRIBUTE_ACCESSORS(UHDAttributeSet, G1_EDEF);
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes")
+	FGameplayAttributeData G1_EDEF;
+
+
 	//Table ID
 	FString TableID;
 protected:

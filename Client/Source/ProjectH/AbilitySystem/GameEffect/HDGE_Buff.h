@@ -11,6 +11,8 @@
 struct FGameplayEffectCustomExecutionParameters;
 struct FGameplayEffectCustomExecutionOutput;
 struct FBattleStateParams;
+struct FGameplayModifierEvaluatedData;
+struct FBuffData;
 
 USTRUCT(BlueprintType)
 struct FBuffEffectContext : public FGameplayEffectContext
@@ -27,6 +29,9 @@ public:
 	UPROPERTY()
 	FBattleStateParams BattleStateParams;
 
+	EBuffExecuteType BuffExecuteType;
+
+	int32 StackCount = 1;
 	int32 RemainTurn;
 	bool IsStackable;
 };
@@ -39,6 +44,9 @@ public:
 	UHDBuffExecutionCalculation();
 
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, OUT FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
+	
+
+	FGameplayModifierEvaluatedData CreateData(const FBuffEffectContext* BuffContext,FBuffData* BuffData) const ;
 };
 
 UCLASS()

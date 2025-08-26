@@ -12,8 +12,9 @@
 UHDGE_Buff::UHDGE_Buff()
 {
 	DurationPolicy = EGameplayEffectDurationType::Infinite;
-	//InheritableOwnedTagsContainer.AddTag(FGameplayTag::RequestGameplayTag("Buff"));
+	InheritableOwnedTagsContainer.AddTag(FGameplayTag::RequestGameplayTag("Battle.Buff"));
 	Executions.Add(FGameplayEffectExecutionDefinition(UHDBuffExecutionCalculation::StaticClass()));
+
 }
 
 UHDBuffExecutionCalculation::UHDBuffExecutionCalculation()
@@ -46,18 +47,47 @@ void UHDBuffExecutionCalculation::Execute_Implementation(const FGameplayEffectCu
 	{
 		const_cast<FBuffEffectContext*>(BuffContext)->RemainTurn = BuffData->TurnCount;
 		const_cast<FBuffEffectContext*>(BuffContext)->IsStackable = BuffData->Stackable;
+		const_cast<FBuffEffectContext*>(BuffContext)->BuffExecuteType = BuffData->ExectueType;
 	}
 
-	//버프 적용
-	if (BuffData->ExectueType == EBuffExecuteType::Instant)
-	{
-		if (BuffData->BuffType == EBuffType::Dot)
-		{
-			//TODO :  어떻게 처리 해야할까 고민을 좀 해야할듯
-		}
-		else
-		{
-
-		}
-	}
+	OutExecutionOutput.AddOutputModifier(CreateData(BuffContext, BuffData));
 }
+
+FGameplayModifierEvaluatedData UHDBuffExecutionCalculation::CreateData(const FBuffEffectContext* BuffContext, FBuffData* BuffData) const
+{
+	if(!BuffData || !BuffContext)
+		return FGameplayModifierEvaluatedData();
+
+	FGameplayAttribute Attribute;
+	float Amount;
+	switch (BuffData->BuffType)
+	{
+	case EBuffType::AddPATK:
+	case EBuffType::LowPATK:
+		Attribute = UHDAttributeSet::GetG1_PATKAttribute();
+		break;
+	case EBuffType::AddEATK:
+	case EBuffType::LowEATK:
+		Attribute = UHDAttributeSet::GetG1_EATKAttribute();
+		break;
+	case EBuffType::AddPDEF:
+	case EBuffType::LowPDEF:
+		Attribute = UHDAttributeSet::GetG1_PDEFAttribute();
+		break;
+	case EBuffType::AddEDEF:
+	case EBuffType::LowEDEF:
+		Attribute = UHDAttributeSet::GetG1_EDEFAttribute();
+		break;
+	}
+
+	Amount = BuffData->Value * const_cast<FBuffEffectContext*>(BuffContext)->StackCount;
+
+	//Low 타입의 경우에는 감소이기 때문에 -1로 계산함
+	if (BuffData->BuffType == EBuffType::LowPATK || BuffData->BuffType == EBuffType::LowEATK 
+		|| BuffData->BuffType == EBuffType::LowPDEF || BuffData->BuffType == EBuffType::LowEDEF)
+		Amount *= -1;
+
+	return FGameplayModifierEvaluatedData(Attribute, EGameplayModOp::Additive,Amount);
+}
+
+

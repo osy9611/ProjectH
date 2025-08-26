@@ -3,6 +3,9 @@
 
 #include "HDGameplayAbility_BuffSkill.h"
 #include "ProjectH/Animation/PaperZDAnimNotify_Buff.h"
+#include "ProjectH/Util/UtilFunc.h"
+#include "ProjectH/Battle/HDBattleComponent.h"
+#include "ProjectH/AbilitySystem/GameEffect/HDGE_Buff.h"
 
 UHDGameplayAbility_BuffSkill::UHDGameplayAbility_BuffSkill(const FObjectInitializer& ObjectInitializer)
 {
@@ -37,9 +40,44 @@ void UHDGameplayAbility_BuffSkill::PlayFlipBookAnimation(FDynamicOnFlipbookCompl
 
 void UHDGameplayAbility_BuffSkill::ApplyBuff()
 {
+	FBattleStateParams* BattleStateParam = static_cast<FBattleStateParams*>(Params);
+	if (!BattleStateParam)
+		return;
+
+	AActor* Actor = GetAvatarActorFromActorInfo();
+	if (!Actor)
+		return;
+
+	UAbilitySystemComponent* ASC = UtilFunc::GetASC(Actor);
+	if (!ASC)
+		return;
+
+	for (AActor* TargetActor : BattleStateParam->Objects)
+	{
+		if (!IsValid(TargetActor))
+			continue;
+
+		UHDBattleComponent* BattleComp = UHDBattleComponent::FindBattleComponent(TargetActor);
+		if (!BattleComp)
+			continue;
+
+		if (!BattleComp->CheckDead())
+			ExecuteGameEffect(ASC, TargetActor);
+	}
 }
 
 void UHDGameplayAbility_BuffSkill::ExecuteGameEffect(UAbilitySystemComponent* OwnerASC, AActor* TargetActor)
 {
+	if (!OwnerASC || !TargetActor)
+	{
+		UE_LOG(HDLog, Warning, TEXT("[HDGameplayAbility_BuffSkill] Create GE Fail"));
+		return;
+	}
+
+	AActor* SourceActor = GetAvatarActorFromActorInfo();
+	UHDAbilitySystemComponent* TargetASC = UtilFunc::GetASC(TargetActor);
+
+	FBuffEffectContext* BuffContext = new FBuffEffectContext();
+	BuffContext->AddInstigator(SourceActor, SourceActor);
 
 }

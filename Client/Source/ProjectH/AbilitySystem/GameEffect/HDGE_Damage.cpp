@@ -35,21 +35,21 @@ void UHDDamageExecutionCalculation::Execute_Implementation(const FGameplayEffect
 
 	//공격자 
 	AActor* SourceActor = ContextHandle.GetOriginalInstigator();
-	UAbilitySystemComponent* SourceASC = UtilFunc::GetASC(SourceActor);	
+	UAbilitySystemComponent* SourceASC = UtilFunc::GetASC(SourceActor);
 	if (!SourceASC)
 		return;
 
 	const UHDAttributeSet* SourceAttributeSet = SourceASC->GetSet<UHDAttributeSet>();
 	if (!SourceAttributeSet)
 		return;
-	
+
 	FSkillData* SourceSkillData = const_cast<UHDAttributeSet*>(SourceAttributeSet)->GetSkillData(DamageContext->SkillTag);
 	if (!SourceSkillData)
 		return;
 
 	//대상자
 	UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
-	if (!TargetASC) 
+	if (!TargetASC)
 		return;
 
 	const UHDAttributeSet* TargetAttr = TargetASC->GetSet<UHDAttributeSet>();
@@ -58,7 +58,17 @@ void UHDDamageExecutionCalculation::Execute_Implementation(const FGameplayEffect
 
 	//스탯 가져오기
 	float ATK = (SourceSkillData->DamageType == EDamageType::Physical) ? SourceAttributeSet->GetPATK() : SourceAttributeSet->GetEATK();
+	float ATK_BuffAmount = (SourceSkillData->DamageType == EDamageType::Physical) ? SourceAttributeSet->GetG1_PATK() : SourceAttributeSet->GetG1_EATK();
+
+	//총 공격력 = 공격력 + (공격력 * (공격력 버프 * 0.01f))
+	ATK = ATK + (ATK * (ATK_BuffAmount * 0.01f));
+
 	float DEF = (SourceSkillData->DamageType == EDamageType::Physical) ? TargetAttr->GetPDEF() : TargetAttr->GetEDEF();
+	float DEF_BuffAmount = (SourceSkillData->DamageType == EDamageType::Physical) ? TargetAttr->GetG1_PDEF() : TargetAttr->GetG1_EDEF();
+
+	//총 방어력 = 방어력 + (방어력 * (방어력 버프 * 0.01f))
+	DEF = DEF + (DEF * (DEF_BuffAmount * 0.01f));
+
 
 	float DefenseFactor = DEF / (DEF + 100.0f);
 	float MitigatedRate = 1.0f - DefenseFactor;
