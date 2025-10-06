@@ -60,7 +60,7 @@ void UTurnManager::ExecuteNextTurn()
 
 void UTurnManager::OnUpdateTurn()
 {
-		Timeline.Sort([](const FTimelineEntry& A, const FTimelineEntry& B)
+	Timeline.Sort([](const FTimelineEntry& A, const FTimelineEntry& B)
 		{
 			if (A.NextTime < B.NextTime)
 				return true;
@@ -167,11 +167,11 @@ void UTurnManager::UnRegisterStun(const AActor* BattleActor)
 
 	if (!Entry)
 		return;
-	
+
 	if (PrevStunTime.Contains(BattleComp))
 	{
 		float OriginTime = PrevStunTime[BattleComp];
-		
+
 		//이전 시간으로 복원
 		Entry->NextTime = OriginTime;
 

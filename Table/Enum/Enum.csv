@@ -41,7 +41,8 @@
 ,!Enumerator,LowEATK,,마법 공격력 감소
 ,!Enumerator,LowEDEF,,마법 방어력 감소
 ,!Enumerator,Stun,,스턴
-,!Enumerator,Dot,!End,도트 데미지
+,!Enumerator,Dot,,도트 데미지
+,!Enumerator,Max,!End,Max
 ,,,,
 ,!Enum,BuffExecuteType,,
 ,!Enumerator,Instant,,즉시

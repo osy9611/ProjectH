@@ -2,6 +2,7 @@
 
 
 #include "BattleState_MonsterTurn.h"
+#include "ProjectH/Util/UtilFunc.h"
 #include "ProjectH/Battle/AI/BattleAIController.h"
 #include "ProjectH/Battle/Turn/TurnManager.h"
 
@@ -25,18 +26,24 @@ void UBattleState_MonsterTurn::DoStart()
 	if (!Controller)
 		return;
 
+	UHDAbilitySystemComponent* ASC = UtilFunc::GetASC(BattleComp->GetOwningActor());
+	if (ASC)
+		ASC->UpdateBuffTurns();
+
 	CurrentAIController = Controller;
 	CurrentAIController->OnStartBehavior();
 }
 
 void UBattleState_MonsterTurn::DoEnd()
 {
-	Super::DoEnd();
 	if (!CurrentAIController.IsValid())
 		return;
 
 	CurrentAIController->OnEndBehavior();
 	CurrentAIController = nullptr;
+
+
+	Super::DoEnd();
 }
 
 void UBattleState_MonsterTurn::DoExecute(FBattleStateParams& Params)
@@ -49,6 +56,12 @@ void UBattleState_MonsterTurn::DoExecute(FBattleStateParams& Params)
 		return;
 
 	BattleComp->ProcessAbility_Skill(Params);
+}
+
+void UBattleState_MonsterTurn::HandleEndSequence(TFunction<void()> Callback)
+{
+	SequenceEndCallback = Callback;
+	Callback();
 }
 
 void UBattleState_MonsterTurn::Update(float DeltaTime)

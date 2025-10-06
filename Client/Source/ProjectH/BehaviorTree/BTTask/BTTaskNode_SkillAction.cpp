@@ -15,11 +15,8 @@
 
 EBTNodeResult::Type UBTTaskNode_SkillAction::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	if (IsCompleted)
-		return EBTNodeResult::Succeeded;
-
 	Super::ExecuteTask(OwnerComp, NodeMemory);
-	ActiveSkillAction();
+	ActiveSkillAction(OwnerComp);
 
 	return EBTNodeResult::InProgress;
 }
@@ -29,7 +26,7 @@ void UBTTaskNode_SkillAction::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, 
 	IsCompleted = false;
 }
 
-void UBTTaskNode_SkillAction::ActiveSkillAction()
+void UBTTaskNode_SkillAction::ActiveSkillAction(UBehaviorTreeComponent& OwnerComp)
 {
 	FGameplayTag ActionTag = GetSkillTag();
 	if (!ActionTag.IsValid())
@@ -38,19 +35,17 @@ void UBTTaskNode_SkillAction::ActiveSkillAction()
 	FBattleStateParams Params;
 	Params.SkillTag = ActionTag;
 	Params.Objects = OnSelectTarget(ActionTag);
-	Params.OnEndAbilityCallBack = [this]()
+	Params.OnEndAbilityCallBack = [this,&OwnerComp]()
 		{
 			CompleteActiveSkill();
+			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		};
 
 	UtilFunc_AI::ExecuteSkill(GetWorld(), Params);
-
-	IsCompleted = false;
 }
 
 void UBTTaskNode_SkillAction::CompleteActiveSkill()
 {
-	IsCompleted = true;
 }
 
 FGameplayTag UBTTaskNode_SkillAction::GetSkillTag()

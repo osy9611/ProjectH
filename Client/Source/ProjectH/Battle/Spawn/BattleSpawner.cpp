@@ -167,7 +167,6 @@ void UBattleSpawner::SetBattleMonsters(int32 GroupID)
 
 			if (UHDBattleComponent* BattleComp = UHDBattleComponent::FindBattleComponent(SpawnedPawn))
 			{
-
 				AController* Controller = SpawnedPawn->GetController();
 				if (Controller)
 				{

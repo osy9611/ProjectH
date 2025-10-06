@@ -31,4 +31,31 @@ UNiagaraComponent* UtilFunc::GetNiagaraSystem(UWorld* World, UNiagaraSystem* Nia
 	return nullptr;
 }
 
+TArray<FText> UtilFunc::EnumToText(const UEnum* EnumPtr,int8 Max)
+{
+	TArray<FText> Result;
+
+	for (int32 i = 0; i < Max; ++i)
+	{
+		if (!EnumPtr->IsValidEnumValue(i))
+			continue;
+
+		FText Name = EnumPtr->GetDisplayNameTextByValue(i);
+		Result.Add(Name);
+	}
+
+	return Result;
+}
+
+FName UtilFunc::EnumToName(const UEnum* EnumPtr, int8 Type)
+{
+	if (EnumPtr)
+	{
+		FString NameString = EnumPtr->GetNameStringByValue(Type);
+		return FName(NameString);
+	}
+
+	return FName();
+}
+
 

@@ -2,10 +2,15 @@
 
 
 #include "HDGameplayAbility_BuffSkill.h"
+#include "AbilitySystemComponent.h"
+#include "GameplayEffect.h"
+#include "ProjectH/LogChannels.h"
 #include "ProjectH/Animation/PaperZDAnimNotify_Buff.h"
 #include "ProjectH/Util/UtilFunc.h"
+#include "ProjectH/Util/UtilFunc_Data.h"
 #include "ProjectH/Battle/HDBattleComponent.h"
 #include "ProjectH/AbilitySystem/GameEffect/HDGE_Buff.h"
+#include "ProjectH/AbilitySystem//AttributeSet/HDAttributeSet.h"
 
 UHDGameplayAbility_BuffSkill::UHDGameplayAbility_BuffSkill(const FObjectInitializer& ObjectInitializer)
 {
@@ -48,7 +53,7 @@ void UHDGameplayAbility_BuffSkill::ApplyBuff()
 	if (!Actor)
 		return;
 
-	UAbilitySystemComponent* ASC = UtilFunc::GetASC(Actor);
+	UHDAbilitySystemComponent* ASC = UtilFunc::GetASC(Actor);
 	if (!ASC)
 		return;
 
@@ -62,11 +67,11 @@ void UHDGameplayAbility_BuffSkill::ApplyBuff()
 			continue;
 
 		if (!BattleComp->CheckDead())
-			ExecuteGameEffect(ASC, TargetActor);
+			ExecuteGameEffect(BattleStateParam->BuffIDs, ASC, TargetActor);
 	}
 }
 
-void UHDGameplayAbility_BuffSkill::ExecuteGameEffect(UAbilitySystemComponent* OwnerASC, AActor* TargetActor)
+void UHDGameplayAbility_BuffSkill::ExecuteGameEffect(TArray<int32>& BuffIDs, UHDAbilitySystemComponent* OwnerASC, AActor* TargetActor)
 {
 	if (!OwnerASC || !TargetActor)
 	{
@@ -76,8 +81,5 @@ void UHDGameplayAbility_BuffSkill::ExecuteGameEffect(UAbilitySystemComponent* Ow
 
 	AActor* SourceActor = GetAvatarActorFromActorInfo();
 	UHDAbilitySystemComponent* TargetASC = UtilFunc::GetASC(TargetActor);
-
-	FBuffEffectContext* BuffContext = new FBuffEffectContext();
-	BuffContext->AddInstigator(SourceActor, SourceActor);
-
+	TargetASC->RegisterBuff(BuffIDs, SourceActor);
 }

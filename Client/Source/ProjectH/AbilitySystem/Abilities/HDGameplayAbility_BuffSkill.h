@@ -5,11 +5,12 @@
 #include "CoreMinimal.h"
 #include "ProjectH/Battle/State/BattleState.h"
 #include "ProjectH/AbilitySystem/Abilities/HDGameplayAbility.h"
+#include "ProjectH/Data/GenerateTableData.h"
+#include "ProjectH/Data/EnumGenerateData.h"
 #include "HDGameplayAbility_BuffSkill.generated.h"
 
-/**
- * 
- */
+class UHDAbilitySystemComponent;
+
 UCLASS()
 class PROJECTH_API UHDGameplayAbility_BuffSkill : public UHDGameplayAbility
 {
@@ -19,7 +20,10 @@ public:
 
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 	virtual void PlayFlipBookAnimation(FDynamicOnFlipbookComplete OnComplete);
-private:
+
+	UFUNCTION(BlueprintCallable)
 	void ApplyBuff();
-	void ExecuteGameEffect(UAbilitySystemComponent* OwnerASC, AActor* TargetActor);
+
+private:
+	void ExecuteGameEffect(TArray<int32>& BuffIDs, UHDAbilitySystemComponent* OwnerASC, AActor* TargetActor);
 };

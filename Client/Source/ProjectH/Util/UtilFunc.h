@@ -36,6 +36,10 @@ public:
 	static UHDAbilitySystemComponent* GetASC(AActor* Actor);
 	
 	static UNiagaraComponent* GetNiagaraSystem(UWorld* World,UNiagaraSystem* NiagaraSystem,AActor* OwnerActor, bool IsActive);
+
+	static TArray<FText> EnumToText(const UEnum* EnumPtr, int8 Max);
+
+	static FName EnumToName(const UEnum* EnumPtr, int8 Type);
 };
 
 template<typename T>

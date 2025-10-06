@@ -18,6 +18,7 @@ struct FBattleStateParams : public FGameAbilityParam
 	GENERATED_BODY()
 public:
 	TArray<AActor*> Objects;
+	TArray<int> BuffIDs;
 	FGameplayTag SkillTag;
 	TFunction<void()> OnEndAbilityCallBack;
 

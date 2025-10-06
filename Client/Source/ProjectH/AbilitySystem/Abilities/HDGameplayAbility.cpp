@@ -15,24 +15,32 @@
 
 void UHDGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
 	UHDAbilitySystemComponent* ASC = Cast<UHDAbilitySystemComponent>(ActorInfo->AbilitySystemComponent);
 	if (ASC)
 	{
 		Params = ASC->ConsumeParams(Handle);
 	}
+
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 void UHDGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	AActor* Actor = GetAvatarActorFromActorInfo();
 
+	FBattleStateParams* Test = static_cast<FBattleStateParams*>(Params);
+	if (Test)
+	{
+		if (Test->OnEndAbilityCallBack)
+			Test->OnEndAbilityCallBack();
+	}
+
 	UBattleSubsystem* BattleSubsystem = GetWorld()->GetSubsystem<UBattleSubsystem>();
 	if (BattleSubsystem)
 	{
 		BattleSubsystem->CheckBattleState();
 	}
+
 	Params = nullptr;
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

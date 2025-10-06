@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameplayEffect.h"
 #include "GameplayEffectExecutionCalculation.h"
+#include "GameplayModMagnitudeCalculation.h"
 #include "ProjectH/Battle/State/BattleState.h"
+#include "ProjectH/Data/GenerateTableData.h"
 #include "HDGE_Buff.generated.h"
 
 struct FGameplayEffectCustomExecutionParameters;
@@ -19,34 +21,15 @@ struct FBuffEffectContext : public FGameplayEffectContext
 {
 	GENERATED_BODY()
 public:
-	bool IsRemainTurn()
-	{
-		return RemainTurn <= 0;
-	}
-public:
 	int32 BuffID;
+
+	UPROPERTY()
+	FBuffData BuffData;
 
 	UPROPERTY()
 	FBattleStateParams BattleStateParams;
 
 	EBuffExecuteType BuffExecuteType;
-
-	int32 StackCount = 1;
-	int32 RemainTurn;
-	bool IsStackable;
-};
-
-UCLASS()
-class PROJECTH_API UHDBuffExecutionCalculation :public UGameplayEffectExecutionCalculation
-{
-	GENERATED_BODY()
-public:
-	UHDBuffExecutionCalculation();
-
-	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, OUT FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
-	
-
-	FGameplayModifierEvaluatedData CreateData(const FBuffEffectContext* BuffContext,FBuffData* BuffData) const ;
 };
 
 UCLASS()
