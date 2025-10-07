@@ -88,17 +88,20 @@ void UHDAbilitySystemComponent::RegisterBuff(TArray<int32> BuffIDs, AActor* Sour
 
 		TSubclassOf<UGameplayEffect> GEClass = UHDGE_Buff::StaticClass();
 		FGameplayEffectContextHandle ContextHandle = FGameplayEffectContextHandle(BuffContext);
-
 		FGameplayEffectSpecHandle SpecHandle = MakeOutgoingSpec(GEClass, 1.0f, ContextHandle);
 		if (SpecHandle.IsValid())
 		{
-			FActiveGameplayEffectHandle Result = ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-			if (Result.IsValid())
+			FActiveGameplayEffectHandle Handle = ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+			if (Handle.IsValid())
 			{
-				AddBuffHandle(Result, Data->TurnCount);
+				AddBuffHandle(Handle, Data->TurnCount);
 			}
 		}
 	}
+}
+
+void UHDAbilitySystemComponent::RegisterDebuff(TArray<int32> BuffIDs, AActor* Source)
+{
 }
 
 void UHDAbilitySystemComponent::AddBuffHandle(FActiveGameplayEffectHandle& Handle, int32 TurnCount)
@@ -113,7 +116,13 @@ void UHDAbilitySystemComponent::ResetBuffHandle(FActiveGameplayEffectHandle& Han
 		BuffTurns[Handle] = TurnCount;
 }
 
-void UHDAbilitySystemComponent::UpdateBuffTurns()
+void UHDAbilitySystemComponent::UpdateGE()
+{
+	UpdateBuff();
+	UpdateDeBuff();
+}
+
+void UHDAbilitySystemComponent::UpdateBuff()
 {
 	TArray<FActiveGameplayEffectHandle> RemoveBuffHandles;
 	for (TPair<FActiveGameplayEffectHandle, int32>& BuffTurn : BuffTurns)
@@ -123,6 +132,28 @@ void UHDAbilitySystemComponent::UpdateBuffTurns()
 		if (BuffTurn.Value <= 0)
 		{
 			RemoveBuffHandles.Add(BuffTurn.Key);
+			continue;
+		}
+	}
+
+	for (FActiveGameplayEffectHandle& Handle : RemoveBuffHandles)
+	{
+		RemoveActiveGameplayEffect(Handle);
+		BuffTurns.Remove(Handle);
+	}
+}
+
+void UHDAbilitySystemComponent::UpdateDeBuff()
+{
+	TArray<FActiveGameplayEffectHandle> RemoveBuffHandles;
+	for (TPair<FActiveGameplayEffectHandle, int32>& BuffTurn : BuffTurns)
+	{
+		BuffTurn.Value--;
+
+		if (BuffTurn.Value <= 0)
+		{
+			RemoveBuffHandles.Add(BuffTurn.Key);
+			continue;
 		}
 	}
 

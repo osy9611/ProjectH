@@ -70,7 +70,7 @@ void UBattleState_CharTurn::DoStart()
 
 	UHDAbilitySystemComponent* ASC = UtilFunc::GetASC(BattleComp->GetOwningActor());
 	if (ASC)
-		ASC->UpdateBuffTurns();
+		ASC->UpdateGE();
 
 	StartSelectSequence(BattleComp->SlotNo);
 }

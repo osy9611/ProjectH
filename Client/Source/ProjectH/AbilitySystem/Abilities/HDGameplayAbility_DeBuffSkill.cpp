@@ -1,28 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "HDGameplayAbility_BuffSkill.h"
-#include "AbilitySystemComponent.h"
-#include "GameplayEffect.h"
-#include "ProjectH/LogChannels.h"
-#include "ProjectH/Animation/PaperZDAnimNotify_Buff.h"
-#include "ProjectH/Util/UtilFunc.h"
-#include "ProjectH/Util/UtilFunc_Data.h"
-#include "ProjectH/Battle/HDBattleComponent.h"
-#include "ProjectH/AbilitySystem/GameEffect/HDGE_Buff.h"
-#include "ProjectH/AbilitySystem//AttributeSet/HDAttributeSet.h"
 #include "HDGameplayAbility_DeBuffSkill.h"
+#include "ProjectH/Util/UtilFunc.h"
+#include "ProjectH/Battle/State/BattleState.h"
+#include "ProjectH/Battle/HDBattleComponent.h"
+#include "ProjectH/Animation/PaperZDAnimNotify_Damage.h"
 
-UHDGameplayAbility_BuffSkill::UHDGameplayAbility_BuffSkill(const FObjectInitializer& ObjectInitializer)
+UHDGameplayAbility_DeBuffSkill::UHDGameplayAbility_DeBuffSkill(const FObjectInitializer& ObjectInitializer)
 {
 }
 
-void UHDGameplayAbility_BuffSkill::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+void UHDGameplayAbility_DeBuffSkill::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UHDGameplayAbility_BuffSkill::PlayFlipBookAnimation(FDynamicOnFlipbookComplete OnComplete)
+void UHDGameplayAbility_DeBuffSkill::PlayFlipBookAnimation(FDynamicOnFlipbookComplete OnComplete)
 {
 	if (!AnimSequence)
 		return;
@@ -31,7 +25,7 @@ void UHDGameplayAbility_BuffSkill::PlayFlipBookAnimation(FDynamicOnFlipbookCompl
 
 	for (UPaperZDAnimNotify_Base* Notify : Notifies)
 	{
-		UPaperZDAnimNotify_Buff* DamageNotify = Cast<UPaperZDAnimNotify_Buff>(Notify);
+		UPaperZDAnimNotify_Damage* DamageNotify = Cast<UPaperZDAnimNotify_Damage>(Notify);
 		if (!DamageNotify)
 			continue;
 
@@ -44,7 +38,7 @@ void UHDGameplayAbility_BuffSkill::PlayFlipBookAnimation(FDynamicOnFlipbookCompl
 	Super::PlayFlipBookAnimation(OnComplete);
 }
 
-void UHDGameplayAbility_BuffSkill::ApplyBuff()
+void UHDGameplayAbility_DeBuffSkill::ApplyDeBuff()
 {
 	FBattleStateParams* BattleStateParam = static_cast<FBattleStateParams*>(Params);
 	if (!BattleStateParam)
@@ -72,11 +66,12 @@ void UHDGameplayAbility_BuffSkill::ApplyBuff()
 	}
 }
 
-void UHDGameplayAbility_BuffSkill::ExecuteGameEffect(TArray<int32>& BuffIDs, UHDAbilitySystemComponent* OwnerASC, AActor* TargetActor)
+void UHDGameplayAbility_DeBuffSkill::ExecuteGameEffect(TArray<int32>& BuffIDs, UHDAbilitySystemComponent* OwnerASC, AActor* TargetActor)
 {
 	if (!OwnerASC || !TargetActor)
 	{
-		UE_LOG(HDLog, Warning, TEXT("[HDGameplayAbility_BuffSkill] Create GE Fail"));
+
+		UE_LOG(HDLog, Warning, TEXT("[HDGameplayAbility_DeBuffSkill] Create GE Fail"));
 		return;
 	}
 

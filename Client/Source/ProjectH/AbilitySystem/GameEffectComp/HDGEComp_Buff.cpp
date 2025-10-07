@@ -38,6 +38,13 @@ void UHDGEComp_Buff::OnGameplayEffectApplied(FActiveGameplayEffectsContainer& Ac
 
 	FBuffData BuffData = BuffContext->BuffData;
 
+	//Set Stack Limit Count
+	const UGameplayEffect* GE = GESpec.Def;
+	if (!GE)
+		return;
+	UGameplayEffect* MutableGE = const_cast<UGameplayEffect*>(GE);
+	MutableGE->StackLimitCount = BuffData.MaxStack;
+
 	//Stack °è»ê
 	float StackCount = GESpec.StackCount ==1 ? 0 : GESpec.StackCount;
 	float Amount = BuffData.Value + (BuffData.Value * StackCount * 0.5f);

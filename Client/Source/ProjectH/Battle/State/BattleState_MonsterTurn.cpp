@@ -28,7 +28,7 @@ void UBattleState_MonsterTurn::DoStart()
 
 	UHDAbilitySystemComponent* ASC = UtilFunc::GetASC(BattleComp->GetOwningActor());
 	if (ASC)
-		ASC->UpdateBuffTurns();
+		ASC->UpdateGE();
 
 	CurrentAIController = Controller;
 	CurrentAIController->OnStartBehavior();

@@ -19,6 +19,8 @@ public:
 	UPROPERTY()
 	FGameplayTag SkillTag;
 
+	float DamageAmount;
+
 	UPROPERTY()
 	FBattleStateParams BattleStateParams;
 };

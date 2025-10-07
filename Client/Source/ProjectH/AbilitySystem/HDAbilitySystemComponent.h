@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "ModularGame/AbilitySystem/ModularAbilitySystemComponent.h"
 #include "ProjectH/AbilitySystem/HDGameAbilityParam.h"
+#include "ProjectH/Data/GenerateTableData.h"
 #include "HDAbilitySystemComponent.generated.h"
 
 UCLASS()
@@ -21,10 +22,18 @@ public:
 
 	//턴제의 경우에는 턴 기반으로 버프를 관리해야하기 떄문에 카운트를 ASC에서 별도로 관리를 해야한다.
 	void RegisterBuff(TArray<int32> BuffIDs,AActor* Source);
+	void RegisterDebuff(TArray<int32> BuffIDs, AActor* Source);
+
 	void AddBuffHandle(FActiveGameplayEffectHandle& Handle, int32 TurnCount);
 	void ResetBuffHandle(FActiveGameplayEffectHandle& Handle, int32 TurnCount);
-	void UpdateBuffTurns();
+	void UpdateGE();
+	void UpdateBuff();
+	void UpdateDeBuff();
 private:
 	TMap<FGameplayAbilitySpecHandle, FGameAbilityParam*> PendingParams;
+
+	UPROPERTY()
 	TMap<FActiveGameplayEffectHandle, int32> BuffTurns;
+	UPROPERTY()
+	TMap<FActiveGameplayEffectHandle, int32> DeBuffTurns;
 };

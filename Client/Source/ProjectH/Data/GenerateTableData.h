@@ -24,6 +24,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool Stackable;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MaxStack;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 TurnCount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Value;
@@ -83,6 +85,24 @@ public:
 	FString en;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString jp;
+};
+USTRUCT(BlueprintType)
+struct FDeBuffData : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EBuffType BuffType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EBuffExecuteType ExectueType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool Stackable;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MaxStack;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TurnCount;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Value;
 };
 USTRUCT(BlueprintType)
 struct FDialogData : public FTableRowBase

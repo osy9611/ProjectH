@@ -13,8 +13,6 @@
 UHDGE_Buff::UHDGE_Buff()
 {
 	DurationPolicy = EGameplayEffectDurationType::Infinite;
-	const UEnum* EnumPtr = StaticEnum<EBuffType>();
-	TArray<FText> BuffNames = UtilFunc::EnumToText(EnumPtr, static_cast<int8>(EBuffType::Max));
 
 	StackingType = EGameplayEffectStackingType::AggregateByTarget;
 	StackDurationRefreshPolicy = EGameplayEffectStackingDurationPolicy::RefreshOnSuccessfulApplication;
