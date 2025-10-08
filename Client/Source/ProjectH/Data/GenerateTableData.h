@@ -234,7 +234,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 CostSP;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 BuffTableNo;
+	ESkillValueType SkillValueType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Value;
 };
 USTRUCT(BlueprintType)
 struct FSkillString : public FTableRowBase

@@ -18,6 +18,6 @@ public:
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 	virtual void PlayFlipBookAnimation(FDynamicOnFlipbookComplete OnComplete);
 private:
-	void ApplyDamage();
+	void OnExecute();
 	void ExecuteGameEffect(UAbilitySystemComponent* OwnerASC,AActor* TargetActor);
 };

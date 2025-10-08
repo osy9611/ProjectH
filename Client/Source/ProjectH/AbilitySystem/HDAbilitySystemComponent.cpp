@@ -5,6 +5,7 @@
 #include "ProjectH/Util/UtilFunc_Data.h"
 #include "ProjectH/AbilitySystem/GameEffect/HDGE_Buff.h"
 #include "ProjectH/AbilitySystem/GameEffect/HDGE_DeBuff.h"
+#include "ProjectH/AbilitySystem/GameEffect/HDGE_Damage.h"
 #include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet.h"
 
 UHDAbilitySystemComponent::UHDAbilitySystemComponent(const FObjectInitializer& ObjectInitializer)

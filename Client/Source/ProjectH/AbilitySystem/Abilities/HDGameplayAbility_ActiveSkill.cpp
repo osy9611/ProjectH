@@ -36,21 +36,21 @@ void UHDGameplayAbility_ActiveSkill::PlayFlipBookAnimation(FDynamicOnFlipbookCom
 
 	for (UPaperZDAnimNotify_Base* Notify : Notifies)
 	{
-	 	UPaperZDAnimNotify_Damage * DamageNotify = Cast<UPaperZDAnimNotify_Damage>(Notify);
+		UPaperZDAnimNotify_Damage* DamageNotify = Cast<UPaperZDAnimNotify_Damage>(Notify);
 		if (!DamageNotify)
 			continue;
 
 		DamageNotify->OnCallback = [this]()
 			{
 				OnPlayEffect();
-				ApplyDamage();
+				OnExecute();
 			};
 	}
 
 	Super::PlayFlipBookAnimation(OnComplete);
 }
 
-void UHDGameplayAbility_ActiveSkill::ApplyDamage()
+void UHDGameplayAbility_ActiveSkill::OnExecute()
 {
 	FBattleStateParams* BattleStateParam = static_cast<FBattleStateParams*>(Params);
 	if (!BattleStateParam)
@@ -70,21 +70,48 @@ void UHDGameplayAbility_ActiveSkill::ApplyDamage()
 	if (!AttributeSet)
 		return;
 
+	FSkillData* SkillData = const_cast<UHDAttributeSet*>(AttributeSet)->GetSkillData(BattleStateParam->SkillTag);
+
+	if (!SkillData)
+		return;
+
 	for (AActor* TargetActor : BattleStateParam->Objects)
 	{
 		if (!IsValid(TargetActor))
 			continue;
 
 		UHDBattleComponent* BattleComp = UHDBattleComponent::FindBattleComponent(TargetActor);
+		UHDAbilitySystemComponent* TargetASC = UtilFunc::GetASC(TargetActor);
 		if (!BattleComp)
 			continue;
 
 		if (!BattleComp->CheckDead())
-			ExecuteGameEffect(ASC, TargetActor);
+		{
+			switch (SkillData->SkillValueType)
+			{
+			case ESkillValueType::Damage:
+			{
+				FDamageEffectContext* DamageContext = new FDamageEffectContext();
+				DamageContext->AddInstigator(Actor, Actor);
+				DamageContext->SkillTag = GetGameplayTag();
+				TargetASC->ApplyGenericEffect(UHDGE_Damage::StaticClass(), DamageContext);
+				break;
+			}
+			case ESkillValueType::Buff:
+				TargetASC->RegisterBuff(BattleStateParam->BuffIDs, Actor);
+				break;
+			case ESkillValueType::DeBuff:
+				TargetASC->RegisterDebuff(BattleStateParam->BuffIDs, Actor);
+				break;
+			default:
+				break;
+			}
+		}
+		
 	}
 }
 
-void UHDGameplayAbility_ActiveSkill::ExecuteGameEffect(UAbilitySystemComponent* OwnerASC,AActor* TargetActor)
+void UHDGameplayAbility_ActiveSkill::ExecuteGameEffect(UAbilitySystemComponent* OwnerASC, AActor* TargetActor)
 {
 	if (!OwnerASC || !TargetActor)
 	{
@@ -104,7 +131,7 @@ void UHDGameplayAbility_ActiveSkill::ExecuteGameEffect(UAbilitySystemComponent* 
 	//Create GE Spec
 	TSubclassOf<UGameplayEffect> GEClass = UHDGE_Damage::StaticClass();
 	FGameplayEffectSpecHandle SpecHandle = OwnerASC->MakeOutgoingSpec(GEClass, 1.0f, ContextHandle);
-	
+
 	if (SpecHandle.IsValid())
 	{
 		OwnerASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);

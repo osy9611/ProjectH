@@ -20,6 +20,11 @@
 ,!Enumerator,Physical,,물리 데미지
 ,!Enumerator,Magical,!End,마법 데미지
 ,,,,
+,!Enum,SkillValueType,,
+,!Enumerator,Damage,,공격
+,!Enumerator,Buff,,버프
+,!Enumerator,DeBuff,!End,디버프
+,,,,
 ,!Enum,SkillTargetType,,
 ,!Enumerator,Mine,,자신
 ,!Enumerator,TeamAll,,팀 전체

@@ -181,8 +181,6 @@ void UHDBattleComponent::ProcessAbility_Skill(const FBattleStateParams& Params)
 	if (!SkillData)
 		return;
 
-	const_cast<FBattleStateParams&>(Params).BuffIDs.Add(SkillData->BuffTableNo);
-
 	if (SkillData->SkillTargetType == ESkillTargetType::Enemy_All)
 	{
 		UBattleSubsystem* BattleSubsystem = GetWorld()->GetSubsystem<UBattleSubsystem>();
