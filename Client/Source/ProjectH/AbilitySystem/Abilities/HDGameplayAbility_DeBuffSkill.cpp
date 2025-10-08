@@ -77,5 +77,5 @@ void UHDGameplayAbility_DeBuffSkill::ExecuteGameEffect(TArray<int32>& BuffIDs, U
 
 	AActor* SourceActor = GetAvatarActorFromActorInfo();
 	UHDAbilitySystemComponent* TargetASC = UtilFunc::GetASC(TargetActor);
-	TargetASC->RegisterBuff(BuffIDs, SourceActor);
+	TargetASC->RegisterDebuff(BuffIDs, SourceActor);
 }

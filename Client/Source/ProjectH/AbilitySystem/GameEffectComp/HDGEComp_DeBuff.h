@@ -14,5 +14,5 @@ class PROJECTH_API UHDGEComp_DeBuff : public UGameplayEffectComponent
 {
 	GENERATED_BODY()
 public:
-
+	virtual void OnGameplayEffectExecuted(FActiveGameplayEffectsContainer& ActiveGEContainer, FGameplayEffectSpec& GESpec, FPredictionKey& PredictionKey) const override;
 };

@@ -24,7 +24,7 @@ public:
 	int32 BuffID;
 
 	UPROPERTY()
-	FBuffData BuffData;
+	FBuffData Data;
 
 	UPROPERTY()
 	FBattleStateParams BattleStateParams;

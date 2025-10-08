@@ -9,4 +9,4 @@ int,string,SkillTargetType,int,DamageType,float,bool,int,int,int
 2003,Ren_Skill3,Mine,0,,0,True,1,7,0
 2004,Ren_Skill4,TeamAll,0,,0,True,1,7,0
 2005,Cerafina_Skill1,TeamAll,0,,1,True,1,0,1001
-2006,Cerafina_Skill1,Enemy_One,0,Physical,1,True,1,0,1001
+2006,Cerafina_Skill1,Enemy_One,0,Physical,1,True,1,0,1002

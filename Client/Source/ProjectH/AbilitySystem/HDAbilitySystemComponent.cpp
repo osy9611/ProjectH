@@ -4,6 +4,8 @@
 #include "HDAbilitySystemComponent.h"
 #include "ProjectH/Util/UtilFunc_Data.h"
 #include "ProjectH/AbilitySystem/GameEffect/HDGE_Buff.h"
+#include "ProjectH/AbilitySystem/GameEffect/HDGE_DeBuff.h"
+#include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet.h"
 
 UHDAbilitySystemComponent::UHDAbilitySystemComponent(const FObjectInitializer& ObjectInitializer)
 {
@@ -46,11 +48,10 @@ FGameAbilityParam* UHDAbilitySystemComponent::ConsumeParams(FGameplayAbilitySpec
 
 void UHDAbilitySystemComponent::RegisterBuff(TArray<int32> BuffIDs, AActor* Source)
 {
-	const FGameplayEffectQuery Query;
-	TArray<FActiveGameplayEffectHandle> BuffEffectHandles = GetActiveEffects(Query);
-
-	for (FActiveGameplayEffectHandle& Handle : BuffEffectHandles)
+	for (TPair<FActiveGameplayEffectHandle, int32>& BuffTurn : BuffTurns)
 	{
+		FActiveGameplayEffectHandle& Handle = BuffTurn.Key;
+
 		const FActiveGameplayEffect* ActiveEffect = GetActiveGameplayEffect(Handle);
 		const FGameplayEffectContextHandle& ContextHandle = ActiveEffect->Spec.GetEffectContext();
 		if (!ContextHandle.IsValid())
@@ -61,47 +62,101 @@ void UHDAbilitySystemComponent::RegisterBuff(TArray<int32> BuffIDs, AActor* Sour
 
 		if (BuffIDs.Contains(BuffContext->BuffID))
 		{
-			const UGameplayEffect* GEClass = ActiveEffect->Spec.Def;
-			if (BuffContext->BuffData.Stackable)
+			if (BuffContext->Data.Stackable)
 			{
 				ApplyGameplayEffectSpecToSelf(ActiveEffect->Spec);
 				BuffIDs.Remove(BuffContext->BuffID);
-				ResetBuffHandle(Handle, BuffContext->BuffData.TurnCount);
+				ResetBuffHandle(Handle, BuffContext->Data.TurnCount);
 			}
 		}
 	}
 
-	AActor* SourceActor = GetAvatarActor();
 	for (int32 BuffID : BuffIDs)
 	{
 		FBuffData* Data = UtilFunc_Data::GetTableData<FBuffData>(GetWorld(), FString::FromInt(BuffID));
 		if (!Data)
 		{
-			UE_LOG(HDLog, Log, TEXT("[UHDGameplayAbility_BuffSkill] BuffData Not Found"));
+			UE_LOG(HDLog, Log, TEXT("[UHDAbilitySystemComponent] BuffData Not Found"));
 			continue;
 		}
 
 		FBuffEffectContext* BuffContext = new FBuffEffectContext();
 		BuffContext->AddInstigator(Source, Source);
 		BuffContext->BuffID = BuffID;
-		BuffContext->BuffData = *Data;
+		BuffContext->Data = *Data;
 
-		TSubclassOf<UGameplayEffect> GEClass = UHDGE_Buff::StaticClass();
-		FGameplayEffectContextHandle ContextHandle = FGameplayEffectContextHandle(BuffContext);
-		FGameplayEffectSpecHandle SpecHandle = MakeOutgoingSpec(GEClass, 1.0f, ContextHandle);
-		if (SpecHandle.IsValid())
+		FActiveGameplayEffectHandle Handle = ApplyGenericEffect(UHDGE_Buff::StaticClass(), BuffContext);
+		if (Handle.IsValid())
 		{
-			FActiveGameplayEffectHandle Handle = ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-			if (Handle.IsValid())
-			{
-				AddBuffHandle(Handle, Data->TurnCount);
-			}
+			AddBuffHandle(Handle, Data->TurnCount);
 		}
 	}
 }
 
 void UHDAbilitySystemComponent::RegisterDebuff(TArray<int32> BuffIDs, AActor* Source)
 {
+	for (TPair<FActiveGameplayEffectHandle, int32>& DeBuffTurn : DeBuffTurns)
+	{
+		FActiveGameplayEffectHandle& Handle = DeBuffTurn.Key;
+
+		const FActiveGameplayEffect* ActiveEffect = GetActiveGameplayEffect(Handle);
+		const FGameplayEffectContextHandle& ContextHandle = ActiveEffect->Spec.GetEffectContext();
+		if (!ContextHandle.IsValid())
+			continue;
+		FDeBuffEffectContext* DeBuffContext = (FDeBuffEffectContext*)ContextHandle.Get();
+		if (!DeBuffContext)
+			continue;
+
+		if (BuffIDs.Contains(DeBuffContext->DeBuffID))
+		{
+			if (DeBuffContext->Data.Stackable)
+			{
+				ApplyGameplayEffectSpecToSelf(ActiveEffect->Spec);
+				BuffIDs.Remove(DeBuffContext->DeBuffID);
+				ResetBuffHandle(Handle, DeBuffContext->Data.TurnCount);
+			}
+		}
+	}
+
+	for (int32 BuffID : BuffIDs)
+	{
+		FDeBuffData* Data = UtilFunc_Data::GetTableData<FDeBuffData>(GetWorld(), FString::FromInt(BuffID));
+		if (!Data)
+		{
+			UE_LOG(HDLog, Log, TEXT("[UHDAbilitySystemComponent] BuffData Not Found"));
+			continue;
+		}
+
+		FDeBuffEffectContext* DeBuffContext = new FDeBuffEffectContext();
+		DeBuffContext->AddInstigator(Source, Source);
+		DeBuffContext->DeBuffID = BuffID;
+		DeBuffContext->Data = *Data;
+
+		FActiveGameplayEffectHandle Handle = ApplyGenericEffect(UHDGE_DeBuff::StaticClass(), DeBuffContext);
+		if (Handle.IsValid())
+		{
+			AddDeBuffHandle(Handle, Data->TurnCount);
+		}
+	}
+}
+
+FActiveGameplayEffectHandle UHDAbilitySystemComponent::ApplyGenericEffect(TSubclassOf<UGameplayEffect> GEClass, FGameplayEffectContext* Context)
+{
+	if (!IsValid(GEClass))
+	{
+		UE_LOG(HDLog, Warning, TEXT("[UHDAbilitySystemComponent] GEClass Is Not Valid"));
+		return FActiveGameplayEffectHandle();
+	}
+
+	FGameplayEffectContextHandle ContextHandle = FGameplayEffectContextHandle(Context);
+	FGameplayEffectSpecHandle SpecHandle = MakeOutgoingSpec(GEClass, 1.0f, ContextHandle);
+
+	if (SpecHandle.IsValid())
+	{
+		return ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());		
+	}
+
+	return FActiveGameplayEffectHandle();
 }
 
 void UHDAbilitySystemComponent::AddBuffHandle(FActiveGameplayEffectHandle& Handle, int32 TurnCount)
@@ -114,6 +169,18 @@ void UHDAbilitySystemComponent::ResetBuffHandle(FActiveGameplayEffectHandle& Han
 {
 	if (BuffTurns.Contains(Handle))
 		BuffTurns[Handle] = TurnCount;
+}
+
+void UHDAbilitySystemComponent::AddDeBuffHandle(FActiveGameplayEffectHandle& Handle, int32 TurnCount)
+{
+	if (!DeBuffTurns.Contains(Handle))
+		DeBuffTurns.Add(Handle, TurnCount);
+}
+
+void UHDAbilitySystemComponent::ResetDeBuffHandle(FActiveGameplayEffectHandle& Handle, int32 TurnCount)
+{
+	if (DeBuffTurns.Contains(Handle))
+		DeBuffTurns[Handle] = TurnCount;
 }
 
 void UHDAbilitySystemComponent::UpdateGE()
@@ -138,6 +205,7 @@ void UHDAbilitySystemComponent::UpdateBuff()
 
 	for (FActiveGameplayEffectHandle& Handle : RemoveBuffHandles)
 	{
+		const UHDAttributeSet* SourceAttributeSet = GetSet<UHDAttributeSet>();
 		RemoveActiveGameplayEffect(Handle);
 		BuffTurns.Remove(Handle);
 	}
@@ -146,20 +214,27 @@ void UHDAbilitySystemComponent::UpdateBuff()
 void UHDAbilitySystemComponent::UpdateDeBuff()
 {
 	TArray<FActiveGameplayEffectHandle> RemoveBuffHandles;
-	for (TPair<FActiveGameplayEffectHandle, int32>& BuffTurn : BuffTurns)
+	for (TPair<FActiveGameplayEffectHandle, int32>& DeBuffTurn : DeBuffTurns)
 	{
-		BuffTurn.Value--;
+		DeBuffTurn.Value--;
 
-		if (BuffTurn.Value <= 0)
+		if (DeBuffTurn.Value <= 0)
 		{
-			RemoveBuffHandles.Add(BuffTurn.Key);
+			RemoveBuffHandles.Add(DeBuffTurn.Key);
 			continue;
 		}
+
+		const FActiveGameplayEffect* ActiveGE = GetActiveGameplayEffect(DeBuffTurn.Key);
+
+		if (!ActiveGE)
+			continue;
+
+		ExecutePeriodicEffect(DeBuffTurn.Key);
 	}
 
 	for (FActiveGameplayEffectHandle& Handle : RemoveBuffHandles)
 	{
 		RemoveActiveGameplayEffect(Handle);
-		BuffTurns.Remove(Handle);
+		DeBuffTurns.Remove(Handle);
 	}
 }

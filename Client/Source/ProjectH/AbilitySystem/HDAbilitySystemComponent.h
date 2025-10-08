@@ -9,6 +9,8 @@
 #include "ProjectH/Data/GenerateTableData.h"
 #include "HDAbilitySystemComponent.generated.h"
 
+struct FDeBuffHandle;
+
 UCLASS()
 class PROJECTH_API UHDAbilitySystemComponent : public UModularAbilitySystemComponent
 {
@@ -24,16 +26,25 @@ public:
 	void RegisterBuff(TArray<int32> BuffIDs,AActor* Source);
 	void RegisterDebuff(TArray<int32> BuffIDs, AActor* Source);
 
-	void AddBuffHandle(FActiveGameplayEffectHandle& Handle, int32 TurnCount);
-	void ResetBuffHandle(FActiveGameplayEffectHandle& Handle, int32 TurnCount);
+	FActiveGameplayEffectHandle ApplyGenericEffect(TSubclassOf<UGameplayEffect> GEClass, FGameplayEffectContext* Context);
+
 	void UpdateGE();
+private:
 	void UpdateBuff();
 	void UpdateDeBuff();
+
+	void AddBuffHandle(FActiveGameplayEffectHandle& Handle, int32 TurnCount);
+	void ResetBuffHandle(FActiveGameplayEffectHandle& Handle, int32 TurnCount);
+
+	void AddDeBuffHandle(FActiveGameplayEffectHandle& Handle, int32 TurnCount);
+	void ResetDeBuffHandle(FActiveGameplayEffectHandle& Handle, int32 TurnCount);
+
 private:
 	TMap<FGameplayAbilitySpecHandle, FGameAbilityParam*> PendingParams;
 
 	UPROPERTY()
 	TMap<FActiveGameplayEffectHandle, int32> BuffTurns;
+
 	UPROPERTY()
 	TMap<FActiveGameplayEffectHandle, int32> DeBuffTurns;
 };

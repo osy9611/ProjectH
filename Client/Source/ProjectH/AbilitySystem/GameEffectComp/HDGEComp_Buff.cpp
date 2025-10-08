@@ -36,7 +36,7 @@ void UHDGEComp_Buff::OnGameplayEffectApplied(FActiveGameplayEffectsContainer& Ac
 	if (!BuffContext)
 		return;
 
-	FBuffData BuffData = BuffContext->BuffData;
+	FBuffData BuffData = BuffContext->Data;
 
 	//Set Stack Limit Count
 	const UGameplayEffect* GE = GESpec.Def;
@@ -46,7 +46,7 @@ void UHDGEComp_Buff::OnGameplayEffectApplied(FActiveGameplayEffectsContainer& Ac
 	MutableGE->StackLimitCount = BuffData.MaxStack;
 
 	//Stack °è»ê
-	float StackCount = GESpec.StackCount ==1 ? 0 : GESpec.StackCount;
+	float StackCount = GESpec.StackCount == 1 ? 0 : GESpec.StackCount;
 	float Amount = BuffData.Value + (BuffData.Value * StackCount * 0.5f);
 
 	if (BuffData.BuffType == EBuffType::LowPATK || BuffData.BuffType == EBuffType::LowEATK
@@ -60,12 +60,12 @@ void UHDGEComp_Buff::OnGameplayEffectApplied(FActiveGameplayEffectsContainer& Ac
 
 	const UHDAttributeSet* SourceAttributeSet = TargetASC->GetSet<UHDAttributeSet>();
 
-	UE_LOG(HDLog, Log, TEXT("Before Data : %f"), SourceAttributeSet->GetG1_PATK());
+	UE_LOG(HDLog, Log, TEXT("BuffID : %d  Before Data : %f"), BuffContext->BuffID, SourceAttributeSet->GetG1_PATK());
 
 	ActiveGEContainer.ApplyModToAttribute(
 		GetBuffAttribute(BuffData.BuffType), EGameplayModOp::Override, Amount);
 
-	UE_LOG(HDLog, Log, TEXT("After Data : %f"), SourceAttributeSet->GetG1_PATK());
+	UE_LOG(HDLog, Log, TEXT("BuffID : %d  After Data : %f"), BuffContext->BuffID, SourceAttributeSet->GetG1_PATK());
 	UE_LOG(HDLog, Log, TEXT("After Stack : %d"), GESpec.StackCount);
 }
 
