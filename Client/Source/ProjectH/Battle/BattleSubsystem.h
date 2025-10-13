@@ -15,6 +15,7 @@ struct FSceneData;
 class UTurnManager;
 class UBattleSpawner;
 class UBattleInput;
+class UHDBattleCameraComponent;
 
 UCLASS()
 class PROJECTH_API UBattleSubsystem : public UTickableWorldSubsystem
@@ -52,6 +53,19 @@ public:
 	//BattleInput
 	void InitInput();
 
+
+	//BattleObserver
+	UFUNCTION(BlueprintCallable)
+	void RegisterBattleObserver(APawn* Pawn);
+
+	//BattleCamera
+	//턴제 전투의 경우 BattleObserver에 카메라가 있기 때문에 Subsystem을 통해서 관리를 해야한다.
+	UFUNCTION(BlueprintCallable)
+	void RegisterBattleCamera(UHDBattleCameraComponent* CameraMode);
+	UHDBattleCameraComponent* GetBattleCam();
+	void SetCameraMode(AActor* Target, TSubclassOf<UModularCameraMode> CameraMode, FGameplayAbilitySpecHandle& OwningSpecHandle, bool UseFovOffset);
+	void ClearCameraMode(const FGameplayAbilitySpecHandle& OwningSpecHandle, bool UseFovOffset);
+
 	int32 RandomBattleSelect(int32 Min, int32 Max);
 
 	bool IsWin();
@@ -78,6 +92,12 @@ private:
 	TObjectPtr<UBattleStateManager> StateManager;
 	UPROPERTY()
 	TObjectPtr<UBattleSpawner> BattleSpawner;
+
+	UPROPERTY()
+	TWeakObjectPtr<UHDBattleCameraComponent> BattleCam;
+
+	UPROPERTY()
+	TWeakObjectPtr<APawn> BattleObserver;
 
 	UPROPERTY()
 	TObjectPtr<UBattleInput> Input;

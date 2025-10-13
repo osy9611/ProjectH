@@ -20,10 +20,13 @@ class MODULARGAME_API UModularCameraComponent : public UCameraComponent
 public:
 	UModularCameraComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	AActor* GetTargetActor()const { return GetOwner(); }
+	virtual AActor* GetTargetActor()const { return GetOwner(); }
 	void UpdateCameraModes();
 
 	static UModularCameraComponent* FindCameraComponent(const AActor* Actor) { return (Actor ? Actor->FindComponentByClass<UModularCameraComponent>() : nullptr); }
+
+	template<typename T = UModularCameraComponent>
+	static T* FindCameraComponent(const AActor* Actor) { return (Actor ? Actor->FindComponentByClass<T>() : nullptr); }
 
 	virtual void OnRegister() override;
 	virtual void GetCameraView(float DeltaTime, FMinimalViewInfo& DesiredView) final;

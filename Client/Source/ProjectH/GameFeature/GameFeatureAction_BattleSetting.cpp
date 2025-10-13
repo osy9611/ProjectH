@@ -2,6 +2,7 @@
 
 
 #include "GameFeatureAction_BattleSetting.h"
+#include "Kismet/GameplayStatics.h"
 #include "ProjectH/LogChannels.h"
 #include "ProjectH/Battle/BattleSubsystem.h"
 #include "ProjectH/GameModes/HDExperienceManagerComponent.h"
@@ -9,6 +10,7 @@
 #include "ProjectH/Data/EnumGenerateData.h"
 #include "ProjectH/Data/DataManagerSubsystem.h"
 #include "ProjectH/Object/HDObjectPoolSubsystem.h"
+#include "ProjectH/Character/HDCharacter.h"
 void UGameFeatureAction_BattleSetting::OnGameFeatureDeactivating(FGameFeatureDeactivatingContext& Context)
 {
 	Super::OnGameFeatureDeactivating(Context);
@@ -62,6 +64,7 @@ void UGameFeatureAction_BattleSetting::SetBattle(UWorld* World)
 		return;
 	}
 	UHDExperienceManagerComponent* ExperienceManagerComponent = GameState->FindComponentByClass<UHDExperienceManagerComponent>();
+
 
 	BattleSubsystem->OnBattleInit(ExperienceManagerComponent->CurrentSceneTableNo, BattleChar, BattleAI);
 	BattleSubsystem->OnStartBattle();

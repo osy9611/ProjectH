@@ -141,6 +141,7 @@ void UHDAbilitySystemComponent::RegisterDebuff(TArray<int32> BuffIDs, AActor* So
 	}
 }
 
+
 FActiveGameplayEffectHandle UHDAbilitySystemComponent::ApplyGenericEffect(TSubclassOf<UGameplayEffect> GEClass, FGameplayEffectContext* Context)
 {
 	if (!IsValid(GEClass))

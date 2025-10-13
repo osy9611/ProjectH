@@ -7,7 +7,8 @@
 #include "ProjectH/Util/UtilFunc_Data.h"
 #include "ProjectH/Battle/Turn/TurnManager.h"
 #include "ProjectH/Battle/Input/BattleInput.h"
-
+#include "ProjectH/Camera/HDBattleCameraComponent.h"
+#include "ProjectH/Character/HDHeroComponent.h"
 void UBattleSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
@@ -150,6 +151,59 @@ void UBattleSubsystem::InitInput()
 	UBattleInput* NewInput = NewObject<UBattleInput>(this);
 	Input = NewInput;
 	Input->OnInit();
+}
+
+void UBattleSubsystem::RegisterBattleObserver(APawn* Pawn)
+{
+	if (!Pawn)
+		return;
+
+	BattleObserver = Pawn;
+
+	UHDBattleCameraComponent* CamComponent = UModularCameraComponent::FindCameraComponent<UHDBattleCameraComponent>(Pawn);
+	if (!CamComponent)
+	{
+		UE_LOG(HDLog, Error, TEXT("[BattleSubsystem] BattleCameraComponent is nullptr"));
+		return;
+	}
+
+	RegisterBattleCamera(CamComponent);
+}
+
+void UBattleSubsystem::RegisterBattleCamera(UHDBattleCameraComponent* CameraMode)
+{
+	if (!CameraMode)
+	{
+		UE_LOG(HDLog, Error, TEXT("[BattleSubsystem] This CameraMode is nullptr"));
+		return;
+	}
+
+	BattleCam = CameraMode;
+}
+
+UHDBattleCameraComponent* UBattleSubsystem::GetBattleCam()
+{
+	if (!BattleCam.IsValid())
+		return nullptr;
+
+	return BattleCam.Get();
+}
+
+void UBattleSubsystem::SetCameraMode(AActor* Target, TSubclassOf<UModularCameraMode> CameraMode, FGameplayAbilitySpecHandle& OwningSpecHandle, bool UseFovOffset)
+{
+	if (!Target)
+		return;
+	
+	UHDHeroComponent* HeroComp = UHDHeroComponent::FindHeroComponent(BattleObserver.Get());
+	if (!HeroComp)
+		return;
+	HeroComp->AbilityCameraMode = CameraMode;
+
+
+}
+
+void UBattleSubsystem::ClearCameraMode(const FGameplayAbilitySpecHandle& OwningSpecHandle, bool UseFovOffset)
+{
 }
 
 int32 UBattleSubsystem::RandomBattleSelect(int32 Min, int32 Max)

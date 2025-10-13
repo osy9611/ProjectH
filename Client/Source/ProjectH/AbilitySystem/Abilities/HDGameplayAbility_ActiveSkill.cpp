@@ -12,7 +12,6 @@
 #include "ProjectH/Battle/HDBattleComponent.h"
 #include "ProjectH/Battle/BattleSubsystem.h"
 #include "ProjectH/Animation/PaperZDAnimNotify_Damage.h"
-#include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet.h"
 #include "ProjectH/AbilitySystem/GameEffect/HDGE_Damage.h"
 #include "ProjectH/Util/UtilFunc.h"
 #include "ProjectH/Util/UtilFunc_Sprite.h"
@@ -34,20 +33,38 @@ void UHDGameplayAbility_ActiveSkill::PlayFlipBookAnimation(FDynamicOnFlipbookCom
 
 	const TArray<UPaperZDAnimNotify_Base*>& Notifies = AnimSequence->GetAnimNotifies();
 
-	for (UPaperZDAnimNotify_Base* Notify : Notifies)
+	if (Notifies.IsEmpty())
 	{
-		UPaperZDAnimNotify_Damage* DamageNotify = Cast<UPaperZDAnimNotify_Damage>(Notify);
-		if (!DamageNotify)
-			continue;
+		//Notify가 비활성화 되어있다면 바로 실행 시킨다.
+		OnPlayEffect();
+		OnExecute();
+	}
+	else
+	{
+		for (UPaperZDAnimNotify_Base* Notify : Notifies)
+		{
+			UPaperZDAnimNotify_Damage* DamageNotify = Cast<UPaperZDAnimNotify_Damage>(Notify);
+			if (!DamageNotify)
+				continue;
 
-		DamageNotify->OnCallback = [this]()
-			{
-				OnPlayEffect();
-				OnExecute();
-			};
+			DamageNotify->OnCallback = [this]()
+				{
+					OnPlayEffect();
+				};
+		}
 	}
 
 	Super::PlayFlipBookAnimation(OnComplete);
+}
+
+void UHDGameplayAbility_ActiveSkill::SetCameraMode(TSubclassOf<UModularCameraMode> CameraMode, bool UseFovOffset)
+{
+	UBattleSubsystem* BattleSubSystem = GetWorld()->GetSubsystem<UBattleSubsystem>();
+	if(BattleSubSystem)
+}
+
+void UHDGameplayAbility_ActiveSkill::ClearCameraMode(bool UseFovOffest)
+{
 }
 
 void UHDGameplayAbility_ActiveSkill::OnExecute()
@@ -98,42 +115,15 @@ void UHDGameplayAbility_ActiveSkill::OnExecute()
 				break;
 			}
 			case ESkillValueType::Buff:
-				TargetASC->RegisterBuff(BattleStateParam->BuffIDs, Actor);
+				TargetASC->RegisterBuff({ SkillData->Value }, Actor);
 				break;
 			case ESkillValueType::DeBuff:
-				TargetASC->RegisterDebuff(BattleStateParam->BuffIDs, Actor);
+				TargetASC->RegisterDebuff({SkillData->Value}, Actor);
 				break;
 			default:
 				break;
 			}
 		}
-		
-	}
-}
 
-void UHDGameplayAbility_ActiveSkill::ExecuteGameEffect(UAbilitySystemComponent* OwnerASC, AActor* TargetActor)
-{
-	if (!OwnerASC || !TargetActor)
-	{
-		UE_LOG(HDLog, Warning, TEXT("[HDGameplayAbility_ActiveSkill] Create GE Fail"));
-		return;
-	}
-
-	AActor* SourceActor = GetAvatarActorFromActorInfo();
-	UHDAbilitySystemComponent* TargetASC = UtilFunc::GetASC(TargetActor);
-
-	FDamageEffectContext* DamageContext = new FDamageEffectContext();
-	DamageContext->AddInstigator(SourceActor, SourceActor);
-	DamageContext->SkillTag = GetGameplayTag();
-
-	FGameplayEffectContextHandle ContextHandle = FGameplayEffectContextHandle(DamageContext);
-
-	//Create GE Spec
-	TSubclassOf<UGameplayEffect> GEClass = UHDGE_Damage::StaticClass();
-	FGameplayEffectSpecHandle SpecHandle = OwnerASC->MakeOutgoingSpec(GEClass, 1.0f, ContextHandle);
-
-	if (SpecHandle.IsValid())
-	{
-		OwnerASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
 	}
 }

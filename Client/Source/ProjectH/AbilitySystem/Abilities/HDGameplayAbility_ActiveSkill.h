@@ -17,7 +17,10 @@ public:
 
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 	virtual void PlayFlipBookAnimation(FDynamicOnFlipbookComplete OnComplete);
+
+	virtual void SetCameraMode(TSubclassOf<UModularCameraMode> CameraMode, bool UseFovOffset = true) override;
+	virtual void ClearCameraMode(bool UseFovOffest = true) override;
+
 private:
 	void OnExecute();
-	void ExecuteGameEffect(UAbilitySystemComponent* OwnerASC,AActor* TargetActor);
 };
