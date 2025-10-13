@@ -9,6 +9,7 @@
 #include "ProjectH/Battle/Input/BattleInput.h"
 #include "ProjectH/Camera/HDBattleCameraComponent.h"
 #include "ProjectH/Character/HDHeroComponent.h"
+
 void UBattleSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
@@ -197,13 +198,22 @@ void UBattleSubsystem::SetCameraMode(AActor* Target, TSubclassOf<UModularCameraM
 	UHDHeroComponent* HeroComp = UHDHeroComponent::FindHeroComponent(BattleObserver.Get());
 	if (!HeroComp)
 		return;
-	HeroComp->AbilityCameraMode = CameraMode;
+	HeroComp->SetAbilityCameraMode(CameraMode, OwningSpecHandle, UseFovOffset);
 
-
+	if (BattleCam.IsValid())
+		BattleCam.Get()->RegisterTargetActor(Target);
 }
 
 void UBattleSubsystem::ClearCameraMode(const FGameplayAbilitySpecHandle& OwningSpecHandle, bool UseFovOffset)
 {
+	UHDHeroComponent* HeroComp = UHDHeroComponent::FindHeroComponent(BattleObserver.Get());
+	if (!HeroComp)
+		return;
+
+	HeroComp->ClearAbilityCameraMode(OwningSpecHandle, UseFovOffset);
+
+	if (BattleCam.IsValid())
+		BattleCam.Get()->UnregisterTargetActor();
 }
 
 int32 UBattleSubsystem::RandomBattleSelect(int32 Min, int32 Max)

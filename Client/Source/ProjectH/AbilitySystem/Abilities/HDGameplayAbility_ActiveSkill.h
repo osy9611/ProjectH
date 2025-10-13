@@ -20,7 +20,6 @@ public:
 
 	virtual void SetCameraMode(TSubclassOf<UModularCameraMode> CameraMode, bool UseFovOffset = true) override;
 	virtual void ClearCameraMode(bool UseFovOffest = true) override;
-
 private:
 	void OnExecute();
 };

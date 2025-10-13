@@ -23,6 +23,7 @@ UHDGameplayAbility_ActiveSkill::UHDGameplayAbility_ActiveSkill(const FObjectInit
 
 void UHDGameplayAbility_ActiveSkill::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
+	ClearCameraMode(true);
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -60,11 +61,27 @@ void UHDGameplayAbility_ActiveSkill::PlayFlipBookAnimation(FDynamicOnFlipbookCom
 void UHDGameplayAbility_ActiveSkill::SetCameraMode(TSubclassOf<UModularCameraMode> CameraMode, bool UseFovOffset)
 {
 	UBattleSubsystem* BattleSubSystem = GetWorld()->GetSubsystem<UBattleSubsystem>();
-	if(BattleSubSystem)
+	if (!BattleSubSystem)
+		return;
+
+	AActor* Actor = GetAvatarActorFromActorInfo();
+	if (!Actor)
+		return;
+
+	BattleSubSystem->SetCameraMode(Actor, CameraMode, CurrentSpecHandle, UseFovOffset);
 }
 
 void UHDGameplayAbility_ActiveSkill::ClearCameraMode(bool UseFovOffest)
 {
+	UBattleSubsystem* BattleSubSystem = GetWorld()->GetSubsystem<UBattleSubsystem>();
+	if (!BattleSubSystem)
+		return;
+
+	AActor* Actor = GetAvatarActorFromActorInfo();
+	if (!Actor)
+		return;
+
+	BattleSubSystem->ClearCameraMode(CurrentSpecHandle, UseFovOffest);
 }
 
 void UHDGameplayAbility_ActiveSkill::OnExecute()
@@ -118,7 +135,7 @@ void UHDGameplayAbility_ActiveSkill::OnExecute()
 				TargetASC->RegisterBuff({ SkillData->Value }, Actor);
 				break;
 			case ESkillValueType::DeBuff:
-				TargetASC->RegisterDebuff({SkillData->Value}, Actor);
+				TargetASC->RegisterDebuff({ SkillData->Value }, Actor);
 				break;
 			default:
 				break;
