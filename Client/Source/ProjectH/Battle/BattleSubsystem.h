@@ -9,7 +9,7 @@
 #include "ProjectH/LogChannels.h"
 #include "ProjectH/Battle/Spawn/BattleSpawner.h"
 #include "ProjectH/Battle/State/BattleStateManager.h"
-#include "ModularGame/Camera/ModularCameraMode.h"
+#include "ModularGame/Public/Camera/ModularCameraMode.h"
 #include "GameplayAbilitySpec.h"
 #include "BattleSubsystem.generated.h"
 
@@ -54,7 +54,6 @@ public:
 
 	//BattleInput
 	void InitInput();
-
 
 	//BattleObserver
 	UFUNCTION(BlueprintCallable)

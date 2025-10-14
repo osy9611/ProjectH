@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ModularGame/Pool/ObjectPoolSubsystem.h"
+#include "ModularGame/Public/Pool/ObjectPoolSubsystem.h"
 #include "HDObjectPoolSubsystem.generated.h"
 
 class UParticleSystemComponent;

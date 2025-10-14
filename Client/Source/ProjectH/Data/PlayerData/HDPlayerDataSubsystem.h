@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ModularGame/Data/PlayerDataSubsystem.h"
+#include "ModularGame/Public/Data/PlayerDataSubsystem.h"
 #include "HDPlayerDataSubsystem.generated.h"
 
 /**

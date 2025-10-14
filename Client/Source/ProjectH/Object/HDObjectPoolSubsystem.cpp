@@ -6,7 +6,7 @@
 #include "NiagaraComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Particles/ParticleSystem.h"
-#include "ModularGame/Pool/Poolable_NiagaraSystem.h"
+#include "ModularGame/Public/Pool/Poolable_NiagaraSystem.h"
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
 void UHDObjectPoolSubsystem::CreateParticle()
 {

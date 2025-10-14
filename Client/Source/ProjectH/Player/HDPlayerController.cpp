@@ -2,7 +2,7 @@
 
 
 #include "HDPlayerController.h"
-#include"ModularGame/Camera/ModularPlayerCameraManager.h"
+#include "ModularGame/Public/Camera/ModularPlayerCameraManager.h"
 #include "ProjectH/AbilitySystem/HDAbilitySystemComponent.h"
 #include "ProjectH/Player/HDPlayerState.h"
 AHDPlayerController::AHDPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "CommonUserWidget.h"
 #include "GameplayTagContainer.h"
-#include "ModularGame/UI/Toggle/Group/ToggleGroupDefaultWidget.h"
+#include "ModularGame/Public/UI/Toggle/Group/ToggleGroupDefaultWidget.h"
 #include "BattleCharActiveWidget.generated.h"
 
 class UVerticalBox;

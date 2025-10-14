@@ -12,10 +12,18 @@ void UHDCameraMode_Battle::UpdateView(float DeltaTime)
 	FVector PivotLocation = GetPivotLocation();
 	FRotator PivotRotation = CameraRotation;
 
-	//View 방향 기준 거리 뒤쪽으로 밀기
+	//View 카메라 뒤쪽으로 밀기
 	FVector CameraOffset = CameraRotation.Vector() * -CameraDistance;
-	FVector FinalCameraLocation = PivotLocation + CameraOffset;
+	if (UseCameraNoise)
+	{
+		float Time = GetWorld()->GetTimeSeconds();
+		float OffsetX = FMath::PerlinNoise1D(Time * NoiseSpeed) * AmplitudeX;
+		float OffsetY = FMath::PerlinNoise1D((Time + 100.0f) * NoiseSpeed) * AmplitudeY;
 
+		CameraOffset += FVector(OffsetX, 0.0f, OffsetY);
+	}
+
+	FVector FinalCameraLocation = PivotLocation + CameraOffset;
 
 	View.Location = FinalCameraLocation;
 	View.Rotation = CameraRotation;

@@ -5,7 +5,7 @@
 #include "ProjectH/LogChannels.h"
 #include "HDExperienceDefinition.h"
 #include "HDExperienceActionSet.h"
-#include "ModularGame/Asset/ModularAssetManager.h"
+#include "ModularGame/Public/Asset/ModularAssetManager.h"
 #include "GameFeaturesSubsystem.h"
 #include "GameFeatureAction.h"
 #include "GameFeaturesSubsystemSettings.h"

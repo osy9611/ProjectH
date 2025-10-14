@@ -64,7 +64,16 @@ void UHDGameplayAbility_ActiveSkill::SetCameraMode(TSubclassOf<UModularCameraMod
 	if (!BattleSubSystem)
 		return;
 
-	AActor* Actor = GetAvatarActorFromActorInfo();
+	FBattleStateParams* BattleStateParam = static_cast<FBattleStateParams*>(Params);
+	if (!BattleStateParam)
+		return;
+
+	AActor* Actor;
+	if (BattleStateParam->Objects.IsEmpty())
+		Actor = GetAvatarActorFromActorInfo();
+	else
+		Actor = BattleStateParam->Objects[0];
+
 	if (!Actor)
 		return;
 

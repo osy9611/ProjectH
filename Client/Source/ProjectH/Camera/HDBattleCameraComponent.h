@@ -3,12 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ModularGame/Camera/ModularCameraComponent.h"
+#include "ModularGame/Public/Camera/ModularCameraComponent.h"
+#include "ModularGame/Public/Camera/ModularCameraMode.h"
+#include "ModularGame/Public/Camera/ModularPlayerCameraManager.h"
 #include "HDBattleCameraComponent.generated.h"
 
-/**
- * 
- */
 UCLASS(Blueprintable, ClassGroup = (Camera), meta = (BlueprintSpawnableComponent))
 class PROJECTH_API UHDBattleCameraComponent : public UModularCameraComponent
 {
@@ -17,6 +16,8 @@ public:
 	UHDBattleCameraComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual AActor* GetTargetActor() const override;
+
+	virtual void GetCameraView(float DeltaTime, FMinimalViewInfo& DesiredView) final;
 
 	void RegisterTargetActor(AActor* Target);
 	void UnregisterTargetActor();

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
-#include "ModularGame/AbilitySystem/ModularAbilitySystemComponent.h"
+#include "ModularGame/Public/AbilitySystem/ModularAbilitySystemComponent.h"
 #include "ProjectH/AbilitySystem/HDGameAbilityParam.h"
 #include "ProjectH/Data/GenerateTableData.h"
 #include "HDAbilitySystemComponent.generated.h"

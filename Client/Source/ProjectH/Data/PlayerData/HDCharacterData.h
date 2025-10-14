@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ModularGame/Data/ModularUserData.h"
+#include "ModularGame/Public/Data/ModularUserData.h"
 #include "HDCharacterData.generated.h"
 
 class UHDAttributeSet_Player;

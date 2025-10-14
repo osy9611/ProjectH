@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ModularGame/AbilitySystem/Abilities/ModularGameplayAbility.h"
+#include "ModularGame/Public/AbilitySystem/Abilities/ModularGameplayAbility.h"
 #include "Abilities/GameplayAbility.h"
 #include "AnimSequences/PaperZDAnimSequence.h"
 #include "HDGameplayAbility.generated.h"

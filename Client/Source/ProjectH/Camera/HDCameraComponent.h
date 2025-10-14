@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ModularGame/Camera/ModularCameraComponent.h"
+#include "ModularGame/Public/Camera/ModularCameraComponent.h"
 #include "HDCameraComponent.generated.h"
 
 class UCapsuleComponent;

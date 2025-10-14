@@ -4,7 +4,7 @@
 #include "HDCameraMode_Player.h"
 #include "Curves/CurveVector.h"
 #include "ProjectH/LogChannels.h"
-#include "ModularGame/Camera/ModularCameraComponent.h"
+#include "ModularGame/Public/Camera/ModularCameraComponent.h"
 
 UHDCameraMode_Player::UHDCameraMode_Player(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

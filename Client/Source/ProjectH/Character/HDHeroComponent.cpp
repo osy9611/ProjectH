@@ -16,7 +16,7 @@
 #include "ProjectH/Input/HDInputComponent.h"
 #include "ProjectH/Input/HDInputManagerSubsystem.h"
 #include "ProjectH/Interaction/InteractionComponent.h"
-#include "ModularGame/Camera/ModularCameraComponent.h"
+#include "ModularGame/Public/Camera/ModularCameraComponent.h"
 const FName UHDHeroComponent::NAME_ActorFeatureName("Hero");
 
 UHDHeroComponent::UHDHeroComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)

@@ -14,7 +14,7 @@
 #include "ProjectH/Player/HDPlayerController.h"
 #include "ProjectH/Character/HDPawnExtensionComponent.h"
 #include "ProjectH/GameModes/HDExperienceDefinition.h"
-#include "ModularGame/Sound/AudioSubsystem.h"
+#include "ModularGame/Public/Sound/AudioSubsystem.h"
 #include "ProjectH/Battle/BattleSubsystem.h"
 #include "ProjectH/Input/HDInputManagerSubsystem.h"
 

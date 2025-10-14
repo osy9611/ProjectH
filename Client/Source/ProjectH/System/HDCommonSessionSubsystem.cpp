@@ -8,7 +8,7 @@
 #include "ProjectH/Data/GenerateTableData.h"
 #include "ProjectH/Data/DataManagerSubsystem.h"
 #include "ProjectH/Util/UtilFunc_Data.h"
-#include "ModularGame/Sound/AudioSubsystem.h"
+#include "ModularGame/Public/Sound/AudioSubsystem.h"
 
 UHDCommonSessionSubsystem::UHDCommonSessionSubsystem()
 {

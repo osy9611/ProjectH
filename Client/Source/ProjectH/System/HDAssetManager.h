@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ModularGame/Asset/ModularAssetManager.h"
+#include "ModularGame/Public/Asset/ModularAssetManager.h"
 #include "HDAssetManager.generated.h"
 
 /**

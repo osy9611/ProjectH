@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "GameplayTagContainer.h"
-#include "ModularGame/UI/Toggle/ToggleWidget.h"
+#include "ModularGame/Public/UI/Toggle/ToggleWidget.h"
 #include "BattleCharActiveSelect.generated.h"
 
 class UImage;

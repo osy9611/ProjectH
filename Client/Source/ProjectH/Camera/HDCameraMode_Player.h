@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ModularGame/Camera/ModularCameraMode.h"
+#include "ModularGame/Public/Camera/ModularCameraMode.h"
 #include "HDCameraMode_Player.generated.h"
 
 class UCurveVector;

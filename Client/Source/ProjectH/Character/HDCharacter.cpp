@@ -3,7 +3,7 @@
 
 #include "HDCharacter.h"
 #include "Components/GameFrameworkComponentManager.h"
-#include "ModularGame/Camera/ModularCameraComponent.h"
+#include "ModularGame/Public/Camera/ModularCameraComponent.h"
 #include "ProjectH/Character/HDPawnExtensionComponent.h"
 
 AHDCharacter::AHDCharacter()
