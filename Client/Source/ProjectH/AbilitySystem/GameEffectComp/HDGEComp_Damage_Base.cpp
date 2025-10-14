@@ -1,44 +1,34 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "HDGE_Damage.h"
-#include "AbilitySystemGlobals.h"
+#include "HDGEComp_Damage_Base.h"
+#include "AbilitySystemComponent.h"
 #include "ProjectH/LogChannels.h"
 #include "ProjectH/Util/UtilFunc.h"
-#include "ProjectH/Player/HDPlayerState.h"
+#include "ProjectH/AbilitySystem/GameEffect/HDGE_Damage.h"
 #include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet.h"
-#include "ProjectH/AbilitySystem/GameEffectComp/HDGEComp_Damage_Base.h"
-UHDGE_Damage::UHDGE_Damage()
+
+
+void UHDGEComp_Damage_Base::OnGameplayEffectChanged()
 {
-	DurationPolicy = EGameplayEffectDurationType::Instant; //한 프레임에 바로 실행되는 GE 타입
-	//Executions.Add(FGameplayEffectExecutionDefinition(UHDDamageExecutionCalculation::StaticClass()));
-	
-	UHDGEComp_Damage_Base* GEComp = CreateDefaultSubobject<UHDGEComp_Damage_Base>(TEXT("HDGEComp_Damage_Base"));
-	GEComponents.Add(GEComp);
+	Super::OnGameplayEffectChanged();
+
+	UE_LOG(HDLog, Log, TEXT("[HDGEComp_Damage_Base] OnGameplayEffectChanged"));
 }
 
-UHDDamageExecutionCalculation::UHDDamageExecutionCalculation()
+void UHDGEComp_Damage_Base::OnGameplayEffectExecuted(FActiveGameplayEffectsContainer& ActiveGEContainer, FGameplayEffectSpec& GESpec, FPredictionKey& PredictionKey) const
 {
-}
+	Super::OnGameplayEffectExecuted(ActiveGEContainer, GESpec, PredictionKey);
+	UE_LOG(HDLog, Log, TEXT("[HDGEComp_Damage_Base] OnGameplayEffectExecuted"));
 
-//SkillMultiplier -> 스킬마다 고정된 데미지 배율 (예 : 1.2x, 2.0x 등)
-//RandomVariance -> 0.95 ~ 1.05 사이의 랜덤 값 (데미지 흔들림)
-//CritBonus -> 치명타 발생 시 ×1.25 ~ ×1.5 배 적용
-//WeaknessBonus -> 약점을 찔렀을 때 보정 (×1.2 ~ ×1.5) + 실드 감소
-void UHDDamageExecutionCalculation::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, OUT FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
-{
-	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
-	FGameplayEffectContextHandle ContextHandle = Spec.GetContext();
-
-	//어떤 스킬을 사용했는지 들어있는 Context
-	const FDamageEffectContext* DamageContext = static_cast<FDamageEffectContext*>(ContextHandle.Get());
+	const FGameplayEffectContextHandle& ContextHandle = GESpec.GetContext();
+	const FDamageEffectContext* DamageContext = static_cast<const FDamageEffectContext*>(ContextHandle.Get());
 	if (!DamageContext)
 		return;
-
-	//공격자 
+	//공격자
 	AActor* SourceActor = ContextHandle.GetOriginalInstigator();
 	UAbilitySystemComponent* SourceASC = UtilFunc::GetASC(SourceActor);
-	if (!SourceASC)
+	if (!SourceActor)
 		return;
 
 	const UHDAttributeSet* SourceAttributeSet = SourceASC->GetSet<UHDAttributeSet>();
@@ -50,7 +40,7 @@ void UHDDamageExecutionCalculation::Execute_Implementation(const FGameplayEffect
 		return;
 
 	//대상자
-	UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
+	UAbilitySystemComponent* TargetASC = ActiveGEContainer.Owner;
 	if (!TargetASC)
 		return;
 
@@ -83,7 +73,11 @@ void UHDDamageExecutionCalculation::Execute_Implementation(const FGameplayEffect
 
 	float FinalDamage = BaseDamage * Rand * CritBonus * WeakBonus;
 
-	//데미지 적용(HP 감소)
-	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(
-		UHDAttributeSet::GetHPAttribute(), EGameplayModOp::Additive, -FinalDamage));
+	TargetASC->ApplyModToAttributeUnsafe(UHDAttributeSet::GetHPAttribute(), EGameplayModOp::Additive, -FinalDamage);
+}
+
+void UHDGEComp_Damage_Base::OnGameplayEffectApplied(FActiveGameplayEffectsContainer& ActiveGEContainer, FGameplayEffectSpec& GESpec, FPredictionKey& PredictionKey) const
+{
+	Super::OnGameplayEffectApplied(ActiveGEContainer, GESpec, PredictionKey);
+	UE_LOG(HDLog, Log, TEXT("[HDGEComp_Damage_Base] OnGameplayEffectApplied"));
 }

@@ -16,11 +16,11 @@ UHDAttributeSet_Monster::UHDAttributeSet_Monster(const FObjectInitializer& Objec
 {
 }
 
-void UHDAttributeSet_Monster::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
+void UHDAttributeSet_Monster::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
 {
-	Super::PostGameplayEffectExecute(Data);
+	Super::PostAttributeChange(Attribute, OldValue, NewValue);
 	AActor* Actor = GetOwningActor();
-	if (Data.EvaluatedData.Attribute == GetHPAttribute())
+	if (Attribute == GetHPAttribute())
 	{
 		float NowHP = GetHP();
 		UE_LOG(HDLog, Log, TEXT("[HDAttributeSet_Monster] Now HP %.2f"), NowHP);
@@ -46,7 +46,7 @@ void UHDAttributeSet_Monster::PostGameplayEffectExecute(const FGameplayEffectMod
 		UHDDamageWidget* DamageWidget = BattleComp->GetWidgetObject<UHDDamageWidget>("DamageWidget", true);
 		if (DamageWidget)
 		{
-			float DamageAmount = FMath::Abs(Data.EvaluatedData.Magnitude);
+			float DamageAmount = FMath::Abs(OldValue-NewValue);
 			DamageWidget->StartDamageWidget(DamageAmount);
 		}
 	}

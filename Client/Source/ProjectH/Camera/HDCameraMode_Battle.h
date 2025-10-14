@@ -38,4 +38,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	float CameraDistance = 3500.0f;
+
+private:
+	FVector PrevPos;
 };

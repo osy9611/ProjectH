@@ -15,8 +15,7 @@ class PROJECTH_API UHDAttributeSet_Monster : public UHDAttributeSet
 	GENERATED_BODY()
 public:
 	UHDAttributeSet_Monster(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
-	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 
 	virtual void OnInit(FString InitTableID) override;
 	virtual void OnUpdateStatus() override;

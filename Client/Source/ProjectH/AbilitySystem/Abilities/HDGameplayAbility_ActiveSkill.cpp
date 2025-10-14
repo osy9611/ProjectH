@@ -51,6 +51,7 @@ void UHDGameplayAbility_ActiveSkill::PlayFlipBookAnimation(FDynamicOnFlipbookCom
 			DamageNotify->OnCallback = [this]()
 				{
 					OnPlayEffect();
+					OnExecute();
 				};
 		}
 	}

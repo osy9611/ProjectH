@@ -51,10 +51,10 @@ public:
 	const FCameraModeView& GetCameraModeView() const { return View; }
 
 	UModularCameraComponent* GetCameraComponent() const;
-	AActor* GetTargetActor() const;
-	FVector GetPivotLocation() const;
-	FVector GetPivotForward() const;
-	FRotator GetPivotRotation() const;
+	virtual AActor* GetTargetActor() const;
+	virtual FVector GetPivotLocation() const;
+	virtual FVector GetPivotForward() const;
+	virtual FRotator GetPivotRotation() const;
 
 	float GetBlendTime() const { return BlendTime; }
 	float GetBlendWeight() const { return BlendWeight; }

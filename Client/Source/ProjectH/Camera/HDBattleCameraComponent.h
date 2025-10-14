@@ -17,8 +17,6 @@ public:
 
 	virtual AActor* GetTargetActor() const override;
 
-	virtual void GetCameraView(float DeltaTime, FMinimalViewInfo& DesiredView) final;
-
 	void RegisterTargetActor(AActor* Target);
 	void UnregisterTargetActor();
 
