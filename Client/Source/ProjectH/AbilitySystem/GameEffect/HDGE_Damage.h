@@ -26,16 +26,6 @@ public:
 };
 
 UCLASS()
-class PROJECTH_API UHDDamageExecutionCalculation :public UGameplayEffectExecutionCalculation
-{
-	GENERATED_BODY()
-public:
-	UHDDamageExecutionCalculation();
-
-	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, OUT FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
-};
-
-UCLASS()
 class PROJECTH_API UHDGE_Damage : public UGameplayEffect
 {
 	GENERATED_BODY()
