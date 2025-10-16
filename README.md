@@ -10,7 +10,7 @@
 
 ## 기술 스택
 
-✔ **Engine:** Unreal Engine 5
+✔ **Engine:** Unreal Engine 5.6
 
 ✔ **Language:** C++, Python ,Blueprint
 
