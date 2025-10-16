@@ -59,7 +59,8 @@ void UHDCommonSessionSubsystem::OnCall_Get()
 {
 	if (!Handler)
 		return;
-	Handler->OnCall_Get(TEXT("http://127.0.0.1:8000/items"), 
+	FHTTPRequestOption Option;
+	Handler->OnCall_Get(TEXT("http://127.0.0.1:8000/items"), Option,
 		[](const FJsonObject& Json, bool bSuccess)
 		{
 			if (bSuccess)
@@ -85,7 +86,8 @@ void UHDCommonSessionSubsystem::OnCall_Post()
 	Obj->SetStringField("description", "Legendary blade");
 	Obj->SetNumberField("price", 999.9);
 
-	Handler->OnCall_Post(TEXT("http://127.0.0.1:8000/items/"),Obj,
+	FHTTPRequestOption Option;
+	Handler->OnCall_Post(TEXT("http://127.0.0.1:8000/items/"), Option, Obj,
 		[](const FJsonObject& Json, bool bSuccess)
 		{
 			if (bSuccess)
