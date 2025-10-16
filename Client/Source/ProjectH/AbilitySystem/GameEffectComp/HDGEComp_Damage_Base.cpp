@@ -8,14 +8,6 @@
 #include "ProjectH/AbilitySystem/GameEffect/HDGE_Damage.h"
 #include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet.h"
 
-
-void UHDGEComp_Damage_Base::OnGameplayEffectChanged()
-{
-	Super::OnGameplayEffectChanged();
-
-	UE_LOG(HDLog, Log, TEXT("[HDGEComp_Damage_Base] OnGameplayEffectChanged"));
-}
-
 void UHDGEComp_Damage_Base::OnGameplayEffectExecuted(FActiveGameplayEffectsContainer& ActiveGEContainer, FGameplayEffectSpec& GESpec, FPredictionKey& PredictionKey) const
 {
 	Super::OnGameplayEffectExecuted(ActiveGEContainer, GESpec, PredictionKey);
@@ -74,10 +66,4 @@ void UHDGEComp_Damage_Base::OnGameplayEffectExecuted(FActiveGameplayEffectsConta
 	float FinalDamage = BaseDamage * Rand * CritBonus * WeakBonus;
 
 	TargetASC->ApplyModToAttributeUnsafe(UHDAttributeSet::GetHPAttribute(), EGameplayModOp::Additive, -FinalDamage);
-}
-
-void UHDGEComp_Damage_Base::OnGameplayEffectApplied(FActiveGameplayEffectsContainer& ActiveGEContainer, FGameplayEffectSpec& GESpec, FPredictionKey& PredictionKey) const
-{
-	Super::OnGameplayEffectApplied(ActiveGEContainer, GESpec, PredictionKey);
-	UE_LOG(HDLog, Log, TEXT("[HDGEComp_Damage_Base] OnGameplayEffectApplied"));
 }

@@ -14,8 +14,5 @@ class PROJECTH_API UHDGEComp_Damage_Base : public UGameplayEffectComponent
 {
 	GENERATED_BODY()
 public:
-	virtual void OnGameplayEffectChanged() override;
 	virtual void OnGameplayEffectExecuted(FActiveGameplayEffectsContainer& ActiveGEContainer, FGameplayEffectSpec& GESpec, FPredictionKey& PredictionKey) const override;
-	virtual void OnGameplayEffectApplied(FActiveGameplayEffectsContainer& ActiveGEContainer, FGameplayEffectSpec& GESpec, FPredictionKey& PredictionKey) const override;
-
 };
