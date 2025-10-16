@@ -154,7 +154,7 @@ void UModularAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool b
 		{
 			if (AbilitySpec->Ability)
 			{
-				AbilitySpec->Ability.GetName();
+				//AbilitySpec->Ability.GetName();
 				AbilitySpec->InputPressed = false;
 				if (AbilitySpec->IsActive())
 					AbilitySpecInputReleased(*AbilitySpec);

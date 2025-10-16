@@ -6,6 +6,7 @@
 #include "CommonPlayerController.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputSubsystems.h"
+#include "UserSettings/EnhancedInputUserSettings.h"
 #include "PlayerMappableInputConfig.h"
 #include "Kismet/GameplayStatics.h"
 #include "ProjectH/LogChannels.h"
@@ -61,32 +62,32 @@ void UHDInputManagerSubsystem::RegisterHDMappableConfigPair(const FHDMappableCon
 
 	if (Pair.bShouldActivateAutomatically)
 	{
-		//Enhanced Input 시스템에서 입력 컨택스트를 추가하거나 제거할 때 사용되는 구조체
-		FModifyContextOptions Options = {};
-		Options.bIgnoreAllPressedKeysUntilRelease = false;
+		UPlayerMappableInputConfig* InputConfig = Pair.Config.LoadSynchronous();
 
-		//내부적으로 Input Mapping Context를 추가한다:
-		EnhanceSubsystem->AddPlayerMappableConfig(Pair.Config.LoadSynchronous(), Options);
+		for (TPair<TObjectPtr<UInputMappingContext>, int32> MappingPair : InputConfig->GetMappingContexts())
+		{
+			UInputMappingContext* IMC = MappingPair.Key;
+			if (!IMC)
+				continue;
+
+			if (UEnhancedInputUserSettings* Settings = EnhanceSubsystem->GetUserSettings())
+			{
+				Settings->RegisterInputMappingContext(IMC);
+			}
+
+			//Enhanced Input 시스템에서 입력 컨택스트를 추가하거나 제거할 때 사용되는 구조체
+			FModifyContextOptions Options = {};
+			Options.bIgnoreAllPressedKeysUntilRelease = false;
+			EnhanceSubsystem->AddMappingContext(IMC, MappingPair.Value, Options);
+		}
 	}
 }
 
 void UHDInputManagerSubsystem::RegisterHDMappableConfigPairs(const TArray<FHDMappableConfigPair>& Pairs)
 {
-	UEnhancedInputLocalPlayerSubsystem* EnhanceSubsystem = GetEnhanceSubsystem();
-	if (!EnhanceSubsystem)
-		return;
-
 	for (const FHDMappableConfigPair& Pair : Pairs)
 	{
-		if (Pair.bShouldActivateAutomatically)
-		{
-			//Enhanced Input 시스템에서 입력 컨택스트를 추가하거나 제거할 때 사용되는 구조체
-			FModifyContextOptions Options = {};
-			Options.bIgnoreAllPressedKeysUntilRelease = false;
-
-			//내부적으로 Input Mapping Context를 추가한다:
-			EnhanceSubsystem->AddPlayerMappableConfig(Pair.Config.LoadSynchronous(), Options);
-		}
+		RegisterHDMappableConfigPair(Pair);
 	}
 }
 

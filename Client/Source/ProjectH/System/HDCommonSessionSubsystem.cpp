@@ -9,6 +9,7 @@
 #include "ProjectH/Data/DataManagerSubsystem.h"
 #include "ProjectH/Util/UtilFunc_Data.h"
 #include "ModularGame/Public/Sound/AudioSubsystem.h"
+#include "ModularGame/Public/NetWork/HTTP/HTTPHandler.h"
 
 UHDCommonSessionSubsystem::UHDCommonSessionSubsystem()
 {
@@ -47,4 +48,49 @@ void UHDCommonSessionSubsystem::MoveSeesionByTableID(int32 TableNo)
 			}
 		}
 	);
+}
+
+void UHDCommonSessionSubsystem::CreateHttpObject()
+{
+	Handler = NewObject<UHTTPHandler>();
+}
+
+void UHDCommonSessionSubsystem::OnCall_Get()
+{
+	if (!Handler)
+		return;
+	Handler->OnCall_Get(TEXT("http://127.0.0.1:8000/items"), 
+		[](const FJsonObject& Json, bool bSuccess)
+		{
+			if (bSuccess)
+			{
+
+			}
+		});
+}
+
+void UHDCommonSessionSubsystem::OnCall_Post()
+{
+	if (!Handler)
+		return;
+
+	/*{
+		"name": "Sword of Dawn",
+			"description" : "Legendary blade",
+			"price" : 999.9
+	}*/
+
+	TSharedRef<FJsonObject> Obj = MakeShared<FJsonObject>();
+	Obj->SetStringField("name", "Sword of Dawn");
+	Obj->SetStringField("description", "Legendary blade");
+	Obj->SetNumberField("price", 999.9);
+
+	Handler->OnCall_Post(TEXT("http://127.0.0.1:8000/items/"),Obj,
+		[](const FJsonObject& Json, bool bSuccess)
+		{
+			if (bSuccess)
+			{
+
+			}
+		});
 }

@@ -6,9 +6,7 @@
 #include "CommonSessionSubsystem.h"
 #include "HDCommonSessionSubsystem.generated.h"
 
-/**
- * 
- */
+class UHTTPHandler;
 UCLASS()
 class PROJECTH_API UHDCommonSessionSubsystem : public UCommonSessionSubsystem
 {
@@ -18,4 +16,16 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void MoveSeesionByTableID(int32 TableNo);
+
+	UFUNCTION(BlueprintCallable)
+	void CreateHttpObject();
+
+	UFUNCTION(BlueprintCallable)
+	void OnCall_Get();
+	
+	UFUNCTION(BlueprintCallable)
+	void OnCall_Post();
+
+private:
+	TObjectPtr<UHTTPHandler> Handler;
 };

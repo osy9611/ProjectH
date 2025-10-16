@@ -31,7 +31,12 @@ public class ModularGame : ModuleRules
 			    //MetaSound
 			    "AudioMixer",
                 "AudioModulation",
-                "MetasoundEngine"
+                "MetasoundEngine",
+
+                //Network
+                "HTTP",
+                "JsonUtilities", 
+                "Json"
             }
             );
 
