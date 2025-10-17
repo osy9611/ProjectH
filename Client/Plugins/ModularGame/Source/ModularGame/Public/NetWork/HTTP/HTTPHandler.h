@@ -13,14 +13,16 @@ struct MODULARGAME_API FHTTPRequestOption
 	GENERATED_BODY()
 public:
 	float TimeoutSecond = -1;
-	int32 MaxRetry = 2;
-	float RetryDelaySeconds = 2.f;
+	int32 MaxRetry = 0;
+	float RetryDelaySeconds = 0;
 	bool AutoFixTrailingSlash = true;
 };
 USTRUCT()
 struct MODULARGAME_API FPendingRequest
 {
 	GENERATED_BODY()
+public:
+	bool IsTryEnd() const { return Tried > Option.MaxRetry; }
 public:
 	FString RequestId;
 	FString Verb;
@@ -44,23 +46,24 @@ class MODULARGAME_API UHTTPHandler : public UObject
 public:
 	UHTTPHandler(const class FObjectInitializer& ObjectInitializer);
 
-	void OnCall_Get(const FString& InURL, const FHTTPRequestOption& Option, TFunction<void(const FJsonObject&, bool)> OnResponseCallback);
-	void OnCall_Post(const FString& InURL, const FHTTPRequestOption& Option, const TSharedPtr<FJsonObject>& JsonObject, TFunction<void(const FJsonObject&, bool)> OnResponseCallback);
+	void Init(UWorld* InWorld) { World = InWorld; }
+	virtual void SendGetRequest(const FString& InURL, const FHTTPRequestOption& Option, TFunction<void(const FJsonObject&, bool)> OnResponseCallback);
+	virtual void SendPostRequest(const FString& InURL, const FHTTPRequestOption& Option, const TSharedPtr<FJsonObject>& JsonObject, TFunction<void(const FJsonObject&, bool)> OnResponseCallback);
 
-	bool CancelCall(const FString& RequestId);
+	virtual bool CancelRequest(const FString& RequestId);
+protected:
+	void SendRequest(const FString& InVerb, const FString& InURL, const TSharedPtr<FJsonObject>& JsonObject, const FHTTPRequestOption& Option, TFunction<void(const FJsonObject&, bool)> OnResponseCallback);
+	void ExecuteRequest(FPendingRequest& Req);
+	virtual void OnResponseReceived(const FPendingRequest& Request, FHttpResponsePtr Response, bool bWasSuccessful);
+
+	bool ShouldRetry(const FPendingRequest& Req, FHttpResponsePtr& Response) const;
+	void ScheduleRetry(const FPendingRequest& Req);
+	FString GetAuthToken();
+
 private:
-	void OnCall(const FString& InVerb, const FString& InURL, const TSharedPtr<FJsonObject>& JsonObject, const FHTTPRequestOption& Option, TFunction<void(const FJsonObject&, bool)> OnResponseCallback);
-	
-	void OnResponseReceived(const FPendingRequest& Request, FHttpResponsePtr Response, bool bWasSuccessful);
-
-	bool SouldRetry(const FPendingRequest& Req, FHttpResponsePtr& Response) const;
-	void SchedulRetry(FPendingRequest Req);
-	FString GetAuth();
-
-private:
+	UPROPERTY()
 	TMap<FString, FPendingRequest> ActiveRequests;
-
+	UPROPERTY()
+	TWeakObjectPtr<UWorld> World;
 	FHttpModule* HttpModule;
-
-	FString EnqueueRequest(const FString& Verb, const FString& URL, const FString& Body, const FHTTPRequestOption& Option);
 };
