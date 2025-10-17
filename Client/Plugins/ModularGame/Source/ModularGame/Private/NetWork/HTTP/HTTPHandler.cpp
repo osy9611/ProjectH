@@ -74,6 +74,7 @@ void UHTTPHandler::SendRequest(const FString& InVerb, const FString& InURL, cons
 	}
 	Req.Body = RequestBody;
 
+	ActiveRequests.Add(Req.RequestId, Req);
 	ExecuteRequest(Req);
 }
 
@@ -107,8 +108,6 @@ void UHTTPHandler::ExecuteRequest(FPendingRequest& Req)
 	Request->ProcessRequest();
 
 	Req.Tried++;
-	if (!ActiveRequests.Contains(Req.RequestId))
-		ActiveRequests.Add(Req.RequestId, Req);
 }
 
 void UHTTPHandler::OnResponseReceived(const FPendingRequest& Request, FHttpResponsePtr Response, bool bWasSuccessful)
@@ -116,18 +115,25 @@ void UHTTPHandler::OnResponseReceived(const FPendingRequest& Request, FHttpRespo
 	if (!bWasSuccessful || !Response.IsValid())
 	{
 		UE_LOG(Modular, Error, TEXT("[HTTPHandler] RequestFailed URL = %s "), *Request.URL);
+
+		if (ShouldRetry(Request, Response))
+		{
+			ScheduleRetry(Request);
+			return;
+		}
+
 		Request.OnCallback(FJsonObject(), false);
 		ActiveRequests.Remove(Request.RequestId);
 		return;
 	}
 
-	int32 ResponseCode = Response->GetResponseCode();
-
+	const int32 ResponseCode = Response->GetResponseCode();
+	const FString ContentStr = Response->GetContentAsString();
 	//Check Response Code
 	if (ResponseCode >= 200 && ResponseCode<300)
 	{
 		TSharedPtr<FJsonObject> JsonObject;
-		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ContentStr);
 		if (FJsonSerializer::Deserialize(Reader, JsonObject))
 		{
 			Request.OnCallback(*JsonObject, true);
@@ -136,7 +142,7 @@ void UHTTPHandler::OnResponseReceived(const FPendingRequest& Request, FHttpRespo
 	}
 	else
 	{
-		UE_LOG(LogTemp,Warning, TEXT("HTTP Error (%d): %s"), ResponseCode, *Response->GetContentAsString());
+		UE_LOG(LogTemp,Warning, TEXT("HTTP Error (%d): %s"), ResponseCode, *ContentStr);
 
 		if (ShouldRetry(Request, Response))
 		{
@@ -144,6 +150,8 @@ void UHTTPHandler::OnResponseReceived(const FPendingRequest& Request, FHttpRespo
 			ScheduleRetry(Request);
 			return;
 		}
+
+		Request.OnCallback(FJsonObject(), false);
 	}
 
 	ActiveRequests.Remove(Request.RequestId);
