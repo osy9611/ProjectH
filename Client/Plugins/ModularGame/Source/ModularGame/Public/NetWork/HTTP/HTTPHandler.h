@@ -15,7 +15,6 @@ public:
 	float TimeoutSecond = -1;
 	int32 MaxRetry = 0;
 	float RetryDelaySeconds = 0;
-	bool AutoFixTrailingSlash = true;
 };
 USTRUCT()
 struct MODULARGAME_API FPendingRequest
