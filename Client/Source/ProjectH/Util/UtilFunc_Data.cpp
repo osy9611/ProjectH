@@ -60,7 +60,8 @@ float UtilFunc_Data::GetBattleConstValue(UWorld* World, EBattleConstType BattleC
 		return 0.0f;
 	}
 
-	const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EBattleConstType"), true);
+	//const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EBattleConstType"), true);
+	const UEnum* EnumPtr = StaticEnum< EBattleConstType>();
 	if (!EnumPtr)
 	{
 		UE_LOG(HDLog, Error, TEXT("[UtilFunc_Data] EnumPtr Not Found"));

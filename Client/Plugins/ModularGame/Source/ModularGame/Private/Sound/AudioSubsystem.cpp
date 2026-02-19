@@ -112,7 +112,8 @@ UAudioComponent* UAudioSubsystem::GetAudioComponent(ESoundType Type)
 	}
 	else
 	{
-		const UEnum* Enum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ESoundType"), true);
+		//const UEnum* Enum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ESoundType"), true);
+		const UEnum* Enum = StaticEnum<ESoundType>();
 		FString TypeStr = Enum->GetNameStringByValue((int32)Type);
 		UE_LOG(Modular, Log, TEXT("This Sound Type Not Have Component : %s"), *TypeStr);
 	}

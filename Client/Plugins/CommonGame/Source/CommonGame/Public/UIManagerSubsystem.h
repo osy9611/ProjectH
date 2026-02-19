@@ -40,8 +40,8 @@ public:
 private:
 	UPROPERTY(Transient)
 	TMap<FGameplayTag, TObjectPtr<UCommonActivatableWidgetContainerBase>> Layers;
-
+	
 	UPROPERTY()
-	TMap<TSubclassOf<UCommonActivatableWidget>, TObjectPtr<UCommonActivatableWidget>> CacheWidgets;
+	TMap<TSubclassOf<UCommonActivatableWidget>, TWeakObjectPtr<UCommonActivatableWidget>> CacheWidgets;
 
 };

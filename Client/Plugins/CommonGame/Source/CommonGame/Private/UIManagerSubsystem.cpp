@@ -98,7 +98,7 @@ UCommonActivatableWidget* UUIManagerSubsystem::CreateUI(FGameplayTag LayerTag, T
 {
 	if (UCommonActivatableWidgetContainerBase* LayerWidget = GetLayerContainer(LayerTag))
 	{
-		if (UCommonActivatableWidget* Widget = CacheWidgets.FindRef(WidgetClass))
+		if (UCommonActivatableWidget* Widget = CacheWidgets.FindRef(WidgetClass).Get())
 		{
 			return Widget;
 		}
@@ -123,7 +123,7 @@ UCommonActivatableWidget* UUIManagerSubsystem::CreateUI(FGameplayTag LayerTag, T
 
 UCommonActivatableWidget* UUIManagerSubsystem::FindWidget(TSubclassOf<UCommonActivatableWidget> WidgetClass)
 {
-	if (UCommonActivatableWidget* Widget = CacheWidgets.FindRef(WidgetClass))
+	if (UCommonActivatableWidget* Widget = CacheWidgets.FindRef(WidgetClass).Get())
 	{
 		return Widget;
 	}

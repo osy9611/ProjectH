@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Kismet/GameplayStatics.h"
 #include "ModularGame/Public/Network/HTTP/HTTPHandler.h"
 #include "ModularGame/Public/Log/ModularLogChannel.h"
 #include "Runtime/Online/HTTP/Public/Http.h"
