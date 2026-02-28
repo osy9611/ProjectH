@@ -10,6 +10,8 @@ struct FMonsterData;
 
 class UTextBlock;
 class UProgressBar;
+class UHDAbilitySystemComponent;
+class UHDMVVM_MonsterInfo;
 
 UCLASS()
 class PROJECTH_API UBattleMonsterInfoWidget : public UCommonUserWidget
@@ -18,8 +20,10 @@ class PROJECTH_API UBattleMonsterInfoWidget : public UCommonUserWidget
 public:
 	UBattleMonsterInfoWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	void OnInit(const FMonsterData MonsterData);
-	void UpdateHP(AActor* Actor);
+	void OnInit(UHDAbilitySystemComponent* ASC,const FMonsterData& MonsterData);
+
+	void HandleUpdateHPBar(UObject* Object, UE::FieldNotification::FFieldId FieldId);
+
 public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> NameText;
@@ -29,4 +33,8 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UProgressBar> HPBar;
+
+private:
+	UPROPERTY()
+	TObjectPtr<UHDMVVM_MonsterInfo> MonsterInfo;
 };

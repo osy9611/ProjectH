@@ -239,7 +239,7 @@ void UHDHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputCompone
 	//check(Subsystem);
 
 	////MappingContext ÃÊ±âÈ­
-	//Subsystem->ClearAllMappings();
+	//Subsystem->ClearAllMappings();	
 	//InputManagerSubsystem->RemoveAllInputContexts();
 
 	if (const UHDPawnExtensionComponent* PawnExtComp = UHDPawnExtensionComponent::FindPawnExtensionComponent(Pawn))

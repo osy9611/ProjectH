@@ -10,11 +10,12 @@
 #include "ProjectH/Util/UtilFunc_Data.h"
 #include "ProjectH/AbilitySystem/HDAbilitySystemComponent.h"
 #include "ProjectH/AbilitySystem/AttributeSet/HDAttributeSet_Monster.h"
+#include "ProjectH/UI/Data/HDMVVM_MonsterInfo.h"
 UBattleMonsterInfoWidget::UBattleMonsterInfoWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
 
-void UBattleMonsterInfoWidget::OnInit(const FMonsterData MonsterData)
+void UBattleMonsterInfoWidget::OnInit(UHDAbilitySystemComponent* ASC, const FMonsterData& MonsterData)
 {
 	FString MonsterName = UtilFunc_Data::GetCommonString(GetWorld(), MonsterData.MonsterName);
 	NameText->SetText(FText::FromString(MonsterName));
@@ -27,19 +28,26 @@ void UBattleMonsterInfoWidget::OnInit(const FMonsterData MonsterData)
 	}
 
 	ToughnessText->SetText(FText::AsNumber(StatusData->Toughness));
+
+	if (!ASC)
+	{
+		UE_LOG(HDLog, Log, TEXT("[BattleMonsterInfoWidget] HDAbilitySystemComponent is nullptr"));
+		return;
+	}
+
+
+	MonsterInfo = NewObject<UHDMVVM_MonsterInfo>(this);
+	MonsterInfo->Init(ASC);
+	MonsterInfo->BindField(UHDMVVM_MonsterInfo::FFieldNotificationClassDescriptor::CurrentHP, this, &ThisClass::HandleUpdateHPBar);
 }
 
-void UBattleMonsterInfoWidget::UpdateHP(AActor* Actor)
+void UBattleMonsterInfoWidget::HandleUpdateHPBar(UObject* Object, UE::FieldNotification::FFieldId FieldId)
 {
-	UHDAbilitySystemComponent* ASC = UtilFunc::GetASC(Actor);
-	if (!ASC)
+	if (!HPBar)
 		return;
 
-	const UHDAttributeSet_Monster* AttributeSet = ASC->GetSet<UHDAttributeSet_Monster>();
+	const UHDMVVM_MonsterInfo* VM = Cast<UHDMVVM_MonsterInfo>(Object);
+	if (!VM) return;
 
-	float OriginHP = AttributeSet->GetOriginHP();
-	float CurrentHP = AttributeSet->GetHP();
-
-	float Amount = CurrentHP / OriginHP;
-	HPBar->SetPercent(Amount);
+	HPBar->SetPercent(VM->CurrentHP);
 }

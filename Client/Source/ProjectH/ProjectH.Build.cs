@@ -26,6 +26,8 @@ public class ProjectH : ModuleRules
 			//CommonUI
 			"CommonInput",
             "CommonUI",
+            //ModelViewViewModel
+            "ModelViewViewModel",
 			//CommonGame
             "CommonGame",
 			// UMG

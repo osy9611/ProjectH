@@ -21,6 +21,8 @@ public class ModularGame : ModuleRules
                 "SlateCore",
                 "UMG",
                 "CommonUI",
+                //ModelViewViewModel
+                "ModelViewViewModel",
                 //GAS
 			    "GameplayTags",
                 "GameplayTasks",
@@ -35,7 +37,7 @@ public class ModularGame : ModuleRules
 
                 //Network
                 "HTTP",
-                "JsonUtilities", 
+                "JsonUtilities",
                 "Json"
             }
             );

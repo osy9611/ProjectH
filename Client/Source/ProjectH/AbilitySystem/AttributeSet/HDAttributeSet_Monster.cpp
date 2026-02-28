@@ -25,23 +25,9 @@ void UHDAttributeSet_Monster::PostAttributeChange(const FGameplayAttribute& Attr
 		float NowHP = GetHP();
 		UE_LOG(HDLog, Log, TEXT("[HDAttributeSet_Monster] Now HP %.2f"), NowHP);
 
-		UWidgetComponent* InfoWidgetComp = UtilFunc::GetActorComponent<UWidgetComponent>(Actor, "InfoWidget");
-		UUserWidget* InfoWidget = InfoWidgetComp->GetUserWidgetObject();
-		if (InfoWidgetComp)
-		{
-			if (UBattleMonsterInfoWidget* MonsterInfoWidget = Cast<UBattleMonsterInfoWidget>(InfoWidget))
-			{
-				MonsterInfoWidget->UpdateHP(Actor);
-			}
-		}
-
 		UHDBattleComponent* BattleComp = UHDBattleComponent::FindBattleComponent(Actor);
 		if (!BattleComp)
 			return;
-
-		UBattleMonsterInfoWidget* MonsterInfoWidget = BattleComp->GetWidgetObject<UBattleMonsterInfoWidget>("InfoWidget", true);
-		if (MonsterInfoWidget)
-			MonsterInfoWidget->UpdateHP(Actor);
 
 		UHDDamageWidget* DamageWidget = BattleComp->GetWidgetObject<UHDDamageWidget>("DamageWidget", true);
 		if (DamageWidget)

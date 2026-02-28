@@ -209,14 +209,15 @@ void UBattleSpawner::SetBattleMonsters(int32 GroupID)
 					});
 
 				//Set Monster Info Widget
-				BattleComp->ChachedWidgets("InfoWidget", [&](UWidgetComponent* Result)
+				BattleComp->ChachedWidgets("InfoWidget", [&, BattleComp](UWidgetComponent* Result)
 					{
 						UUserWidget* InfoWidget = Result->GetUserWidgetObject();
 						if (InfoWidget)
 						{
 							if (UBattleMonsterInfoWidget* MonsterInfoWidget = Cast<UBattleMonsterInfoWidget>(InfoWidget))
 							{
-								MonsterInfoWidget->OnInit(*MonsterData);
+								UHDAbilitySystemComponent* ASC = UtilFunc::GetASC(BattleComp->GetOwner());
+								MonsterInfoWidget->OnInit(ASC, *MonsterData);
 							}
 						}
 					});

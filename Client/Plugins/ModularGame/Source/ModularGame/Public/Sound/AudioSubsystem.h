@@ -14,6 +14,7 @@ enum class ESoundType : uint8
 	BGM,
 	SFX,
 	Voice,
+	UI,
 	Max
 };
 
