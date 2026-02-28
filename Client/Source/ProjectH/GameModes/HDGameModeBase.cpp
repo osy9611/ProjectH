@@ -148,12 +148,6 @@ void AHDGameModeBase::OnExperienceLoaded(const UHDExperienceDefinition* CurrentE
 		}
 	}
 
-	if (UAudioSubsystem* AudioSubSystem = GetGameInstance()->GetSubsystem<UAudioSubsystem>())
-	{
-		//AudioSubSystem->RegisterData();
-		AudioSubSystem->PlaySoundAfterSceneLoading();
-	}
-
 
 	if (UBattleSubsystem* BattleSubsystem = GetWorld()->GetSubsystem<UBattleSubsystem>())
 	{

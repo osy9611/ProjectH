@@ -2,6 +2,7 @@
 
 
 #include "ModularGame/Public/Sound/AudioSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
 #include "ModularGame/Public/Log/ModularLogChannel.h"
 #include "ModularGame/Public/Data/ClientLocalStorageSubsystem.h"
@@ -10,197 +11,173 @@
 void UAudioSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
+
+	ApplySoundMixOverrides();
 }
 
 void UAudioSubsystem::Deinitialize()
 {
-	AudioComponents.Empty();
+	BGMComponent = nullptr;
+	//PendingBGMHandle.Reset();
+
 	Super::Deinitialize();
 }
 
-void UAudioSubsystem::RegisterData()
+void UAudioSubsystem::ApplySettings(const FSoundOptionData& InSoundOptionData)
 {
-	bool IsUpdateSoundOption = false;
-	int32 MaxCount = static_cast<int32>(ESoundType::Max);
-	for (int32 i = 0; i < MaxCount; ++i)
-	{
-		ESoundType SoundType = static_cast<ESoundType>(i);
-		UAudioComponent* AudioComponent = GetAudioComponent(SoundType);
-		if (!AudioComponent)
-		{
-			AudioComponent = NewObject<UAudioComponent>(this);
-			AudioComponents.Add(SoundType, AudioComponent);
-			IsUpdateSoundOption = true;
-		}
-
-		if (SoundType == ESoundType::BGM)
-		{
-			AudioComponent->bAutoActivate = true;
-		}
-		AudioComponent->RegisterComponentWithWorld(GetWorld());
-		//AudioComponent->RegisterComponent();
-	}
-
-	if (IsUpdateSoundOption)
-	{
-		UpdateSoundOption();
-	}
+	OptionData = InSoundOptionData;
+	ApplySoundMixOverrides();
 }
 
-void UAudioSubsystem::UnRegisterData()
+void UAudioSubsystem::PlayBGM(const TSoftObjectPtr<USoundBase>& Sound, float FadeInSeconds, float StartTime)
 {
-	int32 MaxCount = static_cast<int32>(ESoundType::Max);
-
-	for (int32 i = 0; i < MaxCount; ++i)
-	{
-		ESoundType SoundType = static_cast<ESoundType>(i);
-		UAudioComponent* AudioComponent = GetAudioComponent(SoundType);
-		if (!AudioComponent)
-		{
-			continue;
-		}
-		AudioComponent->UnregisterComponent();
-	}
-}
-
-void UAudioSubsystem::RegisterSoundOptionData(const FSoundOptionData& OptionData)
-{
-	SoundOptionData = OptionData;
-	UpdateSoundOption();
-}
-
-void UAudioSubsystem::UpdateSoundOption()
-{
-	for (auto& AudioComponent : AudioComponents)
-	{
-		ESoundType SoundType = AudioComponent.Key;
-
-		bool MuteOption = SoundOptionData.VolumeMutes[static_cast<int32>(SoundType)];
-		if (SoundOptionData.MainVolumeMute || MuteOption)
-		{
-			AudioComponent.Value->SetVolumeMultiplier(0.0f);
-		}
-		else
-		{
-			float VolumeRatio = SoundOptionData.VolumeRatios[static_cast<int32>(SoundType)] * SoundOptionData.MainVolumeRatio;
-			AudioComponent.Value->SetVolumeMultiplier(VolumeRatio);
-		}
-	}
-}
-
-void UAudioSubsystem::RegisterPlaySoundAfterSceneLoading(const FString SoundPath)
-{
-	RegisterBGMSound = SoundPath;
-}
-
-void UAudioSubsystem::PlaySoundAfterSceneLoading()
-{
-	if (RegisterBGMSound.IsEmpty())
+	CreateBGMComponent();
+	if (!BGMComponent)
 		return;
 
-	PlaySound2D_ByPath(ESoundType::BGM, RegisterBGMSound);
-}
+	//if (PendingBGMHandle.IsValid())
+	//{
+	//	PendingBGMHandle->CancelHandle();
+	//	PendingBGMHandle.Reset();
+	//}
 
-UAudioComponent* UAudioSubsystem::GetAudioComponent(ESoundType Type)
-{
-	if (UAudioComponent** AudioComponentPtr = AudioComponents.Find(Type))
-	{
-		if (UAudioComponent* AudioComponent = *AudioComponentPtr)
+	LoadSoundAsync(Sound, [this, Sound, FadeInSeconds, StartTime](USoundBase* Result)
 		{
-			return AudioComponent;
-		}
-	}
+			if (!BGMComponent)
+			{
+				UE_LOG(Modular, Log, TEXT("[AudioSubsystem] PlayBGM LoadSoundAsync Fail BGMComponent is nullptr"));
+				return;
+			}
+
+			if (!Result)
+				return;
+
+			if (BGMComponent->IsPlaying())
+				BGMComponent->Stop();
+
+			BGMComponent->SetSound(Result);
+			BGMComponent->Play(StartTime);
+
+			if (FadeInSeconds > 0.0f)
+				BGMComponent->FadeIn(FadeInSeconds, 1.0f, StartTime);
+		});
+}
+
+void UAudioSubsystem::StopBGM(float FadeOutSeconds)
+{
+	if (!BGMComponent)
+		return;
+
+	if (FadeOutSeconds > 0.0f && BGMComponent->IsPlaying())
+		BGMComponent->FadeOut(FadeOutSeconds, 0.0f);
 	else
+		BGMComponent->Stop();
+}
+
+void UAudioSubsystem::PlaySFX2D(const TSoftObjectPtr<USoundBase>& Sound, float Volume, float Pitch)
+{
+	UWorld* World = GetWorldChecked();
+	if (!World)
+		return;
+
+	LoadSoundAsync(Sound, [World, Volume, Pitch](USoundBase* Result)
+		{
+			if (!Result)
+				return;
+
+			UGameplayStatics::SpawnSound2D(World, Result, Volume, Pitch);
+		});
+
+}
+
+void UAudioSubsystem::PlaySFXAtLocation(const TSoftObjectPtr<USoundBase>& Sound, const FVector& Location, float Volume, float Pitch)
+{
+	UWorld* World = GetWorldChecked();
+	if (!World)
 	{
-		//const UEnum* Enum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ESoundType"), true);
-		const UEnum* Enum = StaticEnum<ESoundType>();
-		FString TypeStr = Enum->GetNameStringByValue((int32)Type);
-		UE_LOG(Modular, Log, TEXT("This Sound Type Not Have Component : %s"), *TypeStr);
+		return;
+	}
+	LoadSoundAsync(Sound, [World, Location, Volume, Pitch](USoundBase* Result)
+		{
+			if (!Result)
+				return;
+
+			UGameplayStatics::SpawnSoundAtLocation(World, Result, Location, FRotator::ZeroRotator, Volume, Pitch);
+		});
+}
+
+UWorld* UAudioSubsystem::GetWorldChecked() const
+{
+	UGameInstance* GI = GetGameInstance();
+	return GI ? GI->GetWorld() : nullptr;
+}
+
+void UAudioSubsystem::CreateBGMComponent()
+{
+	if (BGMComponent)
+		return;
+
+	UWorld* World = GetWorldChecked();
+	if (!World)
+		return;
+
+	BGMComponent = UGameplayStatics::SpawnSound2D(
+		World,
+		nullptr,   // Sound는 나중에 설정
+		1.0f,
+		1.0f,
+		0.0f,
+		nullptr,
+		false,     // bPersistAcrossLevelTransition: 필요하면 true
+		false      // bAutoDestroy
+	);
+
+	if (BGMComponent)
+		BGMComponent->bAutoActivate = false;
+
+}
+
+void UAudioSubsystem::ApplySoundMixOverrides()
+{
+	UWorld* World = GetWorldChecked();
+	if (!World || !GlobalMix || !MasterClass)
+		return;
+
+	UGameplayStatics::PushSoundMixModifier(World, GlobalMix);
+
+	const float Master = OptionData.GetVolumeMute(ESoundType::Master) ? 0.0f : FMath::Clamp(OptionData.GetVolumeRatio(ESoundType::Master), 0.0f, 1.0f);
+	const float BGM = OptionData.GetVolumeMute(ESoundType::BGM) ? 0.0f : FMath::Clamp(OptionData.GetVolumeRatio(ESoundType::BGM), 0.0f, 1.0f);
+	const float SFX = OptionData.GetVolumeMute(ESoundType::SFX) ? 0.0f : FMath::Clamp(OptionData.GetVolumeRatio(ESoundType::SFX), 0.0f, 1.0f);
+
+	UGameplayStatics::SetSoundMixClassOverride(World, GlobalMix, MasterClass, Master, 1.0f, 0.0f, true);
+
+	if (BGMClass)
+	{
+		UGameplayStatics::SetSoundMixClassOverride(World, GlobalMix, BGMClass, BGM, 1.0f, 0.0f, true);
+	}
+	if (SFXClass)
+	{
+		UGameplayStatics::SetSoundMixClassOverride(World, GlobalMix, SFXClass, SFX, 1.0f, 0.0f, true);
 	}
 
-	return nullptr;
+	UGameplayStatics::SetSoundMixClassOverride(World, GlobalMix, BGMClass, OptionData.GetVolumeRatio(ESoundType::BGM), 1.0f, 0.0f, true);
 }
 
-void UAudioSubsystem::SetMainVolume(float Volume)
+void UAudioSubsystem::LoadSoundAsync(const TSoftObjectPtr<USoundBase>& Sound, TFunction<void(USoundBase*)> OnLoaded)
 {
-	SoundOptionData.MainVolumeRatio = Volume;
-	UpdateSoundOption();
-}
-
-void UAudioSubsystem::SetVolume(ESoundType Type, float Volume)
-{
-	if (UAudioComponent* AudioComponent = GetAudioComponent(Type))
+	if (Sound.IsValid() && Sound.ToSoftObjectPath().IsNull())
 	{
-		AudioComponent->SetVolumeMultiplier(Volume);
-		SoundOptionData.VolumeRatios[static_cast<int32>(Type)] = Volume;
-		UpdateSoundOption();
+		OnLoaded(nullptr);
+		return;
 	}
-}
 
-void UAudioSubsystem::PlaySound3D_ByPath(ESoundType Type, const FSoftObjectPath& BGMPath, FVector Location)
-{
-	if (UAudioComponent* AudioComponent = GetAudioComponent(Type))
-	{
-		/*UPTAssetManager& AssetManager = UPTAssetManager::Get();
-		AssetManager.AsynchronusLoadAsset(BGMPath, [&, AudioComponent](UObject* result)
+	UModularAssetManager& AssetManager = UModularAssetManager::Get();
+	AssetManager.AsynchronusLoadAsset(Sound.GetUniqueID(), [&, OnLoaded](UObject* result)
+		{
+			if (USoundBase* Sound = Cast<USoundBase>(result))
 			{
-				if (USoundBase* Sound = Cast<USoundBase>(result))
-				{
-					AudioComponent->SetSound(Sound);
-					AudioComponent->SetWorldLocation(Location);
-					AudioComponent->Play();
-				}
-			});*/
-	}
+				OnLoaded(Sound);
+			}
+		});
 }
 
-void UAudioSubsystem::PlaySound3D_BySound(ESoundType Type, USoundBase* Sound, FVector Location)
-{
-	if (UAudioComponent* AudioComponent = GetAudioComponent(Type))
-	{
-		AudioComponent->SetSound(Sound);
-		AudioComponent->SetWorldLocation(Location);
-		AudioComponent->Play();
-	}
-}
-
-void UAudioSubsystem::PlaySound2D_ByPath(ESoundType Type, const FSoftObjectPath& Path)
-{
-	if (UAudioComponent* AudioComponent = GetAudioComponent(Type))
-	{
-		UModularAssetManager& AssetManager = UModularAssetManager::Get();
-		AssetManager.AsynchronusLoadAsset(Path, [&, AudioComponent](UObject* result)
-			{
-				if (USoundBase* Sound = Cast<USoundBase>(result))
-				{
-					AudioComponent->SetSound(Sound);
-					AudioComponent->Play();
-				}
-			});
-	}
-}
-
-void UAudioSubsystem::PlaySound2D_BySound(ESoundType Type, USoundBase* Sound)
-{
-	if (UAudioComponent* AudioComponent = GetAudioComponent(Type))
-	{
-		AudioComponent->SetSound(Sound);
-		AudioComponent->Play();
-	}
-}
-
-void UAudioSubsystem::FadeInSound(ESoundType Type, float FadeDuration, float TargetVolume)
-{
-	if (UAudioComponent* AudioComponent = GetAudioComponent(Type))
-	{
-		AudioComponent->FadeIn(FadeDuration, TargetVolume);
-	}
-}
-
-void UAudioSubsystem::FadeOutSound(ESoundType Type, float FadeDuration, float TargetVolume)
-{
-	if (UAudioComponent* AudioComponent = GetAudioComponent(Type))
-	{
-		AudioComponent->FadeOut(FadeDuration, TargetVolume);
-	}
-}

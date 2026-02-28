@@ -11,6 +11,7 @@ struct FOptionData;
 UENUM(BlueprintType)
 enum class ESoundType : uint8
 {
+	Master,
 	BGM,
 	SFX,
 	Voice,
@@ -30,14 +31,12 @@ public:
 		VolumeRatios.Init(1.0f, static_cast<int32>(ESoundType::Max));
 	}
 
-	UPROPERTY(BlueprintReadOnly, SaveGame, Category = "MainVolumeMute")
-	bool MainVolumeMute;
+	bool GetVolumeMute(ESoundType Type) { return VolumeMutes[(int32)Type]; }
 
 	UPROPERTY(BlueprintReadOnly, SaveGame, Category = "VolumeMutes")
 	TArray<bool> VolumeMutes;
 
-	UPROPERTY(BlueprintReadOnly, SaveGame, Category = "MainVolumeRatio")
-	float MainVolumeRatio;
+	float GetVolumeRatio(ESoundType Type) { return  VolumeRatios[(int32)Type]; }
 
 	UPROPERTY(BlueprintReadOnly, SaveGame, Category = "VolumeRatios")
 	TArray<float> VolumeRatios;
@@ -52,49 +51,38 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	void RegisterData();
-	void UnRegisterData();
+	void ApplySettings(const FSoundOptionData& InSoundOptionData);
+	const FSoundOptionData& GetOptionData() const { return OptionData; }
 
-	void RegisterSoundOptionData(const FSoundOptionData& OptionData);
+	void PlayBGM(const TSoftObjectPtr<USoundBase>& Sound, float FadeInSeconds = 0.5f, float StartTime = 0.0f);
+	void StopBGM(float FadeOutSeconds);
+	void PlaySFX2D(const TSoftObjectPtr<USoundBase>& Sound, float Volume = 1.0f, float Pitch = 1.0f);
+	void PlaySFXAtLocation(const TSoftObjectPtr<USoundBase>& Sound, const FVector& Location, float Volume = 1.0f, float Pitch = 1.0f);
 
-	UFUNCTION(BlueprintCallable)
-	virtual void UpdateSoundOption();
-
-	void RegisterPlaySoundAfterSceneLoading(const FString SoundPath);
-	void PlaySoundAfterSceneLoading();
-
-	UAudioComponent* GetAudioComponent(ESoundType Type);
-
-	UFUNCTION(BlueprintCallable)
-	void SetMainVolume(float Volume);
-
-	UFUNCTION(BlueprintCallable)
-	void SetVolume(ESoundType Type, float Volume);
-
-	UFUNCTION(BlueprintCallable)
-	void PlaySound3D_ByPath(ESoundType Type, const FSoftObjectPath& BGMPath, FVector Location);
-
-	UFUNCTION(BlueprintCallable)
-	void PlaySound3D_BySound(ESoundType Type, USoundBase* Sound, FVector Location);
-
-	UFUNCTION(BlueprintCallable)
-	void PlaySound2D_ByPath(ESoundType Type, const FSoftObjectPath& Path);
-
-	UFUNCTION(BlueprintCallable)
-	void PlaySound2D_BySound(ESoundType Type, USoundBase* Sound);
-
-	UFUNCTION(BlueprintCallable)
-	void FadeInSound(ESoundType Type, float FadeDuration, float TargetVolume = 1.0f);
-
-	UFUNCTION(BlueprintCallable)
-	void FadeOutSound(ESoundType Type, float FadeDuration, float TargetVolume = 0.0f);
-
-	UPROPERTY(BlueprintReadOnly, Category = "SoudOptionData")
-	FSoundOptionData SoundOptionData;
 private:
-	UPROPERTY()
-	FString RegisterBGMSound;
+	UWorld* GetWorldChecked() const;
 
-	UPROPERTY()
-	TMap<ESoundType, UAudioComponent*> AudioComponents;
+	void CreateBGMComponent();
+	void ApplySoundMixOverrides();
+
+	void LoadSoundAsync(const TSoftObjectPtr<USoundBase>& Sound, TFunction<void(USoundBase*)> OnLoaded);
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Audio|Mix")
+	TObjectPtr<USoundMix> GlobalMix = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio|Class")
+	TObjectPtr<USoundClass> MasterClass = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio|Class")
+	TObjectPtr<USoundClass> BGMClass = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio|Class")
+	TObjectPtr<USoundClass> SFXClass = nullptr;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UAudioComponent> BGMComponent = nullptr;
+
+	//TSharedPtr<FStreamableHandle> PendingBGMHandle;
+	FSoundOptionData OptionData;
 };

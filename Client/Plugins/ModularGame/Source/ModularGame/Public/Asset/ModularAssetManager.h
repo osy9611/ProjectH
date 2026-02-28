@@ -19,7 +19,7 @@ public:
 	/*
 	* UAssetManager's interfaces
 	*/
-	virtual void StartInitialLoading();
+	virtual void StartInitialLoading() override;
 
 	static UModularAssetManager& Get();
 
@@ -139,12 +139,12 @@ void UModularAssetManager::GetSubclassAsync(const TSoftClassPtr<AssetType>& Asse
 
 		if (!LoadedSubClass)
 		{
-			AsynchronusLoadAsset(AssetPath, [resultAsset, bKeepInMemory]()
+			AsynchronusLoadAsset(AssetPath, [bKeepInMemory, bKeepInMemory](UObject* ResultAsset)
 				{
-					if (resultAsset && bKeepInMemory)
-						Get().AddLoadedAsset(resultAsset);
+					if (ResultAsset && bKeepInMemory)
+						Get().AddLoadedAsset(ResultAsset);
 
-					callback(Cast<UClass>(resultAsset));
+					callback(Cast<UClass>(ResultAsset));
 				});
 		}
 	}

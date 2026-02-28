@@ -24,12 +24,6 @@ void UHDCommonSessionSubsystem::MoveSeesionByTableID(int32 TableNo)
 		return;
 	}
 
-	UAudioSubsystem* AudioManager = GetWorld()->GetGameInstance()->GetSubsystem<UAudioSubsystem>();
-	if (AudioManager)
-	{
-		AudioManager->UnRegisterData();
-	}
-
 	UHDAssetManager& AssetManager = UHDAssetManager::Get();
 	AssetManager.AsynchronusLoadAsset(SceneData->DataPath, [&,TableNo](UObject* result)
 		{
