@@ -172,12 +172,6 @@ void UAudioSubsystem::LoadSoundAsync(const TSoftObjectPtr<USoundBase>& Sound, TF
 	}
 
 	UModularAssetManager& AssetManager = UModularAssetManager::Get();
-	AssetManager.AsynchronusLoadAsset(Sound.GetUniqueID(), [&, OnLoaded](UObject* result)
-		{
-			if (USoundBase* Sound = Cast<USoundBase>(result))
-			{
-				OnLoaded(Sound);
-			}
-		});
+	AssetManager.GetAssetAsync<USoundBase>(Sound, OnLoaded,true);
 }
 

@@ -52,7 +52,7 @@ T* UtilFunc::LoadResource(FString Path)
 	}
 
 	UHDAssetManager& AssetManager = UHDAssetManager::Get();
-	UObject* Result = AssetManager.SynchronusLoadAsset(Path);
+	UObject* Result = AssetManager.SyncLoadAsset(Path);
 	if (!Result)
 	{
 		UE_LOG(HDLog, Log, TEXT("[UtilFunc] BattleResource Load Fail Can't Found Data : %s"), *Path);

@@ -205,7 +205,7 @@ void UHDPawnExtensionComponent::SetFlipbook(const FString Path)
 		return;
 	UHDAssetManager& AssetManager = UHDAssetManager::Get();
 
-	UObject* Result = AssetManager.SynchronusLoadAsset(Path);
+	UObject* Result = AssetManager.SyncLoadAsset(Path);
 	if (UPaperFlipbook* PaperFlipbook = Cast<UPaperFlipbook>(Result))
 	{
 		SetFlipbook(PaperFlipbook);
@@ -237,7 +237,7 @@ void UHDPawnExtensionComponent::SetAnimationInstance(const FString Path)
 		ResultPath = Path + TEXT("_C");
 	}
 
-	UObject* Result = AssetManager.SynchronusLoadAsset(ResultPath);
+	UObject* Result = AssetManager.SyncLoadAsset(ResultPath);
 
 	UClass* AnimClass = Cast<UClass>(Result);
 	if (AnimClass && AnimClass->IsChildOf(UPaperZDAnimInstance::StaticClass()))

@@ -42,7 +42,6 @@ public:
 	TArray<float> VolumeRatios;
 };
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlaySoundAfterSceneLoading, const FString);
 UCLASS(Blueprintable)
 class MODULARGAME_API UAudioSubsystem : public UGameInstanceSubsystem
 {

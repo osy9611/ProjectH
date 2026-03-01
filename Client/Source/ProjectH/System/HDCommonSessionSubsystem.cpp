@@ -25,23 +25,22 @@ void UHDCommonSessionSubsystem::MoveSeesionByTableID(int32 TableNo)
 	}
 
 	UHDAssetManager& AssetManager = UHDAssetManager::Get();
-	AssetManager.AsynchronusLoadAsset(SceneData->DataPath, [&,TableNo](UObject* result)
+	AssetManager.GetAssetAsync<UHDSceneData>(TSoftObjectPtr(SceneData->DataPath), [&, TableNo](UHDSceneData* Result)
 		{
-			if (UHDSceneData* SceneData = Cast<UHDSceneData>(result))
+			if(!Result)
+				return;
+
+			UMoveSessionData* MoveSessionData = Result->CreateMoveSessionData(TableNo);
+
+			UE_LOG(HDLog, Log, TEXT("[HDCommonSessionSubSystem] MoveSessionData Map : %s"), *MoveSessionData->MapID.ToString());
+
+			if (MoveSessionData)
 			{
-				UMoveSessionData* MoveSessionData = SceneData->CreateMoveSessionData(TableNo);
-
-				UE_LOG(HDLog, Log, TEXT("[HDCommonSessionSubSystem] MoveSessionData Map : %s"), *MoveSessionData->MapID.ToString());
-
-				if (MoveSessionData)
-				{
-					FString InURL = MoveSessionData->CreateURL();
-					UE_LOG(HDLog, Log, TEXT("[HDCommonSessionSubSystem] CreateURL : %s"), *InURL);
-					GetWorld()->ServerTravel(InURL);
-				}
+				FString InURL = MoveSessionData->CreateURL();
+				UE_LOG(HDLog, Log, TEXT("[HDCommonSessionSubSystem] CreateURL : %s"), *InURL);
+				GetWorld()->ServerTravel(InURL);
 			}
-		}
-	);
+		});
 }
 
 void UHDCommonSessionSubsystem::CreateHttpObject()
