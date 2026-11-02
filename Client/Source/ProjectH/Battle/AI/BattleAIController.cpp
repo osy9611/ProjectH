@@ -28,7 +28,6 @@ void ABattleAIController::OnInit(UBattleResourceData_AI* ResourceData)
 	if (BlackboardAsset)
 	{
 		UseBlackboard(BlackboardAsset, BlackboardComp);
-		//RunBehaviorTree(BehaviorTree);
 	}
 }
 

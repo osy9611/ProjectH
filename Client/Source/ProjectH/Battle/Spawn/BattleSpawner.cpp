@@ -260,7 +260,6 @@ APawn* UBattleSpawner::SpawnPawn(TSubclassOf<AActor> Actor, ECharType CharType, 
 	if (APawn* SpawnedPawn = GetWorld()->SpawnActorDeferred<APawn>(Actor, SpawnPoint))
 	{
 		UGameplayStatics::FinishSpawningActor(SpawnedPawn, SpawnPoint);
-		//SpawnedPawn->FinishSpawning(SpawnPoint);
 
 		UHDPawnExtensionComponent* PawnExtComp = UHDPawnExtensionComponent::FindPawnExtensionComponent(SpawnedPawn);
 
