@@ -14,6 +14,10 @@
 
 ✔ **Language:** C++, Python ,Blueprint
 
+## 테이블 CSV 생성
+
+`Table` 폴더에서 `python python/CSVReader.py`를 실행하면 `Datas`와 `Enum`의 xlsx로 CSV를 생성합니다. `pandas`와 `openpyxl`이 필요합니다.
+
 ## 관련 문서
 
 - [이전 프로젝트(ProjectPT)](https://github.com/osy9611/ProjectPT)
