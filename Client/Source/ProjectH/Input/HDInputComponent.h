@@ -24,8 +24,6 @@ public:
 
 	template <class UserClass, typename PressedFuncType, typename ReleasedFuncType>
 	void BindAbilityActions(const UHDInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, TArray<uint32>& BindHandles);	
-	/*template <class UserClass>
-	void BindAbilityActions(const UHDInputConfig* InputConfig, UserClass* Object, FName PressedFunc, FName ReleasedFunc, TArray<uint32>& BindHandles);*/
 };
 
 template <class UserClass, typename FuncType>
@@ -55,22 +53,3 @@ void UHDInputComponent::BindAbilityActions(const UHDInputConfig* InputConfig, Us
 		}
 	}
 }
-//
-//template<class UserClass>
-//void UHDInputComponent::BindAbilityActions(const UHDInputConfig* InputConfig, UserClass* Object, FName PressedFunc, FName ReleasedFunc, TArray<uint32>& BindHandles)
-//{
-//	check(InputConfig);
-//
-//	//AbilityAction에 대해서는 그냥 모든 InputAction에 다 바인딩 시킨다
-//	for (const FHDInputAction& Action : InputConfig->AbilityInputActions)
-//	{
-//		if (Action.InputAction && Action.InputTag.IsValid())
-//		{
-//			if (PressedFunc.IsNone())
-//				BindHandles.Add(BindAction(Action.InputAction, ETriggerEvent::Triggered, Object, PressedFunc, Action.InputTag).GetHandle());
-//
-//			if (ReleasedFunc.IsNone())
-//				BindHandles.Add(BindAction(Action.InputAction, ETriggerEvent::Completed, Object, ReleasedFunc, Action.InputTag).GetHandle());
-//		}
-//	}
-//}

@@ -30,11 +30,6 @@ void UHDMVVM_MonsterInfo::HandleDataChanged(const FOnAttributeChangeData& Data)
 	if (Data.Attribute == UHDAttributeSet::GetHPAttribute())
 	{
 		CurrentHP = Data.NewValue / OriginHP;
-		/*if (UE_MVVM_SET_PROPERTY_VALUE(CurrentHP, Data.NewValue / OriginHP))
-		{
-			UE_MVVM_BROADCAST_FIELD_VALUE_CHANGED(CurrentHP);
-		}*/
-		//UE_MVVM_SET_PROPERTY_VALUE(CurrentHP, Data.NewValue / OriginHP);
 
 		UE_MVVM_BROADCAST_FIELD_VALUE_CHANGED(CurrentHP);
 	}

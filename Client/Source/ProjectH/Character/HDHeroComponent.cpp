@@ -235,12 +235,6 @@ void UHDHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputCompone
 	const ULocalPlayer* LP = PC->GetLocalPlayer();
 	check(LP);
 
-	//UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
-	//check(Subsystem);
-
-	////MappingContext ÃÊ±âÈ­
-	//Subsystem->ClearAllMappings();	
-	//InputManagerSubsystem->RemoveAllInputContexts();
 
 	if (const UHDPawnExtensionComponent* PawnExtComp = UHDPawnExtensionComponent::FindPawnExtensionComponent(Pawn))
 	{

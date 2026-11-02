@@ -98,7 +98,6 @@ bool UHDBattleComponent::CanChangeInitState(UGameFrameworkComponentManager* Mana
 			return DataManager->CheckLoadData();
 		}
 
-		//bool result = Manager->HasFeatureReachedInitState(Pawn, UHDPawnExtensionComponent::NAME_ActorFeatureName, InitTags.InitState_DataInitialized);
 		return false;
 	}
 
