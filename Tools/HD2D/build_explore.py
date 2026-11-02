@@ -212,10 +212,19 @@ def mirror_hero_right_slots():
         print(name, 'saved', EAL.save_loaded_asset(seq, False))
 
 
+def remove_maps(paths):
+    # delete_asset returns True on these maps but leaves the files, so duplicate_asset then fails and
+    # the old Geo, already without NPCs, gets rebuilt. Remove the files and rescan them instead.
+    files = [unreal.Paths.convert_relative_path_to_full(unreal.Paths.project_content_dir() + p[len('/Game/'):] + '.umap') for p in paths]
+    for f in files:
+        if os.path.exists(f):
+            os.remove(f)
+    unreal.AssetRegistryHelpers.get_asset_registry().scan_modified_asset_files(files)
+    print('removed', [p for p in paths if not EAL.does_asset_exist(p)])
+
+
 def build_geo():
-    for path in [GEO] + list(PRESETS):
-        if EAL.does_asset_exist(path):
-            print('deleted', path, EAL.delete_asset(path))
+    remove_maps([GEO] + list(PRESETS))
     print('duplicated', EAL.duplicate_asset(SOURCE, GEO))
     world = MAPS.load_map(GEO)
     npcs = []
