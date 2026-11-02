@@ -43,7 +43,8 @@ POST_PROCESS = dict(
     color_contrast=unreal.Vector4(1, 1, 1, 1.1), color_gain=unreal.Vector4(1, 0.98, 1.19, 1),
     color_gain_midtones=unreal.Vector4(1, 1, 1.03, 1), color_saturation=unreal.Vector4(1.03, 1.03, 1.03, 1),
     depth_of_field_fstop=5.6, depth_of_field_sensor_width=600.0,
-    dynamic_global_illumination_method=unreal.DynamicGlobalIlluminationMethod.LUMEN,
+    # No dynamic GI: Lumen cost about 2 ms of GPU at 1080p and barely changed the picture.
+    dynamic_global_illumination_method=unreal.DynamicGlobalIlluminationMethod.NONE,
     film_shoulder=1.0, indirect_lighting_intensity=4.0,
 )
 FOG = dict(
@@ -247,6 +248,8 @@ def add_environment(world, preset, anchor):
     c.set_editor_property('mobility', unreal.ComponentMobility.MOVABLE)
     c.set_editor_property('intensity', preset['sun_intensity'])
     c.set_editor_property('light_color', preset['sun_color'])
+    # Fog and translucency use one directional light; without a priority the brighter character_light would win.
+    c.set_editor_property('forward_shading_priority', 1)
 
     sky = ACT.spawn_actor_from_class(unreal.SkyLight, anchor)
     c = sky.get_component_by_class(unreal.SkyLightComponent)

@@ -143,6 +143,9 @@ VARIANTS = dict(
     # Shared-style checks on the real maps: switch off what build_explore added.
     no_character_light=lambda s: s.character_light.set_visibility(False),
     no_foliage=lambda s: s.sprite.create_dynamic_material_instance(0, s.material).set_scalar_parameter_value('Transmission', 0.0),
+    no_lumen=lambda s: s.post(dynamic_global_illumination_method=unreal.DynamicGlobalIlluminationMethod.NONE),
+    sun_priority=lambda s: s.sun.set_editor_property('forward_shading_priority', 1),
+    no_lumen_sky_lower=lambda s: (VARIANTS['no_lumen'](s), sky_lower(s)),
 )
 
 # Candidates that read another candidate's SPEC value.
@@ -187,6 +190,9 @@ def tick(dt):
             scene.sun.get_owner().set_actor_rotation(unreal.Rotator(roll=0, pitch=SPEC['sun'][0], yaw=SPEC['sun'][1]), True)
         scene.pawn.set_actor_location(unreal.Vector(*SPEC['loc']), False, True)
         log('ready tick', ticks, 'pawn', scene.pawn.get_actor_location(), 'material', scene.material.get_path_name())
+        for a in unreal.GameplayStatics.get_all_actors_of_class(w, unreal.Actor):
+            if a.get_class().get_name() == 'BP_NPC_C':
+                log('npc', a.get_actor_location())
         build_plan()
         return
     clock += dt
