@@ -46,7 +46,7 @@ void UHDGEComp_Buff::OnGameplayEffectApplied(FActiveGameplayEffectsContainer& Ac
 	MutableGE->StackLimitCount = BuffData.MaxStack;
 
 	//Stack °è»ê
-	float StackCount = GESpec.StackCount == 1 ? 0 : GESpec.StackCount;
+	float StackCount = GESpec.GetStackCount() == 1 ? 0 : GESpec.GetStackCount();
 	float Amount = BuffData.Value + (BuffData.Value * StackCount * 0.5f);
 
 	if (BuffData.BuffType == EBuffType::LowPATK || BuffData.BuffType == EBuffType::LowEATK
@@ -66,7 +66,7 @@ void UHDGEComp_Buff::OnGameplayEffectApplied(FActiveGameplayEffectsContainer& Ac
 		GetBuffAttribute(BuffData.BuffType), EGameplayModOp::Override, Amount);
 
 	UE_LOG(HDLog, Log, TEXT("BuffID : %d  After Data : %f"), BuffContext->BuffID, SourceAttributeSet->GetG1_PATK());
-	UE_LOG(HDLog, Log, TEXT("After Stack : %d"), GESpec.StackCount);
+	UE_LOG(HDLog, Log, TEXT("After Stack : %d"), GESpec.GetStackCount());
 }
 
 FGameplayAttribute UHDGEComp_Buff::GetBuffAttribute(EBuffType Type) const
