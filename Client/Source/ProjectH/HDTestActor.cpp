@@ -11,6 +11,7 @@ AHDTestActor::AHDTestActor()
 
 }
 
+#if WITH_EDITOR
 void AHDTestActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
     Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -23,3 +24,4 @@ void AHDTestActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
         bEnableIcePower = (EffectType == EEffectType::Ice);
     }
 }
+#endif

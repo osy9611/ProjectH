@@ -82,5 +82,7 @@ void UObjectPoolSubsystem::CreatePoolRoot()
 	FRotator SpawnRotation = FRotator(0.0f, 0.0f, 0.0f);
 
 	SpawnOwnerActor = GetWorld()->SpawnActor<AActor>(AActor::StaticClass(), SpawnLocation, SpawnRotation);
+#if WITH_EDITOR
 	SpawnOwnerActor->SetActorLabel(TEXT("PoolingRoot"));
+#endif
 }
