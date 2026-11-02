@@ -9,10 +9,13 @@ Result lines go to Client/Saved/HD2D_Explore/build.txt.
 """
 import os, sys, unreal
 
-out = os.path.join(unreal.Paths.project_saved_dir(), 'HD2D_Explore')
-os.makedirs(out, exist_ok=True)
-sys.stdout = open(os.path.join(out, 'build.txt'), 'w', encoding='utf-8', buffering=1)
-sys.stderr = sys.stdout
+
+def log_to_file(name):
+    out = os.path.join(unreal.Paths.project_saved_dir(), 'HD2D_Explore')
+    os.makedirs(out, exist_ok=True)
+    sys.stdout = open(os.path.join(out, name), 'w', encoding='utf-8', buffering=1)
+    sys.stderr = sys.stdout
+
 
 EAL = unreal.EditorAssetLibrary
 ACT = unreal.EditorLevelLibrary
@@ -95,29 +98,34 @@ def build_geo():
             print('deleted', path, EAL.delete_asset(path))
     print('duplicated', EAL.duplicate_asset(SOURCE, GEO))
     world = MAPS.load_map(GEO)
+    npcs = []
     for a in unreal.GameplayStatics.get_all_actors_of_class(world, unreal.Actor):
-        if a.get_class().get_name() in ENVIRONMENT_CLASSES:
+        name = a.get_class().get_name()
+        if name == 'BP_NPC_C':
+            # NPCs belong to exploration; the battle map streams Geo too and must not show them.
+            npcs.append((a.get_class(), a.get_actor_location(), a.get_actor_rotation(), a.get_component_by_class(unreal.HDNPCComponent).get_editor_property('table_id')))
+        if name in ENVIRONMENT_CLASSES or name == 'BP_NPC_C':
             ACT.destroy_actor(a)
     print('Geo saved', MAPS.save_map(world, GEO))
+    return npcs
 
 
-def build_preset(path, preset):
-    world = MAPS.new_blank_map(False)
+def add_environment(world, preset, anchor):
     world.get_world_settings().set_editor_property('force_no_precomputed_lighting', True)
 
-    sun = ACT.spawn_actor_from_class(unreal.DirectionalLight, SPAWN, preset['sun_rotation'])
+    sun = ACT.spawn_actor_from_class(unreal.DirectionalLight, anchor, preset['sun_rotation'])
     c = sun.get_component_by_class(unreal.DirectionalLightComponent)
     c.set_editor_property('mobility', unreal.ComponentMobility.MOVABLE)
     c.set_editor_property('intensity', preset['sun_intensity'])
     c.set_editor_property('light_color', preset['sun_color'])
 
-    sky = ACT.spawn_actor_from_class(unreal.SkyLight, SPAWN)
+    sky = ACT.spawn_actor_from_class(unreal.SkyLight, anchor)
     c = sky.get_component_by_class(unreal.SkyLightComponent)
     c.set_editor_property('mobility', unreal.ComponentMobility.MOVABLE)
     c.set_editor_property('intensity', preset['sky_intensity'])
     c.set_editor_property('light_color', unreal.Color(r=255, g=251, b=223))
 
-    fog = ACT.spawn_actor_from_class(unreal.ExponentialHeightFog, SPAWN)
+    fog = ACT.spawn_actor_from_class(unreal.ExponentialHeightFog, anchor)
     c = fog.get_component_by_class(unreal.ExponentialHeightFogComponent)
     c.set_volumetric_fog(True)
     for k, v in dict(
@@ -129,7 +137,7 @@ def build_preset(path, preset):
     ).items():
         c.set_editor_property(k, v)
 
-    pp = ACT.spawn_actor_from_class(unreal.PostProcessVolume, SPAWN)
+    pp = ACT.spawn_actor_from_class(unreal.PostProcessVolume, anchor)
     pp.set_editor_property('unbound', True)
     st = pp.get_editor_property('settings')
     for k, v in POST_PROCESS.items():
@@ -146,14 +154,21 @@ def build_preset(path, preset):
         c.set_editor_property('light_color', unreal.Color(r=255, g=190, b=120))
         c.set_editor_property('volumetric_scattering_intensity', 0.2)
 
+def build_preset(path, preset, npcs):
+    world = MAPS.new_blank_map(False)
+    add_environment(world, preset, SPAWN)
+    for cls, location, rotation, table_id in npcs:
+        ACT.spawn_actor_from_class(cls, location, rotation).get_component_by_class(unreal.HDNPCComponent).set_editor_property('table_id', table_id)
     print('level', unreal.EditorLevelUtils.add_level_to_world(world, GEO, unreal.LevelStreamingAlwaysLoaded))
     print('saved', path, MAPS.save_map(world, path))
 
 
-set_camera_mode()
-set_hero_focus()
-mirror_hero_right_slots()
-build_geo()
-for path, preset in PRESETS.items():
-    build_preset(path, preset)
-print('done')
+if __name__ == '__main__':
+    log_to_file('build.txt')
+    set_camera_mode()
+    set_hero_focus()
+    mirror_hero_right_slots()
+    npcs = build_geo()
+    for path, preset in PRESETS.items():
+        build_preset(path, preset, npcs)
+    print('done')
