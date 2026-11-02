@@ -270,11 +270,11 @@ void FTableGeneratorModule::SaveConfigData()
 		FString FilePath = FPaths::ProjectContentDir() + TEXT("/Data/Config/Config.json");
 		if (FFileHelper::SaveStringToFile(JsonContent, *FilePath))
 		{
-			UE_LOG(LogTemp, Log, TEXT("Success Json File!!"), *FilePath);
+			UE_LOG(LogTemp, Log, TEXT("Success Json File!! %s"), *FilePath);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("Fail Json File"), *FilePath);
+			UE_LOG(LogTemp, Error, TEXT("Fail Json File : %s"), *FilePath);
 		}
 	}
 }

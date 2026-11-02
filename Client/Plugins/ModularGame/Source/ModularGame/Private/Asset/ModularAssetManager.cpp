@@ -179,7 +179,7 @@ TSharedPtr<FStreamableHandle> UModularAssetManager::AsyncLoadAsset(const FSoftOb
 			//스코프 정책:
 			// - 여러 요청이 섞일 때 어떤 Scope로 캐시할지 애매해진다.
 			// - 범용 코어에서는 "처음 들어온 Scope"를 유지하고, 이후는 캐시 Scope를 바꾸지 않는다.
-			// - 더 고급 정책(LRU, Multi-Scope Retain)은 별도의 캐시 레이어에서 처리하는 편이 낫다/
+			// - 더 고급 정책(LRU, Multi-Scope Retain)은 별도의 캐시 레이어에서 처리하는 편이 낫다.
 			if (Existing->Scope.IsNone() && !KeepScope.IsNone())
 			{
 				Existing->Scope = KeepScope;
@@ -190,10 +190,9 @@ TSharedPtr<FStreamableHandle> UModularAssetManager::AsyncLoadAsset(const FSoftOb
 	}
 
 	//Create New Request
-	TUniquePtr<FScopeLogTime> LogTimePtr;
 	if (ShouldLogAssetLoads())
 	{
-		LogTimePtr = MakeUnique<FScopeLogTime>(
+		TUniquePtr<FScopeLogTime> LogTimePtr = MakeUnique<FScopeLogTime>(
 			*FString::Printf(TEXT("Async request [%s]"), *AssetPath.ToString()),
 			nullptr,
 			FScopeLogTime::ScopeLog_Seconds);

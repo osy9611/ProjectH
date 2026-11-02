@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ModularGame/Public/UI/MVVM/Modular_MVVMlBase.h"
+#include "ModularGame/Public/UI/MVVM/Modular_MVVMBase.h"
 #include "AbilitySystemComponent.h"
 #include "HDMVVM_MonsterInfo.generated.h"
 
 struct FOnAttributeChangeData;
 
 UCLASS()
-class PROJECTH_API UHDMVVM_MonsterInfo : public UModular_MVVMlBase
+class PROJECTH_API UHDMVVM_MonsterInfo : public UModular_MVVMBase
 {
 	GENERATED_BODY()
 public:

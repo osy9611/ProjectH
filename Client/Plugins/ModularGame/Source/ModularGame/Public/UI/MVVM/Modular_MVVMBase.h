@@ -6,12 +6,12 @@
 #include "MVVMViewModelBase.h"
 #include "AbilitySystemComponent.h"
 #include "ModularGame/Public/Log/ModularLogChannel.h"
-#include "Modular_MVVMlBase.generated.h"
+#include "Modular_MVVMBase.generated.h"
 
 class UAbilitySystemComponent;
 
 UCLASS()
-class MODULARGAME_API UModular_MVVMlBase : public UMVVMViewModelBase
+class MODULARGAME_API UModular_MVVMBase : public UMVVMViewModelBase
 {
 	GENERATED_BODY()
 public:
@@ -38,7 +38,7 @@ private:
 };
 
 template<typename T>
-void UModular_MVVMlBase::BindASCValueChange(FGameplayAttribute Attribute, T* Object, void(T::* Func)(const FOnAttributeChangeData&))
+void UModular_MVVMBase::BindASCValueChange(FGameplayAttribute Attribute, T* Object, void(T::* Func)(const FOnAttributeChangeData&))
 {
 	if (!ASC.IsValid())
 	{
@@ -61,7 +61,7 @@ void UModular_MVVMlBase::BindASCValueChange(FGameplayAttribute Attribute, T* Obj
 }
 
 template<typename T>
-void UModular_MVVMlBase::BindField(const UE::FieldNotification::FFieldId FieldId, T* Object, void(T::* Func)(UObject*, UE::FieldNotification::FFieldId))
+void UModular_MVVMBase::BindField(const UE::FieldNotification::FFieldId FieldId, T* Object, void(T::* Func)(UObject*, UE::FieldNotification::FFieldId))
 {
 	if (FDelegateHandle* ExistingHandle = VMFiledHandles.Find(FieldId))
 	{
