@@ -10,7 +10,7 @@ Set HD2D_BATTLE_CAMERA to pick an entry of CAMERAS. Result lines go to Client/Sa
 import os, sys, unreal
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from build_explore import ACT, EAL, GEO, MAPS, PRESETS, add_environment, log_to_file
+from build_explore import ACT, EAL, GEO, MAPS, PRESETS, add_environment, log_to_file, set_camera_focus, set_sprite_material
 
 log_to_file('build_battle.txt')
 
@@ -19,7 +19,7 @@ DAY = '/Game/Maps/Village/MAP_Village_Day'
 # Battle (0, 1060, 0) lands on the Village plaza at (14110, 12070, 1002), with the stairs as a backdrop.
 GEO_OFFSET = unreal.Vector(-14110, -11010, -1002)
 FOG_ANCHOR = unreal.Vector(0, 1060, 398)
-REPLACED_CLASSES = ('DirectionalLight', 'SkyLight', 'SkyAtmosphere', 'VolumetricCloud', 'ExponentialHeightFog')
+REPLACED_CLASSES = ('DirectionalLight', 'SkyLight', 'SkyAtmosphere', 'VolumetricCloud', 'ExponentialHeightFog', 'BP_HD2DEnvironment_C')
 REPLACED_LABELS = ('SM_SkySphere',)
 GROUND_LABEL = 'Plane'
 
@@ -28,8 +28,7 @@ CAMERAS = dict(
     explore=dict(pitch=-18.0, noise=False, battle_distance=5500.0, skill_distance=5000.0),
 )
 camera = CAMERAS[os.environ.get('HD2D_BATTLE_CAMERA', 'explore')]
-# f/4 keeps the line-up, which spans 1260 units along the view, readable while the stairs and bridge still blur.
-FOCUS = dict(depth_of_field_focal_distance=camera['battle_distance'], depth_of_field_fstop=4.0, depth_of_field_sensor_width=600.0)
+SPRITES = ('/Game/Blueprints/Battle/BP_BattleActor', '/Game/Blueprints/Battle/AI/BP_BattleActor_AI')
 
 
 def components(path):
@@ -40,7 +39,7 @@ def components(path):
 
 
 def set_sprite_shadows():
-    for path in ('/Game/Blueprints/Battle/BP_BattleActor', '/Game/Blueprints/Battle/AI/BP_BattleActor_AI'):
+    for path in SPRITES:
         bp, comps = components(path)
         for o in comps:
             if isinstance(o, unreal.PaperFlipbookComponent):
@@ -62,11 +61,7 @@ def set_observer_focus():
     bp, comps = components('/Game/Blueprints/Battle/BP_BattleObserver')
     for o in comps:
         if isinstance(o, unreal.CameraComponent):
-            st = o.get_editor_property('post_process_settings')
-            for k, v in FOCUS.items():
-                st.set_editor_property('override_' + k, True)
-                st.set_editor_property(k, v)
-            o.set_editor_property('post_process_settings', st)
+            set_camera_focus(o, camera['battle_distance'])
     print('BP_BattleObserver saved', EAL.save_loaded_asset(bp, False))
 
 
@@ -101,6 +96,7 @@ def build_map():
 
 scan_scene_data_with_plugin()
 set_sprite_shadows()
+set_sprite_material(SPRITES)
 set_camera_modes()
 set_observer_focus()
 build_map()

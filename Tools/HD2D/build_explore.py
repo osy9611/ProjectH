@@ -3,6 +3,8 @@
 MAP_Village_Geo is a copy of Asian_Village_Demo without its lights, fog and post process.
 MAP_Village_Day and MAP_Village_Night hold one preset each and stream Geo in,
 so opening a map picks the time of day and the village exists only once.
+Values shared by every map live in /Game/HD2D: BP_HD2DEnvironment (post process, DoF strength, fog)
+and M_HD2D_SpriteLift (sprite lift). The presets below hold only what differs by time of day.
 
 Run: UnrealEditor-Cmd.exe <uproject> -run=pythonscript -script=<this file> -unattended -nullrhi
 Result lines go to Client/Saved/HD2D_Explore/build.txt.
@@ -26,29 +28,40 @@ GEO = '/Game/Maps/Village/MAP_Village_Geo'
 ENVIRONMENT_CLASSES = ('DirectionalLight', 'SkyLight', 'ExponentialHeightFog', 'PostProcessVolume')
 SPAWN = unreal.Vector(14110, 12070, 1400)
 
-CAMERA_DISTANCE = 1500.0
+STYLE = '/Game/HD2D'
+ENVIRONMENT = STYLE + '/BP_HD2DEnvironment'
+SPRITE_MATERIAL = STYLE + '/M_HD2D_SpriteLift'
+CAMERA_DISTANCE = 2250.0
 
-# Values of the source map's volume. The sensor width sets the blur strength, so it
-# moves to the hero camera together with the focus.
+# Shared by every map through BP_HD2DEnvironment. Cameras override only the focal distance,
+# so the f-stop and sensor width here set the blur strength everywhere.
 POST_PROCESS = dict(
     ambient_occlusion_fade_distance=50000.0, ambient_occlusion_intensity=0.3,
     ambient_occlusion_quality=13.0, ambient_occlusion_radius=60.0,
     auto_exposure_bias=1.263, auto_exposure_min_brightness=1.0, auto_exposure_max_brightness=1.0,
-    bloom_intensity=0.8, vignette_intensity=0.35,
+    bloom_intensity=0.4, vignette_intensity=0.15,
     color_contrast=unreal.Vector4(1, 1, 1, 1.1), color_gain=unreal.Vector4(1, 0.98, 1.19, 1),
-    color_gain_midtones=unreal.Vector4(1, 1, 1.03, 1), color_saturation=unreal.Vector4(1.07, 1.07, 1.07, 1),
+    color_gain_midtones=unreal.Vector4(1, 1, 1.03, 1), color_saturation=unreal.Vector4(1.03, 1.03, 1.03, 1),
+    depth_of_field_fstop=5.6, depth_of_field_sensor_width=600.0,
     dynamic_global_illumination_method=unreal.DynamicGlobalIlluminationMethod.LUMEN,
     film_shoulder=1.0, indirect_lighting_intensity=4.0,
+)
+FOG = dict(
+    fog_density=0.03, fog_height_falloff=0.2, volumetric_fog_extinction_scale=1.0,
+    fog_inscattering_luminance=unreal.LinearColor(0.337, 0.397, 1.0, 1.0),
+    directional_inscattering_luminance=unreal.LinearColor(0.25, 0.25, 0.125, 1.0),
+    volumetric_fog_albedo=unreal.Color(r=255, g=183, b=142),
+    volumetric_fog_scattering_distribution=0.9, volumetric_fog_distance=6000.0,
 )
 
 PRESETS = {
     '/Game/Maps/Village/MAP_Village_Day': dict(
         sun_rotation=unreal.Rotator(roll=0, pitch=-40, yaw=-50), sun_intensity=6.0,
         sun_color=unreal.Color(r=255, g=240, b=215), sky_intensity=1.0, fill_lights=[]),
-    # The camera looks toward -Y, so a fill light must sit on the +Y side to reach the sprite's face.
+    # Lantern pools around the start; they skip volumetric scattering, which drew them as floating orbs.
     '/Game/Maps/Village/MAP_Village_Night': dict(
-        sun_rotation=unreal.Rotator(roll=0, pitch=-35, yaw=-50), sun_intensity=1.6,
-        sun_color=unreal.Color(r=150, g=190, b=255), sky_intensity=0.25,
+        sun_rotation=unreal.Rotator(roll=0, pitch=-35, yaw=-50), sun_intensity=0.8,
+        sun_color=unreal.Color(r=120, g=160, b=255), sky_intensity=0.15,
         fill_lights=[unreal.Vector(SPAWN.x - 350, SPAWN.y + 350, 1300), unreal.Vector(SPAWN.x + 350, SPAWN.y + 350, 1300)]),
 }
 
@@ -69,14 +82,107 @@ def set_hero_focus():
     for h in subs.k2_gather_subobject_data_for_blueprint(bp):
         o = lib.get_object(lib.get_data(h))
         if isinstance(o, unreal.CameraComponent):
-            st = o.get_editor_property('post_process_settings')
-            for k, v in dict(depth_of_field_focal_distance=CAMERA_DISTANCE, depth_of_field_fstop=2.8, depth_of_field_sensor_width=600.0).items():
-                st.set_editor_property('override_' + k, True)
-                st.set_editor_property(k, v)
-            o.set_editor_property('post_process_settings', st)
+            set_camera_focus(o, CAMERA_DISTANCE)
         if isinstance(o, unreal.BoxComponent):
             o.set_editor_property('hidden_in_game', True)
     print('BP_Hero saved', EAL.save_loaded_asset(bp, False))
+
+
+def set_camera_focus(camera, distance):
+    st = camera.get_editor_property('post_process_settings')
+    st.set_editor_property('override_depth_of_field_focal_distance', True)
+    st.set_editor_property('depth_of_field_focal_distance', distance)
+    st.set_editor_property('override_depth_of_field_fstop', False)
+    st.set_editor_property('override_depth_of_field_sensor_width', False)
+    camera.set_editor_property('post_process_settings', st)
+
+
+def build_sprite_material():
+    # A masked lit sprite whose emissive adds a fraction of the art, so a sprite in shadow keeps its colors.
+    mel = unreal.MaterialEditingLibrary
+    if EAL.does_asset_exist(SPRITE_MATERIAL):
+        mat = unreal.load_asset(SPRITE_MATERIAL)
+        mel.delete_all_material_expressions(mat)
+    else:
+        mat = unreal.AssetToolsHelpers.get_asset_tools().create_asset(SPRITE_MATERIAL.rsplit('/', 1)[1], STYLE, unreal.Material, unreal.MaterialFactoryNew())
+    mat.set_editor_property('blend_mode', unreal.BlendMode.BLEND_MASKED)
+    mat.set_editor_property('two_sided', True)
+    tex = mel.create_material_expression(mat, unreal.MaterialExpressionTextureSampleParameter2D)
+    tex.set_editor_property('parameter_name', 'SpriteTexture')
+    tex.set_editor_property('texture', unreal.load_asset('/Paper2D/DummySpriteTexture'))
+    vertex = mel.create_material_expression(mat, unreal.MaterialExpressionVertexColor)
+    color = mel.create_material_expression(mat, unreal.MaterialExpressionMultiply)
+    mel.connect_material_expressions(tex, 'RGB', color, 'A')
+    mel.connect_material_expressions(vertex, 'RGB', color, 'B')
+    lift = mel.create_material_expression(mat, unreal.MaterialExpressionScalarParameter)
+    lift.set_editor_property('parameter_name', 'Lift')
+    lift.set_editor_property('default_value', 0.25)
+    emissive = mel.create_material_expression(mat, unreal.MaterialExpressionMultiply)
+    mel.connect_material_expressions(color, '', emissive, 'A')
+    mel.connect_material_expressions(lift, '', emissive, 'B')
+    mask = mel.create_material_expression(mat, unreal.MaterialExpressionMultiply)
+    mel.connect_material_expressions(tex, 'A', mask, 'A')
+    mel.connect_material_expressions(vertex, 'A', mask, 'B')
+    mel.connect_material_property(color, '', unreal.MaterialProperty.MP_BASE_COLOR)
+    mel.connect_material_property(emissive, '', unreal.MaterialProperty.MP_EMISSIVE_COLOR)
+    mel.connect_material_property(mask, '', unreal.MaterialProperty.MP_OPACITY_MASK)
+    mel.recompile_material(mat)
+    print('sprite material saved', EAL.save_loaded_asset(mat, False))
+
+
+def set_sprite_material(paths):
+    material = unreal.load_asset(SPRITE_MATERIAL)
+    for path in paths:
+        bp = unreal.load_asset(path)
+        subs = unreal.get_engine_subsystem(unreal.SubobjectDataSubsystem)
+        lib = unreal.SubobjectDataBlueprintFunctionLibrary
+        for h in subs.k2_gather_subobject_data_for_blueprint(bp):
+            o = lib.get_object(lib.get_data(h))
+            if isinstance(o, unreal.PaperFlipbookComponent):
+                o.set_material(0, material)
+        print(path, 'saved', EAL.save_loaded_asset(bp, False))
+
+
+def set_texture_filter():
+    # The village textures ship as TF_Nearest; TF_Default hands filtering to the World texture group.
+    changed = 0
+    for data in unreal.AssetRegistryHelpers.get_asset_registry().get_assets_by_path('/Game/Asian_Village/textures', recursive=True):
+        t = data.get_asset()
+        if isinstance(t, unreal.Texture2D) and t.get_editor_property('filter') != unreal.TextureFilter.TF_DEFAULT:
+            t.set_editor_property('filter', unreal.TextureFilter.TF_DEFAULT)
+            EAL.save_loaded_asset(t, False)
+            changed += 1
+    print('textures changed', changed)
+
+
+def build_environment_blueprint():
+    if not EAL.does_asset_exist(ENVIRONMENT):
+        factory = unreal.BlueprintFactory()
+        factory.set_editor_property('parent_class', unreal.Actor)
+        unreal.AssetToolsHelpers.get_asset_tools().create_asset(ENVIRONMENT.rsplit('/', 1)[1], STYLE, unreal.Blueprint, factory)
+    bp = unreal.load_asset(ENVIRONMENT)
+    subs = unreal.get_engine_subsystem(unreal.SubobjectDataSubsystem)
+    lib = unreal.SubobjectDataBlueprintFunctionLibrary
+    handles = subs.k2_gather_subobject_data_for_blueprint(bp)
+    found = {type(lib.get_object(lib.get_data(h))) for h in handles}
+    for cls in (unreal.PostProcessComponent, unreal.ExponentialHeightFogComponent):
+        if cls not in found:
+            subs.add_new_subobject(unreal.AddNewSubobjectParams(parent_handle=handles[0], new_class=cls, blueprint_context=bp))
+    for h in subs.k2_gather_subobject_data_for_blueprint(bp):
+        o = lib.get_object(lib.get_data(h))
+        if isinstance(o, unreal.PostProcessComponent):
+            o.set_editor_property('unbound', True)
+            st = o.get_editor_property('settings')
+            for k, v in POST_PROCESS.items():
+                st.set_editor_property('override_' + k, True)
+                st.set_editor_property(k, v)
+            o.set_editor_property('settings', st)
+        if isinstance(o, unreal.ExponentialHeightFogComponent):
+            o.set_volumetric_fog(True)
+            for k, v in FOG.items():
+                o.set_editor_property(k, v)
+    unreal.BlueprintEditorLibrary.compile_blueprint(bp)
+    print('environment saved', EAL.save_loaded_asset(bp, False))
 
 
 def mirror_hero_right_slots():
@@ -125,34 +231,17 @@ def add_environment(world, preset, anchor):
     c.set_editor_property('intensity', preset['sky_intensity'])
     c.set_editor_property('light_color', unreal.Color(r=255, g=251, b=223))
 
-    fog = ACT.spawn_actor_from_class(unreal.ExponentialHeightFog, anchor)
-    c = fog.get_component_by_class(unreal.ExponentialHeightFogComponent)
-    c.set_volumetric_fog(True)
-    for k, v in dict(
-        fog_density=0.06, fog_height_falloff=0.2, volumetric_fog_extinction_scale=1.0,
-        fog_inscattering_luminance=unreal.LinearColor(0.337, 0.397, 1.0, 1.0),
-        directional_inscattering_luminance=unreal.LinearColor(0.25, 0.25, 0.125, 1.0),
-        volumetric_fog_albedo=unreal.Color(r=255, g=183, b=142),
-        volumetric_fog_scattering_distribution=0.9, volumetric_fog_distance=6000.0,
-    ).items():
-        c.set_editor_property(k, v)
-
-    pp = ACT.spawn_actor_from_class(unreal.PostProcessVolume, anchor)
-    pp.set_editor_property('unbound', True)
-    st = pp.get_editor_property('settings')
-    for k, v in POST_PROCESS.items():
-        st.set_editor_property('override_' + k, True)
-        st.set_editor_property(k, v)
-    pp.set_editor_property('settings', st)
+    ACT.spawn_actor_from_class(unreal.load_asset(ENVIRONMENT).generated_class(), anchor)
 
     for location in preset['fill_lights']:
         light = ACT.spawn_actor_from_class(unreal.PointLight, location)
         c = light.get_component_by_class(unreal.PointLightComponent)
         c.set_editor_property('mobility', unreal.ComponentMobility.MOVABLE)
-        c.set_editor_property('intensity', 60.0)
+        c.set_editor_property('intensity', 180.0)
         c.set_editor_property('attenuation_radius', 900.0)
-        c.set_editor_property('light_color', unreal.Color(r=255, g=190, b=120))
-        c.set_editor_property('volumetric_scattering_intensity', 0.2)
+        c.set_editor_property('light_color', unreal.Color(r=255, g=170, b=90))
+        c.set_editor_property('volumetric_scattering_intensity', 0.0)
+
 
 def build_preset(path, preset, npcs):
     world = MAPS.new_blank_map(False)
@@ -165,6 +254,10 @@ def build_preset(path, preset, npcs):
 
 if __name__ == '__main__':
     log_to_file('build.txt')
+    set_texture_filter()
+    build_environment_blueprint()
+    build_sprite_material()
+    set_sprite_material(['/Game/Blueprints/Characters/BP_Hero', '/Game/Blueprints/Characters/BP_NPC'])
     set_camera_mode()
     set_hero_focus()
     mirror_hero_right_slots()
