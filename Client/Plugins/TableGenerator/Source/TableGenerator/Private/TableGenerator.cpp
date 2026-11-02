@@ -258,9 +258,9 @@ void FTableGeneratorModule::SaveConfigData()
 		return;
 
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
-	JsonObject->SetStringField("CSVFolderPath", CSVPathStr);
-	JsonObject->SetStringField("EnumFolderPath", EnumPathStr);
-	JsonObject->SetBoolField("UseLiveCoding", bIsLiveCoding);
+	JsonObject->SetStringField(TEXT("CSVFolderPath"), CSVPathStr);
+	JsonObject->SetStringField(TEXT("EnumFolderPath"), EnumPathStr);
+	JsonObject->SetBoolField(TEXT("UseLiveCoding"), bIsLiveCoding);
 
 	FString JsonContent;
 	TSharedRef<TJsonWriter<>> JsonWriter = TJsonWriterFactory<>::Create(&JsonContent);

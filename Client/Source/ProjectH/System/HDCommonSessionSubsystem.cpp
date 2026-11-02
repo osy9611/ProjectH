@@ -25,7 +25,7 @@ void UHDCommonSessionSubsystem::MoveSeesionByTableID(int32 TableNo)
 	}
 
 	UHDAssetManager& AssetManager = UHDAssetManager::Get();
-	AssetManager.GetAssetAsync<UHDSceneData>(TSoftObjectPtr(SceneData->DataPath), [&, TableNo](UHDSceneData* Result)
+	AssetManager.GetAssetAsync<UHDSceneData>(TSoftObjectPtr<UHDSceneData>(FSoftObjectPath(SceneData->DataPath)), [&, TableNo](UHDSceneData* Result)
 		{
 			if(!Result)
 				return;
@@ -70,9 +70,9 @@ void UHDCommonSessionSubsystem::OnCall_Post()
 		return;
 
 	TSharedRef<FJsonObject> Obj = MakeShared<FJsonObject>();
-	Obj->SetStringField("name", "Sword of Dawn");
-	Obj->SetStringField("description", "Legendary blade");
-	Obj->SetNumberField("price", 999.9);
+	Obj->SetStringField(TEXT("name"), "Sword of Dawn");
+	Obj->SetStringField(TEXT("description"), "Legendary blade");
+	Obj->SetNumberField(TEXT("price"), 999.9);
 
 	FHTTPRequestOption Option;
 	Option.MaxRetry = 2;

@@ -140,7 +140,7 @@ UObject* UModularAssetManager::SyncLoadAsset(const FSoftObjectPath& AssetPath)
 				FScopeLogTime::ScopeLog_Seconds);
 	}
 
-	check(UAssetManager::IsValid());
+	check(UAssetManager::IsInitialized());
 	return UAssetManager::GetStreamableManager().LoadSynchronous(AssetPath);
 }
 
@@ -157,7 +157,7 @@ TSharedPtr<FStreamableHandle> UModularAssetManager::AsyncLoadAsset(const FSoftOb
 		return nullptr;
 	}
 
-	check(UAssetManager::IsValid());
+	check(UAssetManager::IsInitialized());
 
 	//이미 메모리에 있으면 Callback + 필요 시 캐싱
 	if (UObject* Resolved = AssetPath.ResolveObject())
