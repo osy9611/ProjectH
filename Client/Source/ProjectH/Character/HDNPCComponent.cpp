@@ -24,7 +24,7 @@ void UHDNPCComponent::OnRegister()
 	{
 		if (GetPawn<APawn>())
 		{
-			UE_LOG(HDLog, Error, TEXT("this component has been added to a BP whose base class is not a Pawn!!"));
+			UE_LOG(HDLog, Warning, TEXT("this component has been added to a BP whose base class is not a Pawn!!"));
 			return;
 		}
 	}
