@@ -78,7 +78,6 @@ void UHDInputManagerSubsystem::BindAbilityActions(const UHDInputConfig* InputCon
 		InputComp->BindAbilityActions(InputConfig, Object, PressedFunc, ReleasedFunc, BindHandles);
 	}
 }
-PRAGMA_DISABLE_OPTIMIZATION
 template<class UserClass, typename FuncType>
 void UHDInputManagerSubsystem::BindNativeAction(const UHDInputConfig* InputConfig, const FGameplayTag& InputTag, ETriggerEvent TriggerEvent, UserClass* Object, FuncType Func, bool bLogIfNotFound)
 {
@@ -91,4 +90,3 @@ void UHDInputManagerSubsystem::BindNativeAction(const UHDInputConfig* InputConfi
 		InputComp->BindNativeAction(InputConfig, InputTag, TriggerEvent, Object, Func, bLogIfNotFound);
 	}
 }
-PRAGMA_ENABLE_OPTIMIZATION

@@ -24,7 +24,7 @@ public:
 	UModularGameplayAbility(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 	UFUNCTION(BlueprintCallable)
-	virtual FGameplayTag GetGameplayTag() { return GetCurrentAbilitySpec()->DynamicAbilityTags.GetByIndex(0); }
+	virtual FGameplayTag GetGameplayTag() { return GetCurrentAbilitySpec()->GetDynamicSpecSourceTags().GetByIndex(0); }
 
 	UFUNCTION(BlueprintCallable)
 	virtual void SetCameraMode(TSubclassOf<UModularCameraMode> CameraMode, bool UseFovOffset = true);

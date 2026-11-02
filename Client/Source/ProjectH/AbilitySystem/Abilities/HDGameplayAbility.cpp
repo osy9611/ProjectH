@@ -101,7 +101,7 @@ FGameplayTag UHDGameplayAbility::GetGameplayTag()
 
 	if (Spec)
 	{
-		const FGameplayTagContainer& Tags = Spec->DynamicAbilityTags;
+		const FGameplayTagContainer& Tags = Spec->GetDynamicSpecSourceTags();
 		return Tags.GetByIndex(0);
 	}
 

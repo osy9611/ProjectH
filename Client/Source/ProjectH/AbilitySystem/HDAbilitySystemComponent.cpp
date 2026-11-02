@@ -18,7 +18,7 @@ void UHDAbilitySystemComponent::ProcessAbilityAndParam(const FGameplayTag& Tag, 
 	{
 		for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
 		{
-			if (AbilitySpec.Ability && !AbilitySpec.IsActive() && (AbilitySpec.DynamicAbilityTags.HasTagExact(Tag)))
+			if (AbilitySpec.Ability && !AbilitySpec.IsActive() && (AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(Tag)))
 			{
 				StoreParamsForAbility(AbilitySpec.Handle, Params);
 				TryActivateAbility(AbilitySpec.Handle);

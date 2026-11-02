@@ -46,7 +46,7 @@ void UModularAbilitySystemComponent::ProcessAbility(const FGameplayTag& Tag)
 	{
 		for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
 		{
-			if (AbilitySpec.Ability && !AbilitySpec.IsActive() && (AbilitySpec.DynamicAbilityTags.HasTagExact(Tag)))
+			if (AbilitySpec.Ability && !AbilitySpec.IsActive() && (AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(Tag)))
 			{
 				TryActivateAbility(AbilitySpec.Handle);
 			}
@@ -60,7 +60,7 @@ UGameplayAbility* UModularAbilitySystemComponent::GetAbility(const FGameplayTag&
 	{
 		for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
 		{
-			if (AbilitySpec.Ability && !AbilitySpec.IsActive() && (AbilitySpec.DynamicAbilityTags.HasTagExact(Tag)))
+			if (AbilitySpec.Ability && !AbilitySpec.IsActive() && (AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(Tag)))
 			{
 				return AbilitySpec.Ability;
 			}
@@ -76,7 +76,7 @@ void UModularAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& 
 	{
 		for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
 		{
-			if (AbilitySpec.Ability && (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag)))
+			if (AbilitySpec.Ability && (AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag)))
 			{
 
 				InputPressedSpecHandles.AddUnique(AbilitySpec.Handle);
@@ -92,7 +92,7 @@ void UModularAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag&
 	{
 		for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
 		{
-			if (AbilitySpec.Ability && AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag))
+			if (AbilitySpec.Ability && AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
 			{
 				InputReleasedSpecHandles.AddUnique(AbilitySpec.Handle);
 				InputHeldSpecHandles.Remove(AbilitySpec.Handle);

@@ -14,7 +14,9 @@ UHDGE_Buff::UHDGE_Buff()
 {
 	DurationPolicy = EGameplayEffectDurationType::Infinite;
 
+	PRAGMA_DISABLE_DEPRECATION_WARNINGS
 	StackingType = EGameplayEffectStackingType::AggregateByTarget;
+	PRAGMA_ENABLE_DEPRECATION_WARNINGS
 	StackDurationRefreshPolicy = EGameplayEffectStackingDurationPolicy::RefreshOnSuccessfulApplication;
 
 	UHDGEComp_Buff* GEComp = CreateDefaultSubobject<UHDGEComp_Buff>(TEXT("HDGEComp_Buff"));
