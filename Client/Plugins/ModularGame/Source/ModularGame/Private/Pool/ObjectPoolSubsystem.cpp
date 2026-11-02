@@ -13,10 +13,6 @@ UObjectPoolSubsystem::UObjectPoolSubsystem()
 {
 }
 
-void UObjectPoolSubsystem::OnWorldBeginPlay(UWorld& InWorld)
-{
-}
-
 void UObjectPoolSubsystem::CreatePool(const FName& PoolName, TSubclassOf<AActor> Actor, int32 Count)
 {
 	CreatePool(PoolName, [Actor](UWorld* World)

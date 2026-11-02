@@ -20,8 +20,6 @@ class MODULARGAME_API UObjectPoolSubsystem : public UWorldSubsystem
 public:
 	UObjectPoolSubsystem();
 
-	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
-
 	UFUNCTION(BlueprintCallable)
 	virtual void CreatePool(const FName& PoolName, TSubclassOf<AActor> Actor, int32 Count);
 
