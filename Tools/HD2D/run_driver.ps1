@@ -1,18 +1,19 @@
-# Launches a map in -game with battle_driver.py and captures the window whenever the driver asks.
+# Launches a map in -game with a driver script (battle_driver.py by default) and captures the window whenever the driver asks.
 # The driver cannot capture UMG itself, so it drops a <tag>.req file into $Out and this script answers with <tag>.png.
 param(
     [Parameter(Mandatory)][string]$Out,
     [Parameter(Mandatory)][string]$Steps,
     [string]$Map = '/Game/Maps/Village/MAP_Village_Day',
     [int]$Timeout = 240,
-    [string]$Cmds = ''
+    [string]$Cmds = '',
+    [string]$Script = 'battle_driver.py'
 )
 $root = Resolve-Path "$PSScriptRoot\..\.."
 New-Item -ItemType Directory -Force $Out | Out-Null
 Remove-Item "$Out\*.req" -ErrorAction SilentlyContinue
 $env:HD2D_STEPS = $Steps
 $env:HD2D_OUT = $Out
-$exec = "py $($PSScriptRoot -replace '\\', '/')/battle_driver.py"
+$exec = "py $($PSScriptRoot -replace '\\', '/')/$Script"
 if ($Cmds) { $exec = "$Cmds,$exec" }
 $p = Start-Process 'C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealEditor.exe' -PassThru -ArgumentList @(
     "$root\Client\ProjectH.uproject", $Map, '-game', '-windowed', '-ResX=1920', '-ResY=1080', '-nosplash', '-nosound', '-unattended',
@@ -35,11 +36,15 @@ public class WD{
 '@
 # Screen coordinates are virtualized for a process that is not DPI aware.
 [void][WD]::SetProcessDPIAware()
-function Click([int]$x, [int]$y) {
+function Focus {
     $p.Refresh(); $h = $p.MainWindowHandle
     # Windows only grants foreground to a process that just received input, hence the Alt tap.
     [WD]::keybd_event(0x12, 0, 0, [UIntPtr]::Zero); [WD]::keybd_event(0x12, 0, 2, [UIntPtr]::Zero)
     [void][WD]::SetForegroundWindow($h)
+    $h
+}
+function Click([int]$x, [int]$y) {
+    $h = Focus
     $pt = New-Object WD+P; $pt.X = $x; $pt.Y = $y; [void][WD]::ClientToScreen($h, [ref]$pt)
     [void][WD]::SetCursorPos($pt.X, $pt.Y); Start-Sleep -Milliseconds 150
     [WD]::mouse_event(1, 1, 0, 0, [UIntPtr]::Zero); Start-Sleep -Milliseconds 150
@@ -57,7 +62,9 @@ function Shot([string]$tag) {
 $sw = [Diagnostics.Stopwatch]::StartNew()
 while (-not $p.HasExited -and $sw.Elapsed.TotalSeconds -lt $Timeout) {
     Get-ChildItem "$Out\*.req" -ErrorAction SilentlyContinue | ForEach-Object {
-        if ($_.BaseName -match '^click_(\d+)_(\d+)$') { Click $Matches[1] $Matches[2] } else { Shot $_.BaseName }
+        if ($_.BaseName -match '^click_(\d+)_(\d+)$') { Click $Matches[1] $Matches[2] }
+        elseif ($_.BaseName -eq 'focus') { [void](Focus) }
+        else { Shot $_.BaseName }
         Remove-Item $_.FullName
     }
     Start-Sleep -Milliseconds 100

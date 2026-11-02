@@ -4,7 +4,7 @@ MAP_Village_Geo is a copy of Asian_Village_Demo without its lights, fog and post
 MAP_Village_Day and MAP_Village_Night hold one preset each and stream Geo in,
 so opening a map picks the time of day and the village exists only once.
 Values shared by every map live in /Game/HD2D: BP_HD2DEnvironment (post process, DoF strength, fog)
-and M_HD2D_SpriteLift (sprite lift). The presets below hold only what differs by time of day.
+and M_HD2D_SpriteLift (sprite lift and backlight). The presets below hold only what differs by time of day.
 
 Run: UnrealEditor-Cmd.exe <uproject> -run=pythonscript -script=<this file> -unattended -nullrhi
 Result lines go to Client/Saved/HD2D_Explore/build.txt.
@@ -57,12 +57,15 @@ FOG = dict(
 PRESETS = {
     '/Game/Maps/Village/MAP_Village_Day': dict(
         sun_rotation=unreal.Rotator(roll=0, pitch=-40, yaw=-50), sun_intensity=6.0,
-        sun_color=unreal.Color(r=255, g=240, b=215), sky_intensity=1.0, fill_lights=[]),
+        sun_color=unreal.Color(r=255, g=240, b=215), sky_intensity=1.0, fill_lights=[], character_light=None),
     # Lantern pools around the start; they skip volumetric scattering, which drew them as floating orbs.
     '/Game/Maps/Village/MAP_Village_Night': dict(
         sun_rotation=unreal.Rotator(roll=0, pitch=-35, yaw=-50), sun_intensity=0.8,
         sun_color=unreal.Color(r=120, g=160, b=255), sky_intensity=0.15,
-        fill_lights=[unreal.Vector(SPAWN.x - 350, SPAWN.y + 350, 1300), unreal.Vector(SPAWN.x + 350, SPAWN.y + 350, 1300)]),
+        fill_lights=[unreal.Vector(SPAWN.x - 350, SPAWN.y + 350, 1300), unreal.Vector(SPAWN.x + 350, SPAWN.y + 350, 1300)],
+        # Lights only lighting channel 1, which only the character sprites join, so they stay readable outside the lanterns.
+        # It shines from the camera side (the camera looks down -Y) and 39 degrees above.
+        character_light=dict(rotation=unreal.Rotator(roll=0, pitch=-39, yaw=-90), intensity=3.0, color=unreal.Color(r=170, g=195, b=255))),
 }
 
 
@@ -99,6 +102,7 @@ def set_camera_focus(camera, distance):
 
 def build_sprite_material():
     # A masked lit sprite whose emissive adds a fraction of the art, so a sprite in shadow keeps its colors.
+    # Two Sided Foliage lets a sun behind the sprite through as Subsurface, so a backlit sprite does not turn muddy.
     mel = unreal.MaterialEditingLibrary
     if EAL.does_asset_exist(SPRITE_MATERIAL):
         mat = unreal.load_asset(SPRITE_MATERIAL)
@@ -120,11 +124,19 @@ def build_sprite_material():
     emissive = mel.create_material_expression(mat, unreal.MaterialExpressionMultiply)
     mel.connect_material_expressions(color, '', emissive, 'A')
     mel.connect_material_expressions(lift, '', emissive, 'B')
+    mat.set_editor_property('shading_model', unreal.MaterialShadingModel.MSM_TWO_SIDED_FOLIAGE)
+    transmission = mel.create_material_expression(mat, unreal.MaterialExpressionScalarParameter)
+    transmission.set_editor_property('parameter_name', 'Transmission')
+    transmission.set_editor_property('default_value', 0.8)
+    subsurface = mel.create_material_expression(mat, unreal.MaterialExpressionMultiply)
+    mel.connect_material_expressions(color, '', subsurface, 'A')
+    mel.connect_material_expressions(transmission, '', subsurface, 'B')
     mask = mel.create_material_expression(mat, unreal.MaterialExpressionMultiply)
     mel.connect_material_expressions(tex, 'A', mask, 'A')
     mel.connect_material_expressions(vertex, 'A', mask, 'B')
     mel.connect_material_property(color, '', unreal.MaterialProperty.MP_BASE_COLOR)
     mel.connect_material_property(emissive, '', unreal.MaterialProperty.MP_EMISSIVE_COLOR)
+    mel.connect_material_property(subsurface, '', unreal.MaterialProperty.MP_SUBSURFACE_COLOR)
     mel.connect_material_property(mask, '', unreal.MaterialProperty.MP_OPACITY_MASK)
     mel.recompile_material(mat)
     print('sprite material saved', EAL.save_loaded_asset(mat, False))
@@ -140,6 +152,8 @@ def set_sprite_material(paths):
             o = lib.get_object(lib.get_data(h))
             if isinstance(o, unreal.PaperFlipbookComponent):
                 o.set_material(0, material)
+                # Channel 1 is for character_light; maps without one light the sprite through channel 0 as before.
+                o.set_editor_property('lighting_channels', unreal.LightingChannels(channel0=True, channel1=True, channel2=False))
         print(path, 'saved', EAL.save_loaded_asset(bp, False))
 
 
@@ -232,6 +246,18 @@ def add_environment(world, preset, anchor):
     c.set_editor_property('light_color', unreal.Color(r=255, g=251, b=223))
 
     ACT.spawn_actor_from_class(unreal.load_asset(ENVIRONMENT).generated_class(), anchor)
+
+    character = preset['character_light']
+    if character:
+        light = ACT.spawn_actor_from_class(unreal.DirectionalLight, anchor, character['rotation'])
+        c = light.get_component_by_class(unreal.DirectionalLightComponent)
+        c.set_editor_property('mobility', unreal.ComponentMobility.MOVABLE)
+        c.set_editor_property('intensity', character['intensity'])
+        c.set_editor_property('light_color', character['color'])
+        c.set_editor_property('cast_shadows', False)
+        c.set_editor_property('atmosphere_sun_light', False)
+        c.set_editor_property('volumetric_scattering_intensity', 0.0)
+        c.set_editor_property('lighting_channels', unreal.LightingChannels(channel0=False, channel1=True, channel2=False))
 
     for location in preset['fill_lights']:
         light = ACT.spawn_actor_from_class(unreal.PointLight, location)
