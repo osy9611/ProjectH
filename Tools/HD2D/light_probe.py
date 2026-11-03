@@ -7,7 +7,7 @@ Each segment logs "[Driver] seg <name> <first tick> <last tick>"; ticks count fr
 which is also the frame the CSV profile started, so perf_segments.py can slice the CSV by them.
 Shots go through <tag>.req files that run_driver.ps1 answers. Nothing here is saved to an asset.
 """
-import json, os, unreal
+import json, math, os, unreal
 
 SPEC = json.loads(os.environ['HD2D_PROBE'])
 LAB = '/Game/HD2D/Lab/'
@@ -106,6 +106,59 @@ class Scene:
             self.sprite.set_lighting_channels(True, True, False)
         c.set_visibility(True)
 
+    def arrange_normal_test(self):
+        # The two lab sprites stand on the ground around SPEC['row'], the hero is hidden, and a camera at the art spec's
+        # distance (1500, pitch -18, FOV 35) frames them so one texel covers about 9 screen pixels.
+        cx, cy = SPEC['row']
+        self.sprite.set_visibility(False)
+        rotation = self.sprite.get_world_rotation()
+        self.lab_sprites = {}
+        for pose, dx in (('Front', -SPEC.get('gap', 70)), ('3Q', SPEC.get('gap', 70))):
+            actor = unreal.GameplayStatics.get_all_actors_with_tag(self.w, 'LabSprite' + pose)[0]
+            hit = unreal.SystemLibrary.line_trace_single(self.w, unreal.Vector(cx + dx, cy, 5000), unreal.Vector(cx + dx, cy, -5000),
+                                                         unreal.TraceTypeQuery.TRACE_TYPE_QUERY1, False, [self.pawn, actor],
+                                                         unreal.DrawDebugTrace.NONE, True)
+            ground = hit.to_tuple()[4].z if hit else 0
+            actor.set_actor_location_and_rotation(unreal.Vector(cx + dx, cy, ground), rotation, False, True)
+            actor.set_actor_scale3d(unreal.Vector(1, 1, 1.0515))
+            self.lab_sprites[pose] = actor.get_component_by_class(unreal.PaperSpriteComponent)
+            self.ground = ground
+        camera = unreal.GameplayStatics.get_all_actors_with_tag(self.w, 'LabCamera')[0]
+        d, pitch = SPEC.get('distance', 1500.0), 18.0
+        focus = unreal.Vector(cx, cy, self.ground + 88)
+        camera.set_actor_location_and_rotation(
+            focus + unreal.Vector(0, d * math.cos(math.radians(pitch)), d * math.sin(math.radians(pitch))),
+            unreal.Rotator(roll=0, pitch=-pitch, yaw=-90), False, True)
+        unreal.GameplayStatics.get_player_controller(self.w, 0).set_view_target_with_blend(camera, 0)
+        log('normal test ground', self.ground, 'rotation', rotation)
+
+    def normal_variant(self, suffix, material, **params):
+        for pose, c in self.lab_sprites.items():
+            c.set_sprite(unreal.load_asset(LAB + 'Normal/S_' + pose + suffix))
+            c.set_material(0, unreal.load_asset(material))
+            if params:
+                mid = c.create_dynamic_material_instance(0)
+                for k, v in params.items():
+                    mid.set_scalar_parameter_value(k, v)
+
+
+def normal_params():
+    return dict(NormalStrength=SPEC.get('normal_strength', 1.0), FlipY=SPEC.get('flip_y', 1.0))
+
+
+def probe_light(s):
+    # A plain point light around the row, to check which side each normal source lights.
+    s.light = unreal.GameplayStatics.get_all_actors_with_tag(s.w, 'LabCompanion')[0]
+    ox, oy, oz = SPEC.get('probe_offset', [-200, 100, 90])
+    s.light.set_actor_location(unreal.Vector(SPEC['row'][0] + ox, SPEC['row'][1] + oy, s.ground + oz), False, True)
+    c = s.light.point_light_component
+    c.set_intensity(SPEC.get('probe_cd', 200.0))
+    c.set_attenuation_radius(700.0)
+    c.set_light_color(unreal.LinearColor(1, 1, 1, 1))
+    c.set_lighting_channels(True, False, False)
+    c.set_visibility(True)
+
+
 def rim(s):
     mid = s.material_copy('M_Lab_Rim')
     forward = unreal.MathLibrary.get_forward_vector(s.sun.get_owner().get_actor_rotation())
@@ -144,12 +197,17 @@ VARIANTS = dict(
     no_character_light=lambda s: s.character_light.set_visibility(False),
     no_foliage=lambda s: s.sprite.create_dynamic_material_instance(0, s.material).set_scalar_parameter_value('Transmission', 0.0),
     no_lumen=lambda s: s.post(dynamic_global_illumination_method=unreal.DynamicGlobalIlluminationMethod.NONE),
+    # Normal-map test (needs "row"): A shared material, B alpha-edge normal, C PixelLab map as BC5 or uncompressed.
+    A=lambda s: s.normal_variant('', '/Game/HD2D/M_HD2D_SpriteLift'),
+    B=lambda s: s.normal_variant('', LAB + 'M_Lab_NormalEdge', EdgeWidth=SPEC.get('edge_width', 18.0), **normal_params()),
+    C=lambda s: s.normal_variant('_N', LAB + 'M_Lab_NormalMap', **normal_params()),
+    Craw=lambda s: s.normal_variant('_NRaw', LAB + 'M_Lab_NormalMapRaw', **normal_params()),
     sun_priority=lambda s: s.sun.set_editor_property('forward_shading_priority', 1),
     no_lumen_sky_lower=lambda s: (VARIANTS['no_lumen'](s), sky_lower(s)),
 )
 
 # Candidates that read another candidate's SPEC value.
-PARAM = dict(channel='companion')
+PARAM = dict(channel='companion', B='normal_strength', C='normal_strength', Craw='normal_strength')
 
 # (seconds after ready, action, argument), built once the scene is ready.
 plan, ticks, clock, scene = [], 0, 0.0, None
@@ -189,6 +247,8 @@ def tick(dt):
         if SPEC.get('sun'):
             scene.sun.get_owner().set_actor_rotation(unreal.Rotator(roll=0, pitch=SPEC['sun'][0], yaw=SPEC['sun'][1]), True)
         scene.pawn.set_actor_location(unreal.Vector(*SPEC['loc']), False, True)
+        if SPEC.get('row'):
+            scene.arrange_normal_test()
         log('ready tick', ticks, 'pawn', scene.pawn.get_actor_location(), 'material', scene.material.get_path_name())
         for a in unreal.GameplayStatics.get_all_actors_of_class(w, unreal.Actor):
             if a.get_class().get_name() == 'BP_NPC_C':
@@ -206,6 +266,8 @@ def tick(dt):
                 if value:
                     SPEC[PARAM.get(name, name)] = float(value)
                 VARIANTS[name](scene)
+                if SPEC.get('probe'):
+                    probe_light(scene)
                 log('apply', arg, 'tick', ticks)
             elif action == 'move':
                 scene.pawn.set_actor_location(unreal.Vector(*arg), False, True)
