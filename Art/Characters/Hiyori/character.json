@@ -1,0 +1,26 @@
+{
+ "name": "Hiyori",
+ "role": "hero",
+ "anims": [
+  "Idle"
+ ],
+ "notes": [
+  "탐험 스프라이트에는 손에 든 새장을 넣지 않는다. 새장은 전투 모션에 쓰려고 따로 둔다(2026-11-08 사용자 결정). 허리의 새장 틀은 유지한다.",
+  "디자인 기준: references/lumi_concept 설정화, references/hiyori/Concept.png",
+  "망토는 어깨에서 내려오는 구조다(루미 설정화 아래 줄). 치마는 짧고 다리가 보인다. 측면은 트윈테일이 등을 덮어 망토가 대부분 허리 아래에서 보인다."
+ ],
+ "status": {
+  "FR": "확정 (2026-11-09)",
+  "LS": "확정 (2026-11-09)",
+  "BK": "확정 (2026-11-09)"
+ },
+ "lineage": [
+  "pixellab/character_v3s: 그림체 기준(v3, 크기 52, 파일럿 형식 설명)",
+  "pixellab/character_proSS: 최종 생성(pro, 크기 52, style=character_v3s, concept=Concept.png 정면) -> fit_to_cell.py",
+  "recolor_outline.py -> 눈 인페인트(eye_inpaint, 미채택) -> apply_eyes.py(before_eye_inpaint 기준)",
+  "등불 제거(inpaint, FR·LS) -> 손 다시 그리기(inpaint) -> mirror_arm.py(FR) -> merge_colors.py",
+  "clean_bodice.py(FR) -> tails.py(FR·LS·BK) -> recolor_outline.py --ring",
+  "망토(inpaint, LS 2회·BK 1회) -> fix_dots.py(LS 구멍, BK 목 뒤 칼라) -> merge_colors.py",
+  "pixellab/before_*: 각 단계 직전 상태. 그 밖의 character_*는 시험 결과(채택 안 함)"
+ ]
+}
