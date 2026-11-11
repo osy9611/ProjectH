@@ -26,8 +26,8 @@ CAMERA_X = 14110.0
 # Shot name -> sprites as (x, type, direction). The stone path only spans about x 13834-14351 on this row
 # (grass, which has no collision, hides feet outside it), so both shots share it and the driver shows one set at a time.
 SHOTS = {
-    # Drawn characters stand beside the current hero for scale.
-    'chars': [(14235, 'Hiyori', 'FR')],
+    # Drawn characters stand beside the current hero for scale: (x, '<Name>', 'FR') per character under Art/Characters.
+    'chars': [],
 }
 
 EAL = unreal.EditorAssetLibrary
