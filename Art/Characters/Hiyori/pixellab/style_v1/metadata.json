@@ -1,0 +1,36 @@
+{
+  "group_id": "586ee486-ee0a-4ae9-aa09-4aacb67f1c50",
+  "states": [
+    {
+      "character": {
+        "id": "6a0a72db-905d-4c18-8817-0e8218682805",
+        "name": "Idle",
+        "prompt": "HD-2D JRPG pixel sprite of a slender teenage girl, about 48 pixels tall, about 3.3 heads tall. Very long light ash-beige twin tails that turn soft pink at the tips, reaching her knees. White wing-shaped hair ornaments with pink scalloped edges on both sides of the head, one large white and pink lily on the head. Pink eyes. White frilly long-sleeved dress with wide layered ruffled cuffs, short flared white skirt with a scalloped hem and a few small pink star dots, a cluster of white-pink flowers at the waist, white stockings. Selective dark outline, 2-3 tone shading, light from the top front, limited palette, no pure black.",
+        "size": {
+          "width": 52,
+          "height": 52
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-11-11T12:02:19.144122+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-11-11T12:04:57.672134"
+}

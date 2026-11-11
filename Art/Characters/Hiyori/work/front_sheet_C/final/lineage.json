@@ -1,0 +1,73 @@
+{
+ "tool": "Tools/HD2D/art/cleanup.py",
+ "date": "2026-11-11T23:06:13",
+ "inputs": {
+  "Hiyori_Idle_FR.png": {
+   "path": "D:\\Study\\Unreal\\ProjectH\\.claude\\worktrees\\art-sprite-pipeline-7a8f85\\Art\\Characters\\Hiyori\\work\\front_sheet_C\\eyes\\Hiyori_Idle_FR.png",
+   "sha1": "6f2da4b78b505c76815c737dde3a306537aa6fc2"
+  }
+ },
+ "options": {
+  "role": "hero",
+  "colors": 40,
+  "protect": [
+   [
+    62,
+    26,
+    51
+   ],
+   [
+    154,
+    140,
+    163
+   ],
+   [
+    178,
+    56,
+    110
+   ],
+   [
+    240,
+    140,
+    184
+   ],
+   [
+    244,
+    238,
+    244
+   ]
+  ]
+ },
+ "steps": [
+  {
+   "step": "01_fit",
+   "cell": [
+    64,
+    80
+   ],
+   "sole_row": 75
+  },
+  {
+   "step": "02_clean",
+   "per_image": {
+    "Hiyori_Idle_FR.png": {
+     "lone_removed": 0,
+     "near_black_recoloured": 3
+    }
+   }
+  },
+  {
+   "step": "03_selout",
+   "per_image": {
+    "Hiyori_Idle_FR.png": {
+     "outline_dots": 244
+    }
+   }
+  },
+  {
+   "step": "04_palette",
+   "colours_before": 199,
+   "colours_after": 40
+  }
+ ]
+}
