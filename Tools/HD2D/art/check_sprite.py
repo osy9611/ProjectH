@@ -1,6 +1,6 @@
 """Checks character sprite folders against the production spec (spec.py, Docs/HD2D/character-sprite-spec.md).
 
-A character folder holds character.json ({"name", "role": hero|npc, optional "anims", "mirror_exception"})
+A character folder holds character.json ({"name", "role": hero|npc, optional "anims"})
 and one horizontal strip per animation and direction: <name>_<Anim>_<Dir>.png, cells of spec.CELL_W x spec.CELL_H.
 
 Run: python check_sprite.py <character folder or a folder of them> [--sheet out.png]
@@ -53,12 +53,24 @@ def check_frame(rep, where, f, anim, view):
         ys, xs = np.where(lone)
         rep.err(where, '외톨이 픽셀 %d개, 첫 위치 (%d,%d)' % (len(ys), xs[0], ys[0]))
     edge = a & ~(p[:-2, 1:-1] & p[2:, 1:-1] & p[1:-1, :-2] & p[1:-1, 2:])
+    inner = a & ~edge
     lum = spec.luma(*[f[..., i].astype(float) for i in range(3)])
-    ring = lum[edge]
-    ratio = ((ring <= spec.OUTLINE_LUMA_MAX) & (ring >= spec.OUTLINE_LUMA_MIN)).mean()
-    if ratio < spec.OUTLINE_RATIO_MIN:
-        rep.err(where, '외곽선 조건(밝기 %d~%d) 충족 %.0f%% < %.0f%%' % (spec.OUTLINE_LUMA_MIN, spec.OUTLINE_LUMA_MAX, ratio * 100, spec.OUTLINE_RATIO_MIN * 100))
-    # Only standing frames: a walking foot lifts off and shifts the centre on purpose.
+    H, W = a.shape
+    dark = black = total = 0
+    for y, x in zip(*np.where(edge)):
+        nb = [lum[yy, xx] for yy in (y - 1, y, y + 1) for xx in (x - 1, x, x + 1)
+              if 0 <= yy < H and 0 <= xx < W and inner[yy, xx]]
+        if not nb:
+            continue
+        total += 1
+        dark += lum[y, x] <= spec.OUTLINE_RATIO_MAX * np.median(nb)
+        black += lum[y, x] < spec.OUTLINE_BLACK_LUMA
+    if total:
+        share = dark / total
+        if not spec.OUTLINE_DARK_MIN <= share <= spec.OUTLINE_DARK_MAX:
+            rep.err(where, '어두운 가장자리 %.0f%%, 선택적 유색 외곽선 기준 %.0f~%.0f%%' % (share * 100, spec.OUTLINE_DARK_MIN * 100, spec.OUTLINE_DARK_MAX * 100))
+        if black:
+            rep.err(where, '검은 외곽선 도트 %d개(루마 %d 미만)' % (black, spec.OUTLINE_BLACK_LUMA))
     bright = (lum[a] > spec.TONE_LUMA_MAX).mean()
     if bright > spec.BRIGHT_RATIO_MAX:
         rep.err(where, '밝기 %d 초과 픽셀 %.1f%% > %.0f%% (낮 장면에서 하얗게 날아감)' % (spec.TONE_LUMA_MAX, bright * 100, spec.BRIGHT_RATIO_MAX * 100))
@@ -84,7 +96,7 @@ def check_character(folder, rep):
     anims = meta.get('anims', list(want))
     for missing in set(want) - set(anims):
         rep.warn(name, '%s 애니메이션은 이 캐릭터의 범위에서 제외됨(character.json anims)' % missing)
-    views = list(spec.DIRECTIONS) + (['RS'] if meta.get('mirror_exception') else [])
+    views = list(spec.DIRECTIONS)
     palette = set()
     strips = []
     for anim in anims:

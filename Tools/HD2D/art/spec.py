@@ -22,9 +22,11 @@ PIXELS_PER_UNREAL_UNIT = 1 / UU_PER_DOT  # Paper2D sprite setting, 0.3383
 CELL_W, CELL_H = 64, 80
 PIVOT = (32, 76)  # texture pixels; soles end on row 75, rows 76-79 stay empty
 SOLE_ROW = PIVOT[1] - 1
-# Directions drawn per animation. RS is LS mirrored at runtime; a character listed in mirror_exceptions draws RS too.
-DIRECTIONS = ('FR', 'BK', 'LS')
-OPTIONAL_DIRECTIONS = ('RS',)
+# Directions drawn per animation, 8 in all (2026-11-09). Every direction is drawn, none mirrored: characters are
+# asymmetric (a flower on one side, a cage frame on one hip), so a mirrored right side would swap them.
+# FR front, FLS front-left, LS left, BLS back-left, BK back, BRS back-right, RS right, FRS front-right.
+DIRECTIONS = ('FR', 'FLS', 'LS', 'BLS', 'BK', 'BRS', 'RS', 'FRS')
+OPTIONAL_DIRECTIONS = ()
 
 # Field animations by role: frames per direction and playback fps.
 ROLES = {
@@ -32,10 +34,13 @@ ROLES = {
     'npc': dict(colors=24, anims={'Idle': (2, 3), 'Walk': (4, 8)}),
 }
 
-# Outline: the silhouette ring is dark but not black, Rec.601 luma in 0..255.
-OUTLINE_LUMA_MAX = 80
-OUTLINE_LUMA_MIN = 8
-OUTLINE_RATIO_MIN = 0.95
+# Outline: selective and coloured, as measured on the FFBE map sprites, BEFORE side of the Resonance promo pairs (2026-11-09). An edge dot is "dark" when
+# its luma is at most OUTLINE_RATIO_MAX of the median of its inner neighbours. They have 55-78% dark edge
+# dots (the lit side stays light) and no black edge dots.
+OUTLINE_RATIO_MAX = 0.75
+OUTLINE_DARK_MIN = 0.55
+OUTLINE_DARK_MAX = 0.85
+OUTLINE_BLACK_LUMA = 12
 
 
 # Day exposure plus sprite Lift maps a source luma of about 190 to 233 and clips from about 210 (MAP_Village_Day capture).

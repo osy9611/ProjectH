@@ -68,7 +68,7 @@ def ring(a):
     p = np.pad(solid, 1)
     edge = solid & ~(p[:-2, 1:-1] & p[2:, 1:-1] & p[1:-1, :-2] & p[1:-1, 2:])
     recoloured = added = 0
-    for y, x in zip(*np.where(edge & (lum > spec.OUTLINE_LUMA_MAX))):
+    for y, x in zip(*np.where(edge & (lum > 80))):
         if sizes[lab[y, x] - 1] > SMALL_PIECE:
             a[y, x, :3] = OUTLINES[family(a[y, x, :3])]
             recoloured += 1
