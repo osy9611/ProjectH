@@ -107,6 +107,43 @@ def fina(a):
     return out
 
 
+# Stage 3 (2026-11-11): face structure from Ayaka (FFBE, measured only; brief.md "얼굴 레퍼런스").
+# Ayaka: eyes touch the side locks on both sides with 3 skin dots between them; the inner dot of the eye's middle
+# row is a dark pupil and only the bottom row carries the light iris; the skin is lightest in the middle and steps
+# to a shade at the sides and a warm dark at the chin corners. D4 had a flat skin block one column too wide on the
+# right (eyes off centre). Rows and columns below are D4's.
+LIGHT = (0xe2, 0xc8, 0xbe)       # luma 207, under the 210 rule
+SHADE = (0xd8, 0xbf, 0xb6)
+WARM = (0xc8, 0x9a, 0x94)
+CHIN_DARK = (0xa0, 0x6a, 0x6e)
+PUPIL = (0x5e, 0x22, 0x44)       # Ayaka uses her lash colour; a dark berry keeps a pink hint
+SIDE_LOCK = (0x86, 0x6e, 0x71)
+JAW = (0x74, 0x5b, 0x63)
+FACE_COLOURS = (LIGHT, SHADE, WARM, CHIN_DARK, PUPIL)
+L, S, W, D, B = LIGHT, SHADE, WARM, CHIN_DARK, BLUSH
+AYAKA_ROWS = {                   # row: colours for columns 28..34 (None = keep)
+    35: (None, None, S, S, S, None, None),
+    36: (None, PUPIL, S, S, S, PUPIL, None),
+    37: (None, None, L, L, L, None, None),
+    38: (B, L, L, L, L, L, B),
+    39: (S, L, L, L, L, L, S),
+    40: (W, S, L, L, L, S, W),
+    41: (JAW, W, S, S, S, W, JAW),
+    42: (None, None, D, S, D, None, None),
+}
+
+
+def ayaka(a):
+    out = a.copy()
+    for y, row in AYAKA_ROWS.items():
+        for i, c in enumerate(row):
+            if c is not None:
+                out[y, 28 + i] = (*c, 255)
+    for y in range(35, 42):          # right side lock moves in one column so the face is symmetric
+        out[y, 35] = (*SIDE_LOCK, 255)
+    return out
+
+
 if __name__ == '__main__':
     import argparse, os
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../../Tools/HD2D/art'))
@@ -115,6 +152,16 @@ if __name__ == '__main__':
     p.add_argument('src')
     p.add_argument('dst')
     p.add_argument('--fina', action='store_true', help='stage 2: raise the eyes and deepen the shade steps')
+    p.add_argument('--ayaka', action='store_true', help='stage 3: Ayaka face structure, then back to the palette limit')
     o = p.parse_args()
     a = np.array(Image.open(o.src).convert('RGBA'))
-    Image.fromarray(fina(a) if o.fina else polish(a), 'RGBA').save(o.dst)
+    if o.ayaka:
+        import eyes
+        from merge_colors import merge
+        b = ayaka(a)
+        keep = set(eyes.COLOURS) | set(FACE_COLOURS) | {BLUSH, SIDE_LOCK, JAW}
+        (b,), before, after = merge([b], spec.ROLES['hero']['colors'], keep)
+        print('colours %d -> %d' % (before, after))
+    else:
+        b = fina(a) if o.fina else polish(a)
+    Image.fromarray(b, 'RGBA').save(o.dst)
