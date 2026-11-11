@@ -1,0 +1,36 @@
+{
+  "group_id": "a21d1fac-b76a-47c4-9d28-2686de0f910f",
+  "states": [
+    {
+      "character": {
+        "id": "7a64a207-228d-4348-800a-bf4ce586d4e8",
+        "name": "Idle",
+        "prompt": "Teen girl map sprite, front view, standing straight and symmetric. Exact pixel proportions: total height 50 px; head from hair top to chin 15 px (about 3.3 heads tall); body from chin to skirt hem 17 px; bare legs below the skirt 18 px (legs are 36% of the height, long and slim, short skirt). Face 7 px wide between the side locks; straight blunt bangs ending on the eyelash row; eyes 2 px wide and 3 px tall (top row dark lash, middle row grey outer and dark pupil inner, bottom row white glint outer and light pink iris inner), 3 px apart; 7 px from eye top to chin; one pink blush pixel under each eye. Neck 3 px wide with one shadow row under the chin, high white collar one row below the chin. Twin tails ash-beige, fading to pastel mint, sky and lemon then pink tips, hanging straight down close to the body, sprite width at most 0.78 of the height. White ribbon wings with pink trim on both sides of the head, pink lily on top of the head on the right. Wide white bell sleeves, small hands at the cuffs. Clean white dress with two shading steps of soft lavender, few inner lines. Three 3x3 white-pink flowers diagonally across the waist. Scalloped skirt hem with three 1 px pink stars. Dark grey birdcage crinoline: 1 px vertical bars every 2 px just under the hem. Legs 4 px wide each: white thigh-high stockings with a lavender inner edge, a pink garter flower on the right thigh. Shoes 5 px wide, wider than the legs, white with a pink strap, darker sole row. Dark plum outline, never black; inner lines one step lighter. No cape, no held items, no flames.",
+        "size": {
+          "width": 52,
+          "height": 52
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-11-11T15:06:20.899526+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-11-11T15:08:30.653903"
+}
