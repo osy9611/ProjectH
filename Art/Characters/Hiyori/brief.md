@@ -316,7 +316,24 @@ master_v1·v8(첨부본)·D·M·Fina의 행을 읽어 비교(±1행): 머리는 
 
 - 0.5는 Fina 최대 폭(0.56)과 같고 머리 폭이 가장 넓은 구간이 된다
 - 결과: `work/front_master_narrow_0.65/`, `work/front_master_narrow_0.5/`
-- 결정: (대기)
+- 결정: 0.5(사용자, 2026-11-12) → `master/south_master.png` (정면 승인 ②)
+
+### 2026-11-12 8방향 (master_v1 흐름: 첫 프레임 회전)
+
+- `create_character_pro_flash`, first_frame = `master/south_master.png`(64×80), 1생성 → `hiyori2_master_v1`(7875da78), 원본 `pixellab/master_v1_rot/`
+- 남쪽은 80×80 캔버스 8~71열에 마스터와 픽셀 단위로 같음(확인)
+- 문제 2개: (1) 사선·측면 다섯 방향 머리 위에 분홍 고리 덩어리(93~127도트, 몸과 떨어짐) (2) 동·서 뒤바뀜: 백합(캐릭터 왼쪽)이 서쪽에 보임. master_v1 때와 같은 현상
+- `finalize_rot.py`: 떨어진 덩어리 삭제 → 동 = 서 좌우반전, 서 = 동 좌우반전 → 64×80 셀(발바닥 75행) → 루마 208 위 비례 축소 → 8방향 공용 40색(정면 색 보호, 93→40) → `rot8/Hiyori_Idle_<FR|FLS|LS|BLS|BK|BRS|RS|FRS>.png`. 방향 이름은 화면 기준(LS = 화면 왼쪽을 봄 = west)
+
+| 방향 | FR | FLS | LS | BLS | BK | BRS | RS | FRS |
+|---|---|---|---|---|---|---|---|---|
+| 키 | 50 | 50 | 51 | 50 | 49 | 51 | 50 | 50 |
+| 폭/키 | 0.56 | 0.52 | 0.39 | 0.46 | 0.57 | 0.47 | 0.40 | 0.52 |
+
+- 키 차 2 이내, 실루엣 검사 8방향 오류 0, 밝기 0~0.4%, FR은 마스터와 같음
+- 규격과 다른 점: 규격 3절은 "반전은 쓰지 않는다"(빛이 왼쪽 위에서 오므로). LS·RS는 생성 결과를 반전해서 빛 방향이 반대다. 그대로 쓸지, LS·RS만 편집으로 다시 그릴지 결정 필요
+- 리뷰 보드: `review/Hiyori_rot8_v1.png`
+- 결정: (8방향 승인 ③ 대기)
 
 ## PixelLab 기록
 
@@ -332,3 +349,4 @@ master_v1·v8(첨부본)·D·M·Fina의 행을 읽어 비교(±1행): 머리는 
 | (edit_image job cdb12a10-f89b-4e8a-afa7-4bdd9bdf42b0) | 편집 참조 G | 64×80 | 입력 D6, 참조 E, seed 7(10생성) |
 | (edit_image job d0bded34-a751-4830-b3ab-5ee4aa960298) | 편집 참조 H | 64×80 | 입력 블록아웃, 참조 E, seed 7(10생성) |
 | 7a64a207-228d-4348-800a-bf4ce586d4e8 | hiyori2_detail_J | 52 | 요소별 기준 긴 설명 대조(pro, 10생성) |
+| 7875da78-f7f2-40d4-8f99-1fbe906623ab | hiyori2_master_v1 | 80×80 | 정면 마스터 첫 프레임 회전(pro_flash, 1생성) |
