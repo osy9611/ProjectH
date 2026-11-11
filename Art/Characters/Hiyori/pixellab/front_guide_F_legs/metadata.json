@@ -1,0 +1,36 @@
+{
+  "group_id": "891add6f-0e9b-4091-9f04-55b98f0f7551",
+  "states": [
+    {
+      "character": {
+        "id": "3f968094-a077-4fd7-9901-58c4f1939c8c",
+        "name": "Idle",
+        "prompt": "chibi proportions: large head, short torso and short skirt, long slim legs. teen girl, long ash-beige twin tails hanging straight down close to the body ending above the knees, fading to pastel rainbow then pink tips, white ribbon wing ornaments with pink trim on both sides of head, pink lily on top of head, clean white high-collar long-sleeve dress with soft lavender shading, band of white and pink lily flowers diagonally around the waist, short white scalloped skirt with pink stars, dark grey birdcage crinoline frame under the skirt hem, white thigh-high stockings, white shoes, pink eyes. no cape, no held items, no flames",
+        "size": {
+          "width": 52,
+          "height": 52
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-11-11T14:32:20.518477+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-11-11T14:34:26.307869"
+}

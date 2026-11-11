@@ -1,0 +1,36 @@
+{
+  "group_id": "ffa54437-c479-4f2f-a89f-961a46d9f9d8",
+  "states": [
+    {
+      "character": {
+        "id": "6cac0597-a3af-471c-a84b-55fe35b434b5",
+        "name": "Idle",
+        "prompt": "teen girl with a compact silhouette, long ash-beige twin tails hanging straight down close to the body, fading to pastel rainbow then pink tips, white ribbon wing ornaments with pink trim on both sides of head, pink lily on top of head, clean white high-collar long-sleeve dress with soft lavender shading and few dark lines, two thin pink ribbons on chest, band of white and pink lily flowers diagonally around the waist, white scalloped skirt with pink stars, dark grey birdcage crinoline frame showing under the skirt hem, white thigh-high stockings, white shoes, pink eyes. no cape, no held items, no flames",
+        "size": {
+          "width": 52,
+          "height": 52
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-11-11T14:32:19.498179+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-11-11T14:34:23.654069"
+}
