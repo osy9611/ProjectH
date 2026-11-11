@@ -1,0 +1,36 @@
+{
+  "group_id": "c444cff9-e84b-4ea3-818e-bb21348d9010",
+  "states": [
+    {
+      "character": {
+        "id": "42a8f248-5012-40fd-badb-12a9ee11cb88",
+        "name": "Idle",
+        "prompt": "HD-2D JRPG pixel sprite of a slender young woman with the same body proportions as the style character: small head, long legs, about 3 heads tall. Long twin-tail hair hanging close to the body, soft pinkish ash-beige fading to iridescent pastel and pink at the tips, white wing-like ribbon ornaments on both sides of the head and a white-pink lily on top; white high-collar dress with long wide sleeves and two thin pink ribbons on the chest, a band of white and pink lilies diagonally around the waist, layered white scalloped skirt trimmed with pink and small pink four-point stars, a dark grey birdcage crinoline frame showing under the skirt hem; white thigh-high stockings with a small pink garter flower, white shoes. Clear readable eyes: dark upper lash line, rose-pink iris, white highlight. Selective dark plum outline (not black), soft 2-3 step shading lit from top front, limited palette, clean pixel clusters. No cape, nothing held in the hands, no flames.",
+        "size": {
+          "width": 80,
+          "height": 80
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-11-11T15:33:31.864236+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-11-11T15:49:05.391463"
+}
