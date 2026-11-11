@@ -83,11 +83,11 @@ LEG_ROWS = 4
 KEEP_ROWS = range(50, 58)       # waist flower band and skirt stars: never cut
 
 
-def lengthen_legs(a, n=LEG_ROWS):
+def lengthen_legs(a, n=LEG_ROWS, gap=2):
     diff = {y: int(np.abs(a[y].astype(int) - a[y - 1].astype(int)).sum()) for y in range(TORSO_Y0, TORSO_Y1 + 1) if y not in KEEP_ROWS}
     cut = []
     for y in sorted(diff, key=diff.get):
-        if all(abs(y - c) > 2 for c in cut):  # spread the cuts so no shape loses two rows in a row
+        if all(abs(y - c) > gap for c in cut):  # spread the cuts so no shape loses two rows in a row
             cut.append(y)
         if len(cut) == n:
             break
@@ -133,14 +133,45 @@ AYAKA_ROWS = {                   # row: colours for columns 28..34 (None = keep)
 }
 
 
-def ayaka(a):
+PUPIL_DOTS = ((29, 36), (33, 36))
+
+
+def ayaka(a, pupils=True):
     out = a.copy()
     for y, row in AYAKA_ROWS.items():
         for i, c in enumerate(row):
-            if c is not None:
+            if c is not None and (pupils or c != PUPIL):
                 out[y, 28 + i] = (*c, 255)
     for y in range(35, 42):          # right side lock moves in one column so the face is symmetric
         out[y, 35] = (*SIDE_LOCK, 255)
+    return out
+
+
+# Ordered polish (2026-11-11), from D3, in the order agreed for every character:
+#   1 height  (reference: Fina)  keep 50 +-2
+#   2 ratio   (Fina)  legs below the skirt 12 -> 18 rows; Fina's body:legs 17:18 is the closest to the concept (235:265)
+#   3 face    (Ayaka) chin->eye 7 (Fina's value; Ayaka's 17-dot head is not taken), symmetric 7-column face, skin steps
+#   4 eyes    (Ayaka) dark pupil on the inner dot of the middle row
+#   5 value   shade steps pushed apart (lights and outlines untouched)
+#   6 palette back to the role's colour count, eye and face colours protected
+HEIGHT_TARGET, HEIGHT_TOL = 50, 2
+LEGS_NOW, LEGS_TARGET = 12, 18
+
+
+def ordered(a):
+    import eyes
+    from merge_colors import merge
+    ys = np.nonzero(a[..., 3])[0]
+    h = ys.max() - ys.min() + 1
+    assert abs(h - HEIGHT_TARGET) <= HEIGHT_TOL, 'height %d is off the reference' % h            # 1
+    out, cut = lengthen_legs(a, LEGS_TARGET - LEGS_NOW, gap=1)                                       # 2
+    out = ayaka(raise_eyes(out), pupils=False)                                                       # 3
+    for x, y in PUPIL_DOTS:                                                                          # 4
+        out[y, x] = (*PUPIL, 255)
+    keep = tuple(eyes.COLOURS) + FACE_COLOURS + (BLUSH,)
+    out = deepen(out, keep=keep)                                                                     # 5
+    (out,), before, after = merge([out], spec.ROLES['hero']['colors'], set(keep))                   # 6
+    print('height %d, rows moved to the legs %s, colours %d -> %d' % (h, cut, before, after))
     return out
 
 
@@ -153,9 +184,12 @@ if __name__ == '__main__':
     p.add_argument('dst')
     p.add_argument('--fina', action='store_true', help='stage 2: raise the eyes and deepen the shade steps')
     p.add_argument('--ayaka', action='store_true', help='stage 3: Ayaka face structure, then back to the palette limit')
+    p.add_argument('--ordered', action='store_true', help='all steps in the agreed order, from D3')
     o = p.parse_args()
     a = np.array(Image.open(o.src).convert('RGBA'))
-    if o.ayaka:
+    if o.ordered:
+        b = ordered(a)
+    elif o.ayaka:
         import eyes
         from merge_colors import merge
         b = ayaka(a)
